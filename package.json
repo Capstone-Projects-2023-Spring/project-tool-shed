@@ -1,0 +1,21 @@
+{
+  "name": "tool-node",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web": "node index.js",
+    "db": "scripts/run-postgres.sh",
+    "local": "sh -c \"(trap 'kill 0' SIGINT; (npm run db) & (npm run web))\""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nunjucks": "^3.2.3",
+    "pg": "^8.9.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.28.0"
+  }
+}

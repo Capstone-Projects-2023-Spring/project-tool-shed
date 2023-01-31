@@ -3,6 +3,16 @@ const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
 const { Sequelize } = require('sequelize'); // DB connection/migrations
 
+/*
+	index.js
+	Runs the express server
+*/
+
+/*
+	TODO:
+	- code reloading for routes
+*/
+
 // HTTP Server config 
 const settings = {
     port: 5000 // port the webapp listens on
@@ -49,6 +59,13 @@ async function initSequelize() {
 	return s;
 }
 
+function handleError(err, req, res, next) {
+	console.error(err);
+	res.status(500);
+	app.render('error.html', {error: err});
+	next();
+}
+
 async function startServer() {
 	const app = express();
 
@@ -63,6 +80,9 @@ async function startServer() {
 	await sequelize.sync(); // run migrations
 
 	require('./routes.js')(app, models);
+
+	app.use(handleError);
+	app.use(express.static(__dirname + "public"));
 
 	// Starts the web server.
 	await app.listen(settings.port);

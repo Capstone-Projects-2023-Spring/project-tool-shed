@@ -1,3 +1,12 @@
+const asyncHandler = require('express-async-handler');
+
+/*
+	Routes
+	Contains routes.
+
+	If you write a route that's an async function, you need
+	to wrap it with asyncHandler().
+*/
 
 module.exports = (app, models) => {
 	const { ToolType } = models;
@@ -8,15 +17,10 @@ module.exports = (app, models) => {
 		res.render('index.html', {world: 'WORLD'});
 	});
 
-	app.get('/createtype', async (req, res) => {
+	app.get('/createtype', asyncHandler(async (req, res) => {
 		const name = "Drill";
 		let xs = await ToolType.findAll({where: {name}});
-		if (xs.length === 0) {
-			const tt = await ToolType.create({name});
-			xs = [tt];
-		}
-		
-		const ty = xs[0];
+		let ty = xs.length > 0 ? xs[0] : await ToolType.create({name});
 		res.send(`ToolType: ${ty.name} id: ${ty.id}`);
-	});
+	}));
 };

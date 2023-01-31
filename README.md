@@ -50,7 +50,6 @@ This is a purely JavaScript web application project. To run locally, all you nee
 
 ## Collaborators
 
-[//]: # ( readme: collaborators -start )
 <table>
 <tr>
     <td align="center">
@@ -76,18 +75,11 @@ This is a purely JavaScript web application project. To run locally, all you nee
     </td>\
     <td align="center">
         <a href="https://github.com/natesymer">
-            <img src="https://avatars.githubusercontent.com/u/9451941?v=4" width="100;" alt="natesymer"/>
+            <img src="https://avatars.githubusercontent.com/u/889384?v=4" width="100;" alt="natesymer"/>
             <br />
             <sub><b>Nathaniel Symer</b></sub>
         </a>
     </td>
 </tr>
 </table>
-
-[//]: # ( readme: collaborators -end )
-
-## Requirements
-
-All you need is a working docker install and node. You might need the developer libs
-for postgresql, but try running the project first before worring about it.
 

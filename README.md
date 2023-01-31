@@ -72,7 +72,7 @@ This is a purely JavaScript web application project. To run locally, all you nee
             <br />
             <sub><b>Destinee Sheung</b></sub>
         </a>
-    </td>\
+    </td>
     <td align="center">
         <a href="https://github.com/natesymer">
             <img src="https://avatars.githubusercontent.com/u/889384?v=4" width="100;" alt="natesymer"/>

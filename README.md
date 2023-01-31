@@ -67,6 +67,13 @@ This is a purely JavaScript web application project. To run locally, all you nee
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/lokyen">
+            <img src="https://avatars.githubusercontent.com/u/39927582?v=4" width="100;" alt="lokyen"/>
+            <br />
+            <sub><b>Destinee Sheung</b></sub>
+        </a>
+    </td>
+    <td align="center">
         <a href="https://github.com/JustinG512">
             <img src="https://avatars.githubusercontent.com/u/59921901?v=4" width="100;" alt="JustinG512"/>
             <br />
@@ -74,10 +81,10 @@ This is a purely JavaScript web application project. To run locally, all you nee
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/lokyen">
-            <img src="https://avatars.githubusercontent.com/u/39927582?v=4" width="100;" alt="lokyen"/>
+        <a href="https://github.com/zktejaka">
+            <img src="https://avatars.githubusercontent.com/u/45180475?v=4" width="100;" alt="zktejaka"/>
             <br />
-            <sub><b>Destinee Sheung</b></sub>
+            <sub><b>Kat Tejada</b></sub>
         </a>
     </td>
     <td align="center">

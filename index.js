@@ -33,13 +33,23 @@ async function initSequelize() {
 		await client.query(`CREATE DATABASE "${dbSettings.database}";`);
 	} catch (err) {};
 
-	return new Sequelize({
+	let s = new Sequelize({
 		...dbSettings,
 		dialect: 'postgres'
 	});
+
+	try {
+		await s.authenticate();
+	} catch (error) {
+		console.log("Unable to connect to the database: ");
+		console.log(error.message);
+		process.exit(1);
+	}
+
+	return s;
 }
 
-async function main() {
+async function startServer() {
 	const app = express();
 
 	// Configure expressjs to use nunjucks when rendering html.
@@ -52,22 +62,11 @@ async function main() {
 	const models = require('./models.js')(sequelize); 
 	await sequelize.sync(); // run migrations
 
-/*
-	Routes
-	If we start getting enough of these routes, we can
-	figure out a way to split them apart and/or move them to
-	their own file(s).
-*/
-	require('./routes.js')(app);
-	app.get('/', (req, res) => {
-		// render the template at templates/index.html with
-		// the parameters world=WORLD.
-		res.render('index.html', {world: "WORLD"});
-	});
+	require('./routes.js')(app, models);
 
 	// Starts the web server.
 	await app.listen(settings.port);
 	console.log(`tool-node is running on port ${settings.port}`);
 }
 
-main();
+startServer();

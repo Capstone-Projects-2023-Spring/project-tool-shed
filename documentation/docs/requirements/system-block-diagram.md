@@ -6,6 +6,13 @@ sidebar_position: 2
 
 ```mermaid
 graph LR
-  A[Web Browser] --> B[Web Server]
-  B --> C[PostgreSQL Server]
+  subgraph backend [Backend]
+  B[Load Balancer &\nSSL Termination] <-->|HTTP| C[Application Server\nExpress.js]
+  C -->|query| D[(PostgreSQL)]
+  D -->|results| C
+  end
+  subgraph frontend [Frontend]
+  A[Web Browser] <-->|HTTPS| B
+  E[Mobile App] <-->|HTTPS| B
+  end
 ```

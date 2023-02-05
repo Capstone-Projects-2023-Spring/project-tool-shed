@@ -127,8 +127,6 @@ sidebar_position: 4
 
       - From this more detailed listing, users will be shown a pin on a map letting them know the general vicinity of the tool.  
 
- 
-
     - The listings on the initial search menu will provide only necessary information to determine if it may be a good candidate for purchase/rent. 
 
       - In the case of multiple images, a carousel feature will cycle through them. 

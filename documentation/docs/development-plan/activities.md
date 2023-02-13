@@ -4,6 +4,14 @@ sidebar_position: 1
 
 # Activities
 
+## Requirements Gathering
+In order to fulfill the requirements proposed later in this document our team plans to analyze the needs of our stakeholders and work in an Agile process to actualize specific points into our website. Since our stakeholders are very familiar with our project and have worked as stakeholders before on other projects, communication with them has gone extremely well. From talking with stakeholders, we can find the features that are most important to our website and strategize our time for this project. For instance, our stakeholder has expressed that it is a high priority to have a system which recommends tools to users. We will be meeting with our stakeholders weekly to ensure alignment of the project. Our team then started researching what it would take to build out such a system in the scope of the rest of the project. 
+
+Another important part of our requirements' gathering process was whiteboarding and ticketing all our features, components, and tasks so that all group members could be on the same page. We found that using Miro and Jira respectively has been extremely useful in keeping our requirements organized as well as the process of organization bringing to light additional aspects that we need to flesh out. An example of where our group discovered another required element through our organization process was our messaging system. Although we had discussed using a confirmation email to be the communication between users, we concluded that embedding our own messaging system would be feasible and easier in the long run.
+
+Below you can visualize the gathered information that was inspired by our team and stakeholders.  These plans and organization tools will enable our team to stay organized and align with the needs of our stakeholders. 
+
+
 ## Top-Level Design
 1. Create initial UI components for simple navigation through site 
 2. Establish backend communication with UI components 

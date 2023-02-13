@@ -11,6 +11,10 @@ Another important part of our requirements' gathering process was whiteboarding 
 
 Below you can visualize the gathered information that was inspired by our team and stakeholders.  These plans and organization tools will enable our team to stay organized and align with the needs of our stakeholders. 
 
+![Miro Image](/workspaces/project-tool-shed/documentation/static/img/miro1.png "Miro1")
+![Miro Image](documentation/static/img/miro2.png "Miro2")
+![Jira Image](/workspaces/project-tool-shed/documentation/static/img/Jira.png "Jira")
+
 
 ## Top-Level Design
 1. Create initial UI components for simple navigation through site 

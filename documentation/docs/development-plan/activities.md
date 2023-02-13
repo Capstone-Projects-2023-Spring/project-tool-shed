@@ -4,6 +4,22 @@ sidebar_position: 1
 
 # Activities
 
+## Top-Level Design
+1. Create initial UI components for simple navigation through site 
+2. Establish backend communication with UI components 
+3. Implement a user registration and login system 
+4. Develop a tool listing system that allows users to post tools they would like to rent or sell 
+5. Develop a tool management system for editing and removing current user listings 
+6. Create a page that shows tool listings within a certain distance relative to the user 
+7. Develop a system that allows users to search for tools/specify search criteria 
+8. Develop a way to allow users to be notified when currently unavailable tool becomes available 
+9. Create a transaction system for scheduling a tool to rent or purchasing a tool 
+10. Implement a notification system that notifies a user when their listed tool has been scheduled for rent or purchased 
+11. Establish a communication system between users for transactional purposes 
+12. Create a review/report system for completed transactions  
+13. Implement a recommended tools feature to recommend tools based on a project they’re working on  
+14. Test site functionality to ensure reliability and security of features 
+
 ## Detailed Design
 1. Create initial UI components for simple navigation through site 
     - The webpages will include: 

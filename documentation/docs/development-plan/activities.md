@@ -80,5 +80,13 @@ sidebar_position: 1
 14. Test site functionality to ensure reliability and security of features 
     - Tests will be done in most sprints. The types of testing are written below
 
+## Tests
+There will be 3 different types of testing for the Tool Shed App which are unit testing, integration testing and acceptance tests. 
 
+- Unit
+    * Our team will utilize jest testing framework to implement unit tests for our react native type-script code. There will be a test for each method and function in our code to ensure proper functionality. 
+- Integration
+    * Integration testing will also be using jest testing framework to ensure the flow of our user stories are capable and successful. Jest will allow us to make mock objects for this testing implementation.  
+- Acceptance
+    * Our team will create a series of tasks that will encapsulate all the functional and non-functional requirements for the Tool Shed app. These tasks will be completed by actual users and our team will take notes of every interaction the user takes on the interface. After this, analysis will be done to see if they were able to complete the flow or if there were difficulties due to the interface. From these results we can go back and ensure any missteps will not happen again.  
         

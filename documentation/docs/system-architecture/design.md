@@ -29,4 +29,6 @@ Sequence diagrams showing the data flow for _all_ use cases. One sequence diagr
 Sequence diagrams showing the data flow for _all_ use cases. One sequence diagram corresponds to one use case and different use cases should have different corresponding sequence diagrams.
 
 ## Algorithms
-Tool Shed will constantly run and execute database queries to determine similiar patterns and form submissions through known categories.   Once jobs have been completed, Tool Shed will be able to recommend tools and supplies that are known to have successfully complete similiar jobs in the past.  Using Google YouTube API, search queries will be returned with instructional videos that are highly recommended in the how-to field. 
+Tool Shed will constantly run and execute database queries to determine similiar patterns and form submissions through known categories.   Once jobs have been completed, Tool Shed will be able to recommend tools and supplies that are known to have successfully complete similiar jobs in the past.  Using Google YouTube API, search queries will be returned with instructional videos that are highly recommended in the how-to field.
+
+More TBD 

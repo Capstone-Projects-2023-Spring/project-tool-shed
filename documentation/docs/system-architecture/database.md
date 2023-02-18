@@ -18,4 +18,4 @@ The Design Document - Part I Architecture describes the software architecture an
 | LAST_NAME           | VARCHAR2(60 BYTE)  | No       |              | 5         |          |
 | SHIPPING_ADDRESS_ID | NUMBER             | Yes      | NULL         | 6         |          |
 | BILLING_ADDRESS_ID  | NUMBER             | Yes      | "NULL        |           |          |
-|---------------------|--------------------|----------|--------------|-----------|----------|
+

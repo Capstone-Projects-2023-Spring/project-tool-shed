@@ -29,4 +29,4 @@ Sequence diagrams showing the data flow for _all_ use cases. One sequence diagr
 Sequence diagrams showing the data flow for _all_ use cases. One sequence diagram corresponds to one use case and different use cases should have different corresponding sequence diagrams.
 
 ## Algorithms
-Describe algorithms employed in your project, e.g. neural network paradigm, training and training data set, etc.
+TBD

@@ -9,12 +9,13 @@ The Design Document - Part I Architecture describes the software architecture an
 
 **Table Design**
 
-| **COLUMN_NAME**         | DATA_TYPE          | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
-|-------------------------|--------------------|----------|--------------|-----------|----------|
-| **CUSTOMER_ID**         | NUMBER             | No       |              | 1         |          |
-| **EMAIL_ADDRESS**       | VARCHAR2(255 BYTE) | No       |              | 2         |          |
-| **PASSWORD**            | VARCHAR2(60 BYTE)  | No       |              | 3         |          |
-| **FIRST_NAME**          | VARCHAR2(60 BYTE)  | No       |              | 4         |          |
-| **LAST_NAME**           | VARCHAR2(60 BYTE)  | No       |              | 5         |          |
-| **SHIPPING_ADDRESS_ID** | NUMBER             | Yes      | NULL         | 6         |          |
-| **BILLING_ADDRESS_ID**  | NUMBER             | Yes      | "NULL        |           |          |
+| COLUMN_NAME         | DATA_TYPE          | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
+|---------------------|--------------------|----------|--------------|-----------|----------|
+| CUSTOMER_ID         | NUMBER             | No       |              | 1         |          |
+| EMAIL_ADDRESS       | VARCHAR2(255 BYTE) | No       |              | 2         |          |
+| PASSWORD            | VARCHAR2(60 BYTE)  | No       |              | 3         |          |
+| FIRST_NAME          | VARCHAR2(60 BYTE)  | No       |              | 4         |          |
+| LAST_NAME           | VARCHAR2(60 BYTE)  | No       |              | 5         |          |
+| SHIPPING_ADDRESS_ID | NUMBER             | Yes      | NULL         | 6         |          |
+| BILLING_ADDRESS_ID  | NUMBER             | Yes      | "NULL        |           |          |
+|---------------------|--------------------|----------|--------------|-----------|----------|

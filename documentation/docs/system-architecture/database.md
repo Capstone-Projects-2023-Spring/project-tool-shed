@@ -7,32 +7,11 @@ sidebar_position: 2
 
 **Entity-relation diagram**
 
-erDiagram
-    CAR ||--o{ NAMED-DRIVER : allows
-    CAR {
-        string registrationNumber PK
-        string make
-        string model
-        string[] parts
-    }
-    PERSON ||--o{ NAMED-DRIVER : is
-    PERSON {
-        string driversLicense PK "The license #"
-        string(99) firstName "Only 99 characters are allowed"
-        string lastName
-        string phone UK
-        int age
-    }
-    NAMED-DRIVER {
-        string carRegistrationNumber PK, FK
-        string driverLicence PK, FK
-    }
-    MANUFACTURER only one to zero or more CAR : makes
-
+[![](https://mermaid.ink/img/pako:eNqNVNFugjAU_RXTZ2PUzD34VkunTaCQFra4kBAC1ZGoLKU8GPTfVxBnVXQjPEDPuTf3nnt6K5DkqQBTIKSVxWsZb8NdTz9BISRMkrzcqd7hMBgcqh5MUymKYtoLgX5PNBQrsc7l_syxs0Jlu_UVp42rTn_NiWUxzHlErFDRwJlhdsFQwH3XwawTtAnFo1C9Q4YWkI2j12F0DY4fgYj4SwN7MTHuQx8b4NjAPokXIdcy4ZEZ6y1cegWawRbhcGbjm0aOdwpX_2wfO5DYUaueWfBkYpYEOf9wmfVIijfCuB9R6OCHSsI_CHxBPI_QefRskjNi2884xxsLmSrogcxdtux2yBm8qfCiQpu5NaOZ2GOuFSD_ed4u8Bz41Ast52FdjScwR4x4PnGpmWcyvLayHoDHCML3lWhTITegGscMYep3MHQjteq18ervX1FAH2yF3MZZqi98o0oI1JfYihDUNzYVq7jcqPreHjU1LlXO97sETJUsRR-U36keVbslwHQVbwp9KtJM5dI5LZFmlxx_AB_5NKQ?type=png)](https://mermaid.live/edit#pako:eNqNVNFugjAU_RXTZ2PUzD34VkunTaCQFra4kBAC1ZGoLKU8GPTfVxBnVXQjPEDPuTf3nnt6K5DkqQBTIKSVxWsZb8NdTz9BISRMkrzcqd7hMBgcqh5MUymKYtoLgX5PNBQrsc7l_syxs0Jlu_UVp42rTn_NiWUxzHlErFDRwJlhdsFQwH3XwawTtAnFo1C9Q4YWkI2j12F0DY4fgYj4SwN7MTHuQx8b4NjAPokXIdcy4ZEZ6y1cegWawRbhcGbjm0aOdwpX_2wfO5DYUaueWfBkYpYEOf9wmfVIijfCuB9R6OCHSsI_CHxBPI_QefRskjNi2884xxsLmSrogcxdtux2yBm8qfCiQpu5NaOZ2GOuFSD_ed4u8Bz41Ast52FdjScwR4x4PnGpmWcyvLayHoDHCML3lWhTITegGscMYep3MHQjteq18ervX1FAH2yF3MZZqi98o0oI1JfYihDUNzYVq7jcqPreHjU1LlXO97sETJUsRR-U36keVbslwHQVbwp9KtJM5dI5LZFmlxx_AB_5NKQ)
 
 **Table Design**
 
-***Accounts***
+***UserAccount***
 
 | COLUMN_NAME         | DATA_TYPE          | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
 |---------------------|--------------------|----------|--------------|-----------|----------|
@@ -45,7 +24,7 @@ erDiagram
 | BILLING_ADDRESS_ID  | NUMBER             | Yes      | "NULL        |           |          |
 
 
-***Addresses***
+***Address***
 
 | COLUMN_NAME | DATA_TYPE         | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
 |-------------|-------------------|----------|--------------|-----------|----------|
@@ -59,7 +38,7 @@ erDiagram
 | PHONE       | VARCHAR2(12 BYTE) | No       |              | 8         |          |
 | DISABLED    | NUMBER(1,0)       | Yes      | "0           |           |          |
 
-***Listings***
+***Listing***
 
 | COLUMN_NAME      | DATA_TYPE           | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
 |------------------|---------------------|----------|--------------|-----------|----------|

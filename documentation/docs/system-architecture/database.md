@@ -25,6 +25,7 @@ The Design Document - Part I Architecture describes the software architecture an
 
 
 ***Addresses***
+
 | COLUMN_NAME | DATA_TYPE         | NULLABLE | DATA_DEFAULT | COLUMN_ID | COMMENTS |
 |-------------|-------------------|----------|--------------|-----------|----------|
 | ADDRESS_ID  | NUMBER            | No       |              | 1         |          |

@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 ---
+## Database Diagrams
 
 **Entity-relation diagram**
 

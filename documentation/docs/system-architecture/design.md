@@ -63,29 +63,29 @@ Type of Listing (Sell or For Rent)
 <details><summary>Use Case Listing a Tool</summary>
 The user would like to rent out tools that they are not currently using to earn some extra money.
 
-The user navigates to (URL:TBD) and enters their username and password followed by clicking the (button: LOGIN).
+1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the (button: LOGIN).
 
-The user clicks on the (button: LIST_TOOL) and completes the following fields.
+2. The user clicks on the (button: LIST_TOOL) and completes the following fields.
 
-Name of Tool
+    - Name of Tool
 
-Zip Code: #####
+    - Zip Code: #####
 
-Type of Tool (Electric, Battery, Wireless, etc.)
+    - Type of Tool (Electric, Battery, Wireless, etc.)
 
-Type of Listing (For Rent)
+    - Type of Listing (For Rent)
 
-Price (Price per hour/day/week)
+    - Price (Price per hour/day/week)
 
-The user clicks on the (button: INSERT_IMAGE) to upload images of the tool.
+3. The user clicks on the (button: INSERT_IMAGE) to upload images of the tool.
 
-The user clicks the (button: SUBMIT) to add tool to the list of tools for rent.
+4. The user clicks the (button: SUBMIT) to add tool to the list of tools for rent.
 
-The user is brought to the local listings menu once submission is successful.
+5. The user is brought to the local listings menu once submission is successful.
 
-The user clicks on the (button: LIST_TOOL) to repeat the process for as many tools as they would like to list for rent.
+6. The user clicks on the (button: LIST_TOOL) to repeat the process for as many tools as they would like to list for rent.
 
-The user can then close the website or click the (button: LOG_OFF).
+7. The user can then close the website or click the (button: LOG_OFF).
 
 
 </details>  

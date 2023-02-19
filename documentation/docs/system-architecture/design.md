@@ -44,7 +44,6 @@ classDiagram
     User --> Address
     User --> PaymentMethod
 ```
-For each component provide class diagrams showing the classes to be developed (or used) and their relationship.
 
 ## Components & Interfaces
 A description the different components and their interfaces. For example: client, server, database.

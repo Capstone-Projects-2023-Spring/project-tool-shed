@@ -20,6 +20,43 @@ A description the different components and their interfaces. For example: client
 [![](https://mermaid.ink/img/pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38?type=png)](https://mermaid.live/edit#pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38)
 
 ## Sequence Diagram - Selling a Tool
+
+<details><summary>Use Case Selling a Tool</summary>
+A homeowner wants to list a tool to sell it as they no longer need it anymore and for other users to be able to purchase it.
+
+1. The user enters the URL.
+
+2. The user enters their username and password.
+
+3. The user clicks on the (button: LOGIN).
+
+4. The user is brought to the homepage.
+
+5. The user clicks on the (button: LIST_TOOL) and completes the following fields.
+
+Name of tool
+
+Zip Code: #####
+
+Type of tool (Electric, Battery, Wireless, etc.)
+
+Type of Listing (Sell or For Rent)
+
+6. The user clicks on the (button: INSERT_IMAGE) to upload an image of the tool.
+
+7. The user then clicks the (button: SUBMIT) to add tool to a listing.
+
+8. The user sees a list of tools being sold after clicking submit.
+
+9. The user can click the (button: LIST_TOOL) to list another tool if they want to.
+
+10. The user clicks on the (button: LOG_OFF) to log off account.
+
+11. The user exits the website.
+
+
+</details>  
+
 [![](https://mermaid.ink/img/pako:eNp1VMtu4zAM_BVCl90F2h_woZe2WSwQIEAeNwGFbNGpUFlyJapdo-i_L2W7rpJsbjJnSA6pkT9E4zWKSkR8TegafDDqGFQnHRmyCDu01rgjKNh7b6VTDfkACVSEQ8QgXa8Cmcb0yhHUOVwH_36BxIxw9O0c0BnQilStIo7lzZsihCRdgtu7O6greHSEAQ7bdYHX0tUjHr9w64_GgXGtD50i413BjtLFka0ruH_G5gVMC4n1AP41kWJB1Xy2BIYVzxNquJ0bHcqMOIXrOTy2j9wfYmoajLFN1g7Soc1zndXQHqP7QVOtstRjCLzejtPVEccRM5Aq2IcB1FEZngqdLpZzb03zwltPRN7Bz_Wf3f5pv9msfxUL2ua7ZdHAu4GFAf3Y47t5QEqBv88Z3yoeTOytGi4pixz2CzaU73r2TQQaegTfguVZOXRNV87Ih66UtJ0l5Tj8V8mUkZaMlbE2gk80I0uzHe9tKbS4YYpmA0IbfDfh5KFm07DTUZd3l5_A6AytUWfWPBK7QWPpoMudOny3A6SeO3Hq9Q3rr7muUc8vfr35_bRZrWYDlKVGp7FaduaRC_m2PZF5Kro--eLXJ25Eh_ySjOafw4d0AFLQM3YoRcVHja1KlqSQ7pOpKpHfDa4RFYWEN2JSP_9LRNUqfgWf_wDNxYKy?type=png)](https://mermaid.live/edit#pako:eNp1VMtu4zAM_BVCl90F2h_woZe2WSwQIEAeNwGFbNGpUFlyJapdo-i_L2W7rpJsbjJnSA6pkT9E4zWKSkR8TegafDDqGFQnHRmyCDu01rgjKNh7b6VTDfkACVSEQ8QgXa8Cmcb0yhHUOVwH_36BxIxw9O0c0BnQilStIo7lzZsihCRdgtu7O6greHSEAQ7bdYHX0tUjHr9w64_GgXGtD50i413BjtLFka0ruH_G5gVMC4n1AP41kWJB1Xy2BIYVzxNquJ0bHcqMOIXrOTy2j9wfYmoajLFN1g7Soc1zndXQHqP7QVOtstRjCLzejtPVEccRM5Aq2IcB1FEZngqdLpZzb03zwltPRN7Bz_Wf3f5pv9msfxUL2ua7ZdHAu4GFAf3Y47t5QEqBv88Z3yoeTOytGi4pixz2CzaU73r2TQQaegTfguVZOXRNV87Ih66UtJ0l5Tj8V8mUkZaMlbE2gk80I0uzHe9tKbS4YYpmA0IbfDfh5KFm07DTUZd3l5_A6AytUWfWPBK7QWPpoMudOny3A6SeO3Hq9Q3rr7muUc8vfr35_bRZrWYDlKVGp7FaduaRC_m2PZF5Kro--eLXJ25Eh_ySjOafw4d0AFLQM3YoRcVHja1KlqSQ7pOpKpHfDa4RFYWEN2JSP_9LRNUqfgWf_wDNxYKy)
 
 ## Sequence Diagram - Use Case #5

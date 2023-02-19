@@ -4,6 +4,46 @@ sidebar_position: 1
 # Design
 
 ## Class Diagram
+```mermaid
+classDiagram
+    class Address {
+        +int id;
+        +String line_one;
+        +String line_two;
+        +String city;
+        +String state;
+        +String zip_code;
+    }
+    class PaymentMethod {
+        +String label;
+        +Blob data;
+        +int type;
+    }
+    class User{
+        +int id;
+        +String email_address;
+        +Blob password_digest;
+        +String first_name;
+        +String last_name;
+        +Address address;
+        +List~PaymentMethod~ payment_methods;
+    }
+    class ToolCategory {
+        +String name;
+    }
+    class Tool {
+        +ToolCategory category;
+    }
+    class Listing {
+        +Tool tool;
+        +User lister;
+    }
+    Tool --> ToolCategory
+    Listing --> Tool
+    Listing --> User
+    User --> Address
+    User --> PaymentMethod
+```
 For each component provide class diagrams showing the classes to be developed (or used) and their relationship.
 
 ## Components & Interfaces

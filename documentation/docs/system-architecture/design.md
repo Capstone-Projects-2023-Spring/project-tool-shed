@@ -196,6 +196,53 @@ The user would like to rent out tools that they are not currently using to earn 
     
 </details>
 
+```mermaid
+sequenceDiagram
+    actor TO as ToolOwner
+    participant B as Browser
+    participant S as Server
+    participant DB as Database
+    activate TO
+    TO->>B: Fills out and submits login form
+    activate B
+    B->>S: POSTs form
+    activate S
+    S->>DB: Queries for corresponding user
+    activate DB
+    DB->>S: Returns user
+    deactivate DB
+    S->>DB: Queries for user's active listings
+    activate DB
+    DB->>S: Returns active listings
+    deactivate DB
+    S->>B: Renders active listings
+    deactivate S
+    B->>TO: Displays active listings page to User
+    deactivate B
+    TO->>B: Clicks edit on listing
+    activate B
+    B->>S: Requests "Edit Listing" page
+    activate S
+    S->>DB: Requests listing
+    activate DB
+    DB->>S: Returns listing
+    deactivate DB
+    S->>B: Renders "Edit Listing" page
+    deactivate S
+    B->>TO: Displays "Edit Listing" page
+    deactivate B
+    TO->>B: Changes form control that corresponds <br />to tool availability to "Not available" and clicks save
+    activate B
+    B->>S: Posts the edited form to the backend
+    activate S
+    S->>DB: Issues an UPDATE query to change the tool status
+    S->>B: Re-renders the "Edit Listing" page
+    deactivate S
+    B->>TO: Displays new "Edit Listing" page
+    deactivate TO
+ 
+```
+
 ## Algorithms
 Tool Shed will constantly run and execute database queries to determine similar patterns and form submissions through known categories. Once jobs have been completed, Tool Shed will be able to recommend tools and supplies that are known to have successfully completed similar jobs in the past. Using Google YouTube API, search queries will be returned with instructional videos that are highly recommended in the how-to field. 
 

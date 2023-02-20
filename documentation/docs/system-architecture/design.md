@@ -140,7 +140,49 @@ Type of Listing (Sell or For Rent)
 
 </details>  
 
-[![](https://mermaid.ink/img/pako:eNp1VMtu4zAM_BVCl90F2h_woZe2WSwQIEAeNwGFbNGpUFlyJapdo-i_L2W7rpJsbjJnSA6pkT9E4zWKSkR8TegafDDqGFQnHRmyCDu01rgjKNh7b6VTDfkACVSEQ8QgXa8Cmcb0yhHUOVwH_36BxIxw9O0c0BnQilStIo7lzZsihCRdgtu7O6greHSEAQ7bdYHX0tUjHr9w64_GgXGtD50i413BjtLFka0ruH_G5gVMC4n1AP41kWJB1Xy2BIYVzxNquJ0bHcqMOIXrOTy2j9wfYmoajLFN1g7Soc1zndXQHqP7QVOtstRjCLzejtPVEccRM5Aq2IcB1FEZngqdLpZzb03zwltPRN7Bz_Wf3f5pv9msfxUL2ua7ZdHAu4GFAf3Y47t5QEqBv88Z3yoeTOytGi4pixz2CzaU73r2TQQaegTfguVZOXRNV87Ih66UtJ0l5Tj8V8mUkZaMlbE2gk80I0uzHe9tKbS4YYpmA0IbfDfh5KFm07DTUZd3l5_A6AytUWfWPBK7QWPpoMudOny3A6SeO3Hq9Q3rr7muUc8vfr35_bRZrWYDlKVGp7FaduaRC_m2PZF5Kro--eLXJ25Eh_ySjOafw4d0AFLQM3YoRcVHja1KlqSQ7pOpKpHfDa4RFYWEN2JSP_9LRNUqfgWf_wDNxYKy?type=png)](https://mermaid.live/edit#pako:eNp1VMtu4zAM_BVCl90F2h_woZe2WSwQIEAeNwGFbNGpUFlyJapdo-i_L2W7rpJsbjJnSA6pkT9E4zWKSkR8TegafDDqGFQnHRmyCDu01rgjKNh7b6VTDfkACVSEQ8QgXa8Cmcb0yhHUOVwH_36BxIxw9O0c0BnQilStIo7lzZsihCRdgtu7O6greHSEAQ7bdYHX0tUjHr9w64_GgXGtD50i413BjtLFka0ruH_G5gVMC4n1AP41kWJB1Xy2BIYVzxNquJ0bHcqMOIXrOTy2j9wfYmoajLFN1g7Soc1zndXQHqP7QVOtstRjCLzejtPVEccRM5Aq2IcB1FEZngqdLpZzb03zwltPRN7Bz_Wf3f5pv9msfxUL2ua7ZdHAu4GFAf3Y47t5QEqBv88Z3yoeTOytGi4pixz2CzaU73r2TQQaegTfguVZOXRNV87Ih66UtJ0l5Tj8V8mUkZaMlbE2gk80I0uzHe9tKbS4YYpmA0IbfDfh5KFm07DTUZd3l5_A6AytUWfWPBK7QWPpoMudOny3A6SeO3Hq9Q3rr7muUc8vfr35_bRZrWYDlKVGp7FaduaRC_m2PZF5Kro--eLXJ25Eh_ySjOafw4d0AFLQM3YoRcVHja1KlqSQ7pOpKpHfDa4RFYWEN2JSP_9LRNUqfgWf_wDNxYKy)
+```mermaid
+    sequenceDiagram
+    title Selling a Tool
+    actor u as User
+    participant b as browser
+    participant s as server
+    participant d as database
+    activate u
+    u ->> b: Enter URL
+    activate b
+    b ->> s: Enter login information
+    activate s
+    s ->> d: Check if user exists
+    activate d
+    alt is a User
+    d -->> s: User exists
+    s -->> b: User logins in successfully
+    else
+    d -->> s: User doesn't exist
+    s -->> b: Error message
+    b -->> u: Try again
+    end
+    u ->> b: Clicks button (LIST_TOOL)
+    b ->> s: Requests for LIST_TOOL page
+    s -->> b: returns LIST_TOOL page
+    b -->> u: Displays LIST_TOOL page
+    u ->> b: Selects selling as type of listing
+    b ->> s: Requests for sell form
+    s -->> b: Returns form 
+    b -->> u: Displays form
+    u -->> b: Fills out form
+    b ->> s: Sends form 
+    s ->> d: Sends data from form to be stored
+    d -->> s: Tool is added to listings
+    deactivate d
+    s -->> b: returns newly updated LIST_TOOL page
+    b -->> u: displays updated LIST_TOOL page
+    u ->> b: Clicks LOG_OFF button
+    b -->> u: User is logged off
+    deactivate s
+    deactivate b
+    deactivate u
+```
 
 ## Sequence Diagram - Listing a Tool
 <details><summary>Use Case Listing a Tool</summary>

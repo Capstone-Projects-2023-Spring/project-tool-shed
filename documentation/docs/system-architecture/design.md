@@ -46,7 +46,14 @@ classDiagram
 ```
 
 ## Components & Interfaces
-A description the different components and their interfaces. For example: client, server, database.
+
+Toolshed is a thin-client webapp that loads/stores data from/in PostgreSQL.
+
+The primary component of Toolshed is the backend webserver. The backend server implements the data model in the previous section via the Sequelize ORM, which manages migrations (table creation/updates based on data model changes) & query generation. Each endpoint on the backend server serves an HTML page based on data it loads from the database.
+
+The database is PostgreSQL, which uses a TCP protocol (not too dissimilar to a binary version of HTTP) to transmit queries and result sets. As mentioned before, Sequelize will manage the schema of the database.
+
+The client/frontend is currently a basic form-driven static HTML affair, with the expectation that as interactivity increases, the "thickness" of the client increases to the point where there is no more UI logic on the backend. This is made easier by the fact that the backend and frontend are both JavaScript.
 
 
 ## Sequence Diagram - Removing a Listing

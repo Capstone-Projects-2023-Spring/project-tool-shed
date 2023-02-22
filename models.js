@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		password_hash: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: true
 		}
 	}, {
 		tableName: "user",
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 	});
 
 	User.prototype.setPassword = async function(v) {
-		const s = bcrypt.genSalt(10);
+		const s = await bcrypt.genSalt(10);
 		this.password_hash = await bcrypt.hash(v, s);
 	};
 
@@ -75,7 +75,6 @@ module.exports = (sequelize, DataTypes) => {
 	}, {tableName: 'address', paranoid: true});
 
 	Address.hasMany(User, {foreignKey: 'address_id'});
-	User.belongsTo(Address);
 
 	Address.prototype.getCoordinates = async function() {
 		const {lat, lon} = {lat: null, lon: null}; // TODO: do the geocoding

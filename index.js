@@ -4,11 +4,14 @@ const nunjucks = require('nunjucks'); // Templating engine
 const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migrations
 const { Umzug, SequelizeStorage } = require('umzug'); // DB Migrations, sister lib to sequelize
 const authMiddleware = require('./middleware/auth.js');
+const cookieParser = require('cookie-parser');
 
 /*
 	index.js
 	Runs the express server
 */
+
+const command = process.argv.length < 3 ? 'server' : process.argv[2];
 
 /*
 	TODO:
@@ -58,6 +61,7 @@ async function initSequelize() {
 		process.exit(1);
 	}
 
+/*
 	const umzug = new Umzug({
 		migrations: { glob: 'migrations/*.js' },
 		context: sequelize.getQueryInterface(),
@@ -66,14 +70,14 @@ async function initSequelize() {
 	});
 
 	await umzug.up();
-
+*/
 	return s;
 }
 
 function handleError(err, req, res, next) {
 	console.error(err);
 	res.status(500);
-	app.render('error.html', {error: err});
+	res.render('error.html', {error: err});
 	next();
 }
 
@@ -88,14 +92,16 @@ async function startServer() {
 
 	const sequelize = await initSequelize();
 	const models = require('./models.js')(sequelize, DataTypes); 
-
-	require('./routes.js')(app, models);
+	await sequelize.sync();
 
 	app.use(handleError);
 	app.use(express.json());
 	app.use(express.urlencoded({extended: true}));
-	app.use(express.cookieParser());
+	app.use(cookieParser());
 	app.use(authMiddleware(models.User));
+
+	require('./routes.js')(app, models);
+
 	app.use(express.static(__dirname + "public"));
 
 	// Starts the web server.
@@ -103,4 +109,18 @@ async function startServer() {
 	console.log(`tool-node is running on port ${settings.port}`);
 }
 
-startServer();
+async function startShell() {
+	const sequelize = await initSequelize();
+	const models = require('./models.js')(sequelize, DataTypes);
+	await sequelize.sync();
+	const repl = require('repl');
+	const replServer = repl.start({prompt: "tool-shed> ", useGlobal: true});
+	replServer.context.models = models;
+	replServer.context.sequelize = sequelize;
+}
+
+if (command === 'server') {
+	startServer();
+} else if (command === 'shell') {
+	startShell();
+}

@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block body %}
-hello {{ world }}
+
+{% if user %}
+Hello {{ user.first_name }} {{ user.last_name }}
+{% else %}
+Hello, World!
+{% endif %}
 
 {% endblock %}

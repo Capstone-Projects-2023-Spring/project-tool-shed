@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const loginUserSchema = require('./validators/loginUser');
 
 /*
 	Routes
@@ -9,18 +10,28 @@ const asyncHandler = require('express-async-handler');
 */
 
 module.exports = (app, models) => {
-	const { ToolType } = models;
-	app.get('/', (req, res) => {
+	const { User, Address } = models;
+	app.get('/', asyncHandler(async (req, res) => {
 		// render the template at templates/index.html
 		// with the parameters:
-		// world = "WORLD"
-		res.render('index.html', {world: 'WORLD'});
-	});
+		// user: the logged in user (if logged in)
+		res.render('index.html', {user: req.user});
+	}));
 
-	app.get('/createtype', asyncHandler(async (req, res) => {
-		const name = "Drill";
-		let xs = await ToolType.findAll({where: {name}});
-		let ty = xs.length > 0 ? xs[0] : await ToolType.create({name});
-		res.send(`ToolType: ${ty.name} id: ${ty.id}`);
+	app.get('/user/login', asyncHandler(async (req, res) => {
+		res.render('login.html', {error: null});
+	}));
+
+	app.post('/user/login', asyncHandler(async (req, res) => {
+		const {email, password} = await loginUserSchema.validate(req.body);
+		let u = await models.User.findAll({where: {email: email}});
+		u = u.length > 0 ? u[0] : null;
+		
+		if (u && u.passwordMatches(password)) {
+			await res.setUser(u);
+			res.redirect('/');
+		} else {
+			res.render('login.html', {error: "Invalid username or password."});
+		} 
 	}));
 };

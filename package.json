@@ -7,16 +7,22 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "web": "node index.js",
     "db": "scripts/run-postgres.sh",
+    "shell": "node index.js shell",
     "local": "sh -c \"(trap 'kill 0' SIGINT; (npm run db) & (npm run web))\""
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.0",
     "nunjucks": "^3.2.3",
     "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.28.0"
+    "sequelize": "^6.28.0",
+    "umzug": "^3.2.1",
+    "yup": "^1.0.0"
   }
 }

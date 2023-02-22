@@ -1,7 +1,9 @@
 const path = require('path');
 const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
-const { Sequelize } = require('sequelize'); // DB connection/migrations
+const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migrations
+const { Umzug, SequelizeStorage } = require('umzug'); // DB Migrations, sister lib to sequelize
+const authMiddleware = require('./middleware/auth.js');
 
 /*
 	index.js
@@ -56,6 +58,15 @@ async function initSequelize() {
 		process.exit(1);
 	}
 
+	const umzug = new Umzug({
+		migrations: { glob: 'migrations/*.js' },
+		context: sequelize.getQueryInterface(),
+		storage: new SequelizeStorage({ sequelize: s }),
+		logger: console,
+	});
+
+	await umzug.up();
+
 	return s;
 }
 
@@ -76,12 +87,15 @@ async function startServer() {
 	});
 
 	const sequelize = await initSequelize();
-	const models = require('./models.js')(sequelize); 
-	await sequelize.sync(); // run migrations
+	const models = require('./models.js')(sequelize, DataTypes); 
 
 	require('./routes.js')(app, models);
 
 	app.use(handleError);
+	app.use(express.json());
+	app.use(express.urlencoded({extended: true}));
+	app.use(express.cookieParser());
+	app.use(authMiddleware(models.User));
 	app.use(express.static(__dirname + "public"));
 
 	// Starts the web server.

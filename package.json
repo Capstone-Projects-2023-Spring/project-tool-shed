@@ -12,11 +12,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
     "nunjucks": "^3.2.3",
     "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.28.0"
+    "sequelize": "^6.28.0",
+    "umzug": "^3.2.1",
+    "yup": "^1.0.0"
   }
 }

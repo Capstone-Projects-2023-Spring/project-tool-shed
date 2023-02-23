@@ -15,6 +15,7 @@ classDiagram
         +String zip_code;
     }
     class PaymentMethod {
+        +int id;
         +String label;
         +Blob data;
         +int type;
@@ -27,18 +28,29 @@ classDiagram
         +String last_name;
         +Address address;
         +List~PaymentMethod~ payment_methods;
+        +setPassword(String password);
+        +passwordMatches(String aPassword) bool;
     }
     class ToolCategory {
+        +int id;
         +String name;
     }
     class Tool {
+        +int id;
+        +String description;
         +ToolCategory category;
+        +ToolMaker maker;
+    }
+    class ToolMaker {
+        +int id;
+        +String name;
     }
     class Listing {
         +Tool tool;
-        +User lister;
+        +double price;
     }
     Tool --> ToolCategory
+    Tool --> ToolMaker
     Listing --> Tool
     Listing --> User
     User --> Address

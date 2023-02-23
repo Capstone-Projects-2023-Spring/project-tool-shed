@@ -34,4 +34,10 @@ module.exports = (app, models) => {
 			res.render('login.html', {error: "Invalid username or password."});
 		} 
 	}));
+	app.get('/profile', asyncHandler(async (req, res) => {
+		res.render('profile.html', {error: null});
+	}));
+	app.get('/edit', asyncHandler(async (req, res) => {
+		res.render('edit.html', {error: null});
+	}));
 };

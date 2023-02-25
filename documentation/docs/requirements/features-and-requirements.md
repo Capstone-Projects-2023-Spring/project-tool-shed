@@ -117,6 +117,7 @@ For users who are looking to sell or lend their tools out to other users, they c
     - A rating of 5 stars would imply the reviewer of the tool (or user) did have a positive experience and would recommend the tool (or user) to a friend 
 
  - The system shall allow users will have access to contact information of other users
+    
     - A notification that alerts the user of the contact information for a tool they recently rented (TO BE EDITED)
 
     - A notification will consist of the meeting address and the instructions from the seller/renter (TO BE EDITED)

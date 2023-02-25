@@ -3,6 +3,13 @@ sidebar_position: 4
 ---
 
 # Features and Requirements
+
+## High Level Requirements Overview
+
+Users will begin by registering online accounts using the Create Account option. After accounts are created, the user will manage tools they own and want to make available to the public by setting a daily rate and availability. Users will also be able to search the local community using keywords like, “Table saw,” or “Miter Saw,” and view low cost locally owned tools available. To help with their search, the user can filter their search results by type of tool and by mile radius. If the tool is unavailable at the time, the user can make a request to receive a notification when the tool is available. Once a tool is selected for either buy or rent, the users will be able to make a request with the owner of the tool and agree on a date and price. Users will be prompted to return the tool within an agreed window set by both users. 
+
+For users who are looking to sell or lend their tools out to other users, they can select to list their tools. Afterwards, they are prompted to fill out information about their tools and upload images of them. The user receives a notification once another user requests their tool. 
+
 ## Functional Requirements 
 
 - Tool Shed will require registration using a login system, this will be with a username and password or via a google/Facebook account 

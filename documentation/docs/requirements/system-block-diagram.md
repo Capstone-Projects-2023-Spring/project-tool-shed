@@ -18,10 +18,14 @@ graph LR
   C <-->|read/write| D[(PostgreSQL)]
   CC <-->|read/write| D[(PostgreSQL)]
   CCC <-->|read/write| D[(PostgreSQL)]
+  subgraph tool-finding-system [Tool Finding System]
+  TF[Application Server\nNode.js]
+  TF -->|read/write| D[(PostgreSQL)]
   end
   subgraph frontend [Frontend]
   A[Web Browser] <-->|HTTPS| B
   E[Mobile App] <-->|HTTPS| B
+  TF -->|HTTP| B
   end
 ```
 <p align="center"><b>Figure 1.</b> High level technical design of the Tool Shed Website.</p> 

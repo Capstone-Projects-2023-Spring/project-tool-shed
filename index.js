@@ -102,7 +102,8 @@ async function startServer() {
 
 	require('./routes.js')(app, models);
 
-	app.use(express.static(__dirname + "public"));
+	app.use('/public', express.static(path.join(__dirname, "public")));
+	app.use('/node_modules', express.static(path.join(__dirname, "node_modules"))); // dirty hack to allow serving JS from installed packages.
 
 	// Starts the web server.
 	await app.listen(settings.port);

@@ -100,21 +100,21 @@ Represents an address.
 **Kind**: static class of [<code>models</code>](#models)  
 **Properties**
 
-| Name | Type |
-| --- | --- |
-| line_one | <code>string</code> | 
-| line_two | <code>string</code> | 
-| city | <code>string</code> | 
-| state | <code>string</code> | 
-| zip_code | <code>string</code> | 
-| geocoded | <code>bool</code> | 
-| geocoded_lat | <code>double</code> | 
-| geocoded_lon | <code>double</code> | 
+| Name | Type | Description |
+| --- | --- | --- |
+| line_one | <code>string</code> |  |
+| line_two | <code>string</code> |  |
+| city | <code>string</code> |  |
+| state | <code>string</code> |  |
+| zip_code | <code>string</code> |  |
+| geocoded | <code>bool</code> | Whether or not the address has been geocoded yet |
+| geocoded_lat | <code>double</code> | the latitude value from geocoding - not user set |
+| geocoded_lon | <code>double</code> | the longitude value from geocoding - not user set |
 
 <a name="models.Address.Address+getCoordinates"></a>
 
 #### Address.Address#getCoordinates()
-Geocodes the address and sets [#models.Address.geocoded_lat](#models.Address.geocoded_lat) & [models.Address#geocoded_lat](models.Address#geocoded_lat).
+Geocodes the address and sets models.Address.geocoded_lat & models.Address.geocoded_lat.
 
 **Kind**: static method of [<code>Address</code>](#models.Address)  
 <a name="settings"></a>

@@ -18,7 +18,16 @@ const command = process.argv.length < 3 ? 'server' : process.argv[2];
 	- code reloading for routes
 */
 
-// HTTP Server config 
+/**
+ * HTTP Server settings
+ * @typedef {Object} HTTPServerSettings
+ * @property {number} port - The port the server binds to
+ */
+
+/**
+ * The settings Express.js uses to serve HTTP
+ * @type {HTTPServerSettings}
+ */
 const settings = {
     port: 5000 // port the webapp listens on
 };
@@ -30,6 +39,10 @@ const dbSettings = {
 	host: 'localhost',
 }
 
+/**
+ * Initializes a sequelize instance
+ * @return {Sequelize} An instance of Sequelize that's ready to use.
+ */
 async function initSequelize() {
 	// first, connect to postgres manually.
 	const { Client } = require("pg");

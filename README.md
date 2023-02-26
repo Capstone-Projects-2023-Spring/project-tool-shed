@@ -24,6 +24,10 @@
     |   |  base.html # base template file
     |   |  ... more .html files that extend base.html
 
+## Generating documentation
+
+To generate up-to-date documentation, run `npm run docs`. This will create the necessary .md file for the documentation site.
+
 ## Keywords
 
 Section 704, JavaScript, Google Maps API, Node, NodeJS, Database, Buy, Sell, Trade, Tool Shed, Web-based Application

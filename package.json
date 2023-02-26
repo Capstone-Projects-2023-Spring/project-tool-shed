@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "web": "node index.js",
     "db": "scripts/run-postgres.sh",
+    "docs": "scripts/gen-docs.sh",
     "shell": "node index.js shell",
     "local": "sh -c \"(trap 'kill 0' SIGINT; (npm run db) & (npm run web))\""
   },
@@ -27,5 +28,8 @@
     "sequelize": "^6.28.0",
     "umzug": "^3.2.1",
     "yup": "^1.0.0"
+  },
+  "devDependencies": {
+    "jsdoc-to-markdown": "^8.0.0"
   }
 }

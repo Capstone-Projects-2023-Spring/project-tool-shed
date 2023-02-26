@@ -1,9 +1,22 @@
+
+/**
+ * Model definitions.
+ * @module models
+ * @namespace models
+ */
+
 const bcrypt = require('bcrypt');
 
-module.exports = (sequelize, DataTypes) => {
-	/*
-		User model
-	*/
+const genModels = (sequelize, DataTypes) => {
+	/**
+	 * @class User
+         * @classdesc Represents a user.
+         * @property {string} first_name The user's first name
+	 * @property {string} last_name The user's last name
+         * @property {string} email The user's email, used for logging in
+         * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
+         * @memberof models
+         */
 	const User = sequelize.define('User', {
 		first_name: {
 			type: DataTypes.STRING,
@@ -26,19 +39,39 @@ module.exports = (sequelize, DataTypes) => {
 		paranoid: true, // soft delete enabled
 	});
 
+	/**
+         * Sets a user's password. 
+	 * @memberof models.User
+	 * @param {string} v The user's new password.
+         */
 	User.prototype.setPassword = async function(v) {
 		const s = await bcrypt.genSalt(10);
 		this.password_hash = await bcrypt.hash(v, s);
 	};
 
+	/**
+	 * Determines if a given password matches a user's password.
+	 * @param {string} v The password to test
+	 * @return {boolean} Whether or not the password matched.
+	 * @memberof models.User
+	 */
 	User.prototype.passwordMatches = async function(v) {
 		return await bcrypt.compare(v, this.password_hash);
 	};
 
-	/*
-		Address model
-	*/
-
+	/**
+	 * @class Address
+         * @classdesc Represents an address.
+         * @property {string} line_one 
+         * @property {string} line_two
+	 * @property {string} city
+	 * @property {string} state
+	 * @property {string} zip_code
+	 * @property {bool} geocoded - Whether or not the address has been geocoded yet
+	 * @property {double} geocoded_lat - the latitude value from geocoding - not user set
+	 * @property {double} geocoded_lon - the longitude value from geocoding - not user set
+         * @memberof models
+         */
 	const Address = sequelize.define('Address', {
 		line_one: {
 			type: DataTypes.STRING,
@@ -76,6 +109,10 @@ module.exports = (sequelize, DataTypes) => {
 
 	Address.hasMany(User, {foreignKey: 'address_id'});
 
+	/**
+	 * Geocodes the address and sets {@link models.Address}.geocoded_lat & {@link models.Address}.geocoded_lat.
+	 * @memberof models.Address
+	 */
 	Address.prototype.getCoordinates = async function() {
 		const {lat, lon} = {lat: null, lon: null}; // TODO: do the geocoding
 		this.geocoded = lat && lon;
@@ -89,3 +126,5 @@ module.exports = (sequelize, DataTypes) => {
 
 	return {User, Address};
 };
+
+module.exports = genModels;

@@ -15,6 +15,7 @@ const genModels = (sequelize, DataTypes) => {
 	 * @property {string} last_name The user's last name
          * @property {string} email The user's email, used for logging in
          * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
+	 * @property {int} address_id The ID of an Address record for the user.
          * @memberof models
          */
 	const User = sequelize.define('User', {
@@ -65,7 +66,7 @@ const genModels = (sequelize, DataTypes) => {
          * @property {string} line_one 
          * @property {string} line_two
 	 * @property {string} city
-	 * @property {string} state
+	 * @property {string} state - The state of the address, should be a 2-digit uppercase value like "NJ" or "PA"
 	 * @property {string} zip_code
 	 * @property {bool} geocoded - Whether or not the address has been geocoded yet
 	 * @property {double} geocoded_lat - the latitude value from geocoding - not user set

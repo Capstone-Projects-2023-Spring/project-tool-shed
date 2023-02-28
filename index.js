@@ -1,3 +1,8 @@
+/**
+ * Server boilerplate and CLI functionality.
+ * @module index
+ */
+
 const path = require('path');
 const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
@@ -6,21 +11,17 @@ const { Umzug, SequelizeStorage } = require('umzug'); // DB Migrations, sister l
 const authMiddleware = require('./middleware/auth.js');
 const cookieParser = require('cookie-parser');
 
-/*
-	index.js
-	Runs the express server
-*/
-
 const command = process.argv.length < 3 ? 'server' : process.argv[2];
 
 /*
 	TODO:
 	- code reloading for routes
+	- code reloading for models
 */
 
 /**
  * HTTP Server settings
- * @typedef {Object} HTTPServerSettings
+ * @typedef {object} HTTPServerSettings
  * @property {number} port - The port the server binds to
  */
 
@@ -32,25 +33,40 @@ const settings = {
     port: 5000 // port the webapp listens on
 };
 
-const dbSettings = {
-	database: 'tool-node',
-	username: 'postgres',
-	password: 'password',
-	host: 'localhost',
-}
+/**
+ * The connection parameters for connecting to the database.
+ * @typedef {object} DatabaseSettings
+ * @property {string} database Overridable via PGDATABASE
+ * @property {string} username Overridable via PGUSER
+ * @property {string} password Overridable via PGPASSWORD
+ * @property {string} host Overridable via PGHOST
+ */
+
+/**
+ * The settings used to connect to databases.
+ * @type {DatabaseSettings}
+ */
+const databaseSettings = {
+	database: process.env.PGDATABASE ?? 'tool-node',
+	username: process.env.PGUSER ?? 'postgres',
+	password: process.env.PGPASSWORD ?? 'password',
+	host: process.env.PGHOST ?? 'localhost'
+};
 
 /**
  * Initializes a sequelize instance
  * @return {Sequelize} An instance of Sequelize that's ready to use.
  */
 async function initSequelize() {
+	const {database, username, password, host} = databaseSettings;
+
 	// first, connect to postgres manually.
 	const { Client } = require("pg");
 
 	const client = new Client({
-		user: dbSettings.username,
-		password: dbSettings.password,
-		host: dbSettings.host
+		user: username,
+		password: password,
+		host: host
 	});
 	await client.connect();
 
@@ -58,11 +74,14 @@ async function initSequelize() {
 	// if it fails, we're assuming it failed because the
 	// database already exists.
 	try {
-		await client.query(`CREATE DATABASE "${dbSettings.database}";`);
+		await client.query(`CREATE DATABASE "${database}";`);
 	} catch (err) {};
 
 	let s = new Sequelize({
-		...dbSettings,
+		database,
+		username,
+		password,
+		host,
 		dialect: 'postgres'
 	});
 
@@ -87,6 +106,13 @@ async function initSequelize() {
 	return s;
 }
 
+/**
+ * A middleware that renders a fancy error page
+ * @param {Error} err The error that occurred
+ * @param {Request} req The Express.js request
+ * @param {Response} res The Express.js response that's being generated
+ * @param {function} next A function from Express.js that continues routing
+ */
 function handleError(err, req, res, next) {
 	console.error(err);
 	res.status(500);
@@ -94,6 +120,9 @@ function handleError(err, req, res, next) {
 	next();
 }
 
+/**
+ * Starts the Express.js HTTP server.
+ */
 async function startServer() {
 	const app = express();
 
@@ -123,6 +152,9 @@ async function startServer() {
 	console.log(`tool-node is running on port ${settings.port}`);
 }
 
+/**
+ * Starts the Sequelize shell
+ */
 async function startShell() {
 	const sequelize = await initSequelize();
 	const models = require('./models.js')(sequelize, DataTypes);

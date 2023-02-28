@@ -34,4 +34,20 @@ module.exports = (app, models) => {
 			res.render('login.html', {error: "Invalid username or password."});
 		} 
 	}));
+
+	app.get('/account', asyncHandler(async (req, res) => {
+		res.render('account.html', {error: null});
+	}));
+	
+	/* Not tested if this works */
+	app.delete('/user/:id', asyncHandler(async (req, res) => {
+		const id = req.params.id;
+		try {
+			let u = await models.User.findOne({where: {id: id}});
+			await u.destroy();
+			return res.json({ message: 'User deleted'})
+		}catch(err){
+			res.render('account.html', { error: 'Something went wrong'});
+		}
+	}));
 };

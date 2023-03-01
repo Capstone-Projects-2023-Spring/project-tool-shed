@@ -22,7 +22,7 @@ const cookieParser = require('cookie-parser');
  * @property {number} port - The port the server binds to
  */
 const settings = {
-    port: 5000 // port the webapp listens on
+    port: process.env.PORT ?? 5000 // port the webapp listens on
 };
 
 /**
@@ -63,6 +63,8 @@ async function initSequelize() {
 	try {
 		await client.query(`CREATE DATABASE "${database}";`);
 	} catch (err) {};
+
+	await client.end();
 
 	let s = new Sequelize({
 		database,

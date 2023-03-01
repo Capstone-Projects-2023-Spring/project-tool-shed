@@ -69,11 +69,15 @@ Schedule | Project Tool Shed
     - R2. User can view other listings of tools
     - R3. User can remove or hide a tool listing (draft) 
     - R4. User can edit an existing listing's title, description, image, availability
+- F4. Communication Between Users
+    - R1. Users should be able to contact other users from their profile page
+    - R2. A Borrower should be able to contact an owner regarding a listing they have.
 
 ## Milestone Demo 2
-- F4. Notifications
-    - R1. User can receive notification when a tool they require is listed
-    - R2. Notification will show the tool and availability status 
+- F4. Tool Exchange
+    - R1. Borrower will be provided with some sort of way to communicate with the tool owner
+    - R2. User will be presented with some sort of validation at the time of tool exchange
+    - R3. User will be able to report any misbehavior
 - F5. Search
     - R1. User can enter text queries to find tools they are looking for
     - R2. Search results show all of the tools within the search criteria
@@ -92,7 +96,6 @@ Schedule | Project Tool Shed
     - R2. User can search a "how to" or "help" video
     - R3. Tools should have associated YouTube videos uploaded by tool owners. 
     - R4. User can be redirected to a Youtube video appropriate to their search
-- F8. Tool Exchange
-    - R1. Borrower will be provided with some sort of way to communicate with the tool owner
-    - R2. User will be presented with some sort of validation at the time of tool exchange
-    - R3. User will be able to report any misbehavior
+- F8. Notifications
+    - R1. User can receive notification when a tool they require is listed
+    - R2. Notification will show the tool and availability status 

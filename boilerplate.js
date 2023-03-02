@@ -6,7 +6,7 @@ const path = require('path');
 const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
 const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migrations
-//const { Umzug, SequelizeStorage } = require('umzug'); // DB Migrations, sister lib to sequelize
+const { MoldyMeat } = require('moldymeat');
 const authMiddleware = require('./middleware/auth.js');
 const cookieParser = require('cookie-parser');
 
@@ -43,6 +43,7 @@ const databaseSettings = {
 /**
  * Initializes a sequelize instance
  * @return {Sequelize} An instance of Sequelize that's ready to use.
+ * @async
  */
 async function initSequelize() {
 	const {database, username, password, host} = databaseSettings;
@@ -82,21 +83,38 @@ async function initSequelize() {
 		process.exit(1);
 	}
 
-/*
-	const umzug = new Umzug({
-		migrations: { glob: 'migrations/*.js' },
-		context: sequelize.getQueryInterface(),
-		storage: new SequelizeStorage({ sequelize: s }),
-		logger: console,
-	});
+	await loadModels(s);
+	await syncDatabase(s);
 
-	await umzug.up();
-*/
 	return s;
 }
 
 /**
+ * Loads model definitions
+ * @param {Sequelize} sequelize The Sequelize instance to use
+ * @returns {object} The models defined
+ * @async
+ */
+async function loadModels(sequelize) {
+	return require('./models.js')(sequelize, DataTypes); 
+}
+
+/**
+ * Ensures the database tables match the models.
+ * @param {Sequelize} sequelize The Sequelize instance to use
+ * @async
+ */
+async function syncDatabase(sequelize) {
+	// await sequelize.sync();
+
+	const moldyMeat = new MoldyMeat({sequelize});
+	await moldyMeat.initialize();
+	await moldyMeat.updateSchema();
+}
+
+/**
  * Starts the Express.js HTTP server.
+ * @async
  */
 async function startServer() {
 	const app = express();
@@ -108,8 +126,6 @@ async function startServer() {
 	});
 
 	const sequelize = await initSequelize();
-	const models = require('./models.js')(sequelize, DataTypes); 
-	await sequelize.sync();
 
 	// middleware to respond to errors with page
 	function handleError(err, req, res, next) {
@@ -123,9 +139,9 @@ async function startServer() {
 	app.use(express.json());
 	app.use(express.urlencoded({extended: true}));
 	app.use(cookieParser());
-	app.use(authMiddleware(models.User));
+	app.use(authMiddleware(sequelize.models.User));
 
-	require('./routes.js')(app, models);
+	require('./routes.js')(app, sequelize.models);
 
 	app.use('/public', express.static(path.join(__dirname, "public")));
 	app.use('/node_modules', express.static(path.join(__dirname, "node_modules"))); // dirty hack to allow serving JS from installed packages.
@@ -137,14 +153,13 @@ async function startServer() {
 
 /**
  * Starts the Sequelize shell
+ * @async
  */
 async function startShell() {
 	const sequelize = await initSequelize();
-	const models = require('./models.js')(sequelize, DataTypes);
-	await sequelize.sync();
 	const repl = require('repl');
 	const replServer = repl.start({prompt: "tool-shed> ", useGlobal: true});
-	replServer.context.models = models;
+	replServer.context.models = sequelize.models;
 	replServer.context.sequelize = sequelize;
 }
 
@@ -155,4 +170,3 @@ module.exports = {
 	databaseSettings,
 	settings
 }
-

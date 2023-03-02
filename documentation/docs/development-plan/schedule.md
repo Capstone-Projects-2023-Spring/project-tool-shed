@@ -68,20 +68,23 @@ Schedule | Project Tool Shed
     - R1. User can add a listing of their shared tool
     - R2. User can view other listings of tools
     - R3. User can remove or hide a tool listing (draft) 
-    - R4. User can edit an existing listing's title, description, image, availability
-- F4. Communication Between Users
-    - R1. Users should be able to contact other users from their profile page
-    - R2. A Borrower should be able to contact an owner regarding a listing they have.
+    - R4. User can edit an existing listing's title, description, image, availability.
+- F5. Search
+    - R1. User can enter text queries to find tools they are looking for
+    - R2. Search results show all of the tools within the search criteria
+    - R3. When the user updates the search bar the tools listed will change
+
 
 ## Milestone Demo 2
 - F4. Tool Exchange
     - R1. Borrower will be provided with some sort of way to communicate with the tool owner
     - R2. User will be presented with some sort of validation at the time of tool exchange
     - R3. User will be able to report any misbehavior
-- F5. Search
-    - R1. User can enter text queries to find tools they are looking for
-    - R2. Search results show all of the tools within the search criteria
-    - R3. When the user updates the search bar the tools listed will change
+    - R4. User can rate the tool owner.
+    - R5. Tool owners should be able to rate tool borrowers.
+- F4. Communication Between Users
+    - R1. Users should be able to contact other users from their profile page
+    - R2. A Borrower should be able to contact an owner regarding a listing they have.
 - F6. Tool Revlevancy and Info
     - R1. Users should be able to upload tool manuals, and YouTube Videos.
     - R2. Users should be able to tag tools by project type, use case, and specific requirements such as material types if applicable
@@ -91,6 +94,12 @@ Schedule | Project Tool Shed
    - R3. Tools should be relevant to project type, and materials used (some tools may be used for woodworking while another may be used for metal specific jobs)
 
 ## Milestone Demo 3
+- F8. Interactive Map
+    - R1. User should be able to see availble tools on a map.
+    - R2. A modal of the selected tool should appear with relevant details.
+    - R3. A user should be able to navigate to the full tool page.
+    - R4. Search mile radius should be accessible to user.
+    - R5. Filters  for time posted, availablity, and types of job, and seller rating. All the search capabilities of F5. 
 - F7. Video Library
     - R1. Users will be presented relavant videos below their tool search query 
     - R2. User can search a "how to" or "help" video

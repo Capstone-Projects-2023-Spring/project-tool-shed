@@ -108,7 +108,7 @@ const genModels = (sequelize, DataTypes) => {
 	Address.hasMany(User, {foreignKey: 'address_id'});
 
 	/**
-	 * Geocodes the address and sets {@link module:models~Address}#geocoded_lat & {@link module:models~Address}#geocoded_lon.
+	 * Geocodes the address and sets models.Address#geocoded_lat & models~Address#geocoded_lon.
 	 * @method module:models~Address#getCoordinates
 	 */
 	Address.prototype.getCoordinates = async function() {

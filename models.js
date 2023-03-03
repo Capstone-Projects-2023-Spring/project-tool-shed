@@ -3,6 +3,7 @@
  * @module models
  */
 
+const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
 
 const genModels = (sequelize, DataTypes) => {
@@ -37,6 +38,9 @@ const genModels = (sequelize, DataTypes) => {
 		tableName: "user",
 		paranoid: true, // soft delete enabled
 	});
+
+	// TODO: rewrite setPassword into a setter on password_hash
+	// https://sequelize.org/docs/v6/core-concepts/getters-setters-virtuals/#setters
 
 	/**
          * Sets a user's password. 
@@ -108,18 +112,40 @@ const genModels = (sequelize, DataTypes) => {
 	Address.hasMany(User, {foreignKey: 'address_id'});
 
 	/**
-	 * Geocodes the address and sets models.Address#geocoded_lat & models~Address#geocoded_lon.
+	 * Returns a string representing the address.
+	 * @method module:models~Address#stringValue
+	 * @returns {string} A string representing the address, suitable for display or geocoding.
+	 */
+	Address.prototype.stringValue = function() {
+		let r = `${this.line_one}`;
+		if (this.line_two) r += `\n${this.line_two}`;
+		r += `\n${this.city}, ${this.state} ${this.zip_code}`;
+		return r;
+	};
+
+	/**
+	 * Gets coordinates for the address.
+	 * @returns {object} coordinate The coordinate the address geocodes to (`{lat, lon}`)
 	 * @method module:models~Address#getCoordinates
 	 */
 	Address.prototype.getCoordinates = async function() {
-		const {lat, lon} = {lat: null, lon: null}; // TODO: do the geocoding
-		this.geocoded = lat && lon;
-		this.geocoded_lat = lat;
-		this.geocoded_lon = lon;
+		const addrString = this.stringValue();
+		const pt = "ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
+		const [res, metadata] = await sequelize.query(`SELECT ST_Y(${pt}) as lat,ST_X(${pt}) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addrString]});
+		if (res.length > 0) {
+			const {lat, lon} = res[0];
+			return {lat, lon};
+		}
+		return null;
 	};
 
-	Address.addHook('beforeUpsert', 'do_geocoding', (a, opts) => {
-		a.getCoordinates();
+	Address.addHook('beforeSave', 'do_geocoding', async (a, opts) => {
+		const coords = await a.getCoordinates();
+		a.geocoded = !!coords;
+		if (a.geocoded) {
+			a.geocoded_lat = coords.lat;
+			a.geocoded_lon = coords.lon;
+		}
 	});
 
 	return {User, Address};

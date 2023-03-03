@@ -119,12 +119,13 @@ const genModels = (sequelize, DataTypes) => {
 	 * @async
 	 */
 	Address.geocode = async function(addressString) {
-		const pt = "g.geomout"//"ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
-		const [res, metadata] = await sequelize.query(`SELECT ST_Y(${pt}) as lat,ST_X(${pt}) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addressString]});
+		const [res, metadata] = await sequelize.query(`SELECT g.rating as rating, ST_Y(g.geomout) as lat,ST_X(g.geomout) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addressString]});
 		if (res.length > 0) {
-			const {lat, lon} = res[0];
+			const {lat, lon, rating} = res[0];
+			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${100 - rating}%)`);
 			return {lat, lon};
 		}
+		console.log(`Failed to geocode "${addressString}".`);
 		return null;
 	};
 

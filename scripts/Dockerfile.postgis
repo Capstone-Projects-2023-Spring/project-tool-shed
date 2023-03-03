@@ -25,14 +25,11 @@ cat /tmp/tiger_loader_states.sh >> /tmp/tiger_loader.sh
 rm /tmp/tiger_loader_states.sh
 sed -i 's/aaaaa//g' /tmp/tiger_loader.sh
 chmod a+x /tmp/tiger_loader.sh
+
+echo "\n\n\n\n" >> /tmp/tiger_loader.sh
+echo '${PSQL} -c "SELECT install_missing_indexes();"' >> /tmp/tiger_loader.sh
+
 sh /tmp/tiger_loader.sh
-
-#echo "\n\n\n" >> tiger_loader.sh
-#cat tiger_loader_states.sh >> tiger_loader.sh
-#rm tiger_loader_states.sh
-
-#echo "\n\n\n" >> tiger_loader.sh
-#echo '${PSQL} -c "SELECT install_missing_indexes();"' >> tiger_loader.sh
 
 EOF
 

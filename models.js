@@ -119,7 +119,7 @@ const genModels = (sequelize, DataTypes) => {
 	 * @async
 	 */
 	Address.geocode = async function(addressString) {
-		const pt = "ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
+		const pt = "g.geomout"//"ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
 		const [res, metadata] = await sequelize.query(`SELECT ST_Y(${pt}) as lat,ST_X(${pt}) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addressString]});
 		if (res.length > 0) {
 			const {lat, lon} = res[0];

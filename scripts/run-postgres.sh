@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-PASSWORD=password
+PASSWORD=postgres
 
 mkdir .pgdata 2>/dev/null > /dev/null
 
@@ -17,8 +17,10 @@ elif [[ $EUID = 0 ]]; then
 	PFX=''
 fi
 
+HASH=$(DOCKER_BUILDKIT=1 docker build -q - < scripts/Dockerfile.postgis)
+
 $PFX docker run \
   -v $(pwd)/.pgdata:/var/lib/postgresql/data \
   -e POSTGRES_PASSWORD=$PASSWORD \
   -p 5432:5432 \
-  postgres
+  $HASH

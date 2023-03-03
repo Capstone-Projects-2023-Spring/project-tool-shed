@@ -36,7 +36,7 @@ const settings = {
 const databaseSettings = {
 	database: process.env.PGDATABASE ?? 'tool-node',
 	username: process.env.PGUSER ?? 'postgres',
-	password: process.env.PGPASSWORD ?? 'password',
+	password: process.env.PGPASSWORD ?? 'postgres',
 	host: process.env.PGHOST ?? 'localhost'
 };
 

@@ -34,7 +34,7 @@ const settings = {
  * @property {string} host Overridable via PGHOST
  */
 const databaseSettings = {
-	database: process.env.PGDATABASE ?? 'tool-node',
+	database: process.env.PGDATABASE ?? 'postgres',
 	username: process.env.PGUSER ?? 'postgres',
 	password: process.env.PGPASSWORD ?? 'postgres',
 	host: process.env.PGHOST ?? 'localhost'

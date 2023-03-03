@@ -112,6 +112,23 @@ const genModels = (sequelize, DataTypes) => {
 	Address.hasMany(User, {foreignKey: 'address_id'});
 
 	/**
+	 * Gets coordinates for a string address.
+	 * @param {string} addressString An address in string form, similar to but not necessarily formatted like "123 Example Street, Exampleton, CA 12345"
+	 * @returns {object} coordinate The coordinate the address geocodes to (`{lat, lon}`)
+	 * @method module:models~Address.geocode
+	 * @async
+	 */
+	Address.geocode = async function(addressString) {
+		const pt = "ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
+		const [res, metadata] = await sequelize.query(`SELECT ST_Y(${pt}) as lat,ST_X(${pt}) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addressString]});
+		if (res.length > 0) {
+			const {lat, lon} = res[0];
+			return {lat, lon};
+		}
+		return null;
+	};
+
+	/**
 	 * Returns a string representing the address.
 	 * @method module:models~Address#stringValue
 	 * @returns {string} A string representing the address, suitable for display or geocoding.
@@ -129,14 +146,7 @@ const genModels = (sequelize, DataTypes) => {
 	 * @method module:models~Address#getCoordinates
 	 */
 	Address.prototype.getCoordinates = async function() {
-		const addrString = this.stringValue();
-		const pt = "ST_AsText(ST_SnapToGrid(g.geomout,0.00000000000000000000001))";
-		const [res, metadata] = await sequelize.query(`SELECT ST_Y(${pt}) as lat,ST_X(${pt}) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addrString]});
-		if (res.length > 0) {
-			const {lat, lon} = res[0];
-			return {lat, lon};
-		}
-		return null;
+		return Address.geocode(this.stringValue());
 	};
 
 	Address.addHook('beforeSave', 'do_geocoding', async (a, opts) => {

@@ -5,7 +5,8 @@ sidebar_position: 2
 
 #### 1. Use Case 1: 
 - Description: User can search for a tool.
-- Objective:
+- Objective: 
+- Expected Test Result:
 
 #### 2. Use Case 2: 
 - Description: User can sell their tool.

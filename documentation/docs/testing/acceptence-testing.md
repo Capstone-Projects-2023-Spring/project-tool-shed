@@ -18,15 +18,27 @@ sidebar_position: 3
 - Enter the url: TBD
 - Click on the "login" option on the navigation bar
 - There is an option to either "login" or "sign up" and click on "login"
-- 
+- Enter account username and password
+
+    Expected Result: 
+    - The entered credentials match an existing user account and the user is redirected to the homepage, which should look different depending on whether a user is loggin or not
+    - The user enters credentials that don't match and the user is told to "try again"
 
 3. Creating a listing
+- Select "List Tool" on the navigation bar
+- A form should appear 
+- The user 
+
 
 4. Searching for tools
 
 5. Rating a tool
 
-6. 
+6. Deleting account
+
+7. Editing username/password
+
+
 
 
 

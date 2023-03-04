@@ -3,7 +3,7 @@ sidebar_position: 3
 ---
 # Acceptance test
 
-1. Creating an account
+#### 1. Creating an account
 - Enter the url: TBD
 - Click on the "login" option on the navigation bar
 - There is an option to either "login" or "sign up", and select "create an account"
@@ -14,7 +14,7 @@ sidebar_position: 3
     - The user created an account and is redirected to the homepage, which looks different depending on whether a user is logged in or not.
     - If the user tries to enter a username which isn't an email, the user will not be able to successfully create an account and there will be a reminder that the username needs to be an email
 
-2. Logging in
+#### 2. Logging in
 - Enter the url: TBD
 - Click on the "login" option on the navigation bar
 - There is an option to either "login" or "sign up" and click on "login"
@@ -24,20 +24,36 @@ sidebar_position: 3
     - The entered credentials match an existing user account and the user is redirected to the homepage, which should look different depending on whether a user is loggin or not
     - The user enters credentials that don't match and the user is told to "try again"
 
-3. Creating a listing
+
+#### 3. Creating a listing
 - Select "List Tool" on the navigation bar
 - A form should appear 
 - The user 
 
 
-4. Searching for tools
+#### 4. Searching for tools
 
-5. Rating a tool
+#### 5. Rating a tool
 
-6. Deleting account
+#### 6. Deleting account
+- On the navigation bar click on account
+- Select "delete account" from the drop down menu
+- Click on "delete" button 
 
-7. Editing username/password
+    Expected Result:
+    - User is redirected to home page and is logged out
+    - user is unable to login to account with their credentials
 
+#### 7. Editing username or password
+- On the navigation bar click on account
+- Select "edit account" from the drop down menu
+- Click on "edit" next to username or password 
+- Enter new username or password
+- Click on submit
+
+    Expected Result:
+    - User is redirected to account page 
+    - The next time user logins the new username and/or new password logs the user into their account
 
 
 

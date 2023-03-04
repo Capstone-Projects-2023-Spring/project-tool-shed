@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM postgis/postgis
+FROM postgis/postgis:15-3.3
 
 COPY <<EOF /tiger_setup.sh
 export PGPASSWORD="$POSTGRES_PASSWORD"
@@ -12,24 +12,32 @@ UNZIPTOOL=unzip
 WGETTOOL=wget
 PSQL=psql
 SHP2PGSQL=shp2pgsql
-cd tmp/', pgbin, wget, unzip_command, psql, path_sep, loader, environ_set_command, county_process_command
+', pgbin, wget, unzip_command, psql, path_sep, loader, environ_set_command, county_process_command
 FROM tiger.loader_platform
 WHERE os = 'sh';"
 
-psql -c "SELECT loader_generate_nation_script('stretch') AS aaaaa" -t -x -A -F "" -q -o /tmp/tiger_loader.sh
+psql -c "SELECT loader_generate_nation_script('stretch')" -tA > /tmp/tiger_loader.sh
 
-psql -c "SELECT loader_generate_script(ARRAY['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FL','GA','GU','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','MP','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','VI','WA','WV','WI','WY'], 'stretch') AS aaaaa" -t -x -A -F "" -q -o /tmp/tiger_loader_states.sh
-
-echo "\n\n\n\n" >> /tmp/tiger_loader.sh
-cat /tmp/tiger_loader_states.sh >> /tmp/tiger_loader.sh
-rm /tmp/tiger_loader_states.sh
-sed -i 's/aaaaa//g' /tmp/tiger_loader.sh
-chmod a+x /tmp/tiger_loader.sh
-
-echo "\n\n\n\n" >> /tmp/tiger_loader.sh
-echo '${PSQL} -c "SELECT install_missing_indexes();"' >> /tmp/tiger_loader.sh
-
+# Must be ran before generating the state scripts
 sh /tmp/tiger_loader.sh
+
+#psql -c "SELECT loader_generate_script(ARRAY['NJ', 'PA'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
+psql -c "SELECT loader_generate_script(ARRAY['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FL','GA','GU','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','MP','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','VI','WA','WV','WI','WY'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
+
+sh /tmp/tiger_loader_states.sh
+
+psql -c "SELECT install_missing_indexes();"
+psql -c "vacuum (analyze, verbose) tiger.addr;"
+psql -c "vacuum (analyze, verbose) tiger.edges;"
+psql -c "vacuum (analyze, verbose) tiger.faces;"
+psql -c "vacuum (analyze, verbose) tiger.featnames;"
+psql -c "vacuum (analyze, verbose) tiger.place;"
+psql -c "vacuum (analyze, verbose) tiger.cousub;"
+psql -c "vacuum (analyze, verbose) tiger.county;"
+psql -c "vacuum (analyze, verbose) tiger.state;"
+psql -c "vacuum (analyze, verbose) tiger.zip_lookup_base;"
+psql -c "vacuum (analyze, verbose) tiger.zip_state;"
+psql -c "vacuum (analyze, verbose) tiger.zip_state_loc;"
 
 EOF
 

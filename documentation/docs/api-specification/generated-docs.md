@@ -21,6 +21,8 @@ description: JSDoc-generated API docs
     * [~settings](#module_boilerplate..settings) : <code>object</code>
     * [~databaseSettings](#module_boilerplate..databaseSettings) : <code>object</code>
     * [~initSequelize()](#module_boilerplate..initSequelize) ⇒ <code>Sequelize</code>
+    * [~loadModels(sequelize)](#module_boilerplate..loadModels) ⇒ <code>object</code>
+    * [~syncDatabase(sequelize)](#module_boilerplate..syncDatabase)
     * [~startServer()](#module_boilerplate..startServer)
     * [~startShell()](#module_boilerplate..startShell)
 
@@ -58,6 +60,29 @@ Initializes a sequelize instance
 
 **Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
 **Returns**: <code>Sequelize</code> - An instance of Sequelize that's ready to use.  
+<a name="module_boilerplate..loadModels"></a>
+
+### boilerplate~loadModels(sequelize) ⇒ <code>object</code>
+Loads model definitions
+
+**Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
+**Returns**: <code>object</code> - The models defined  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sequelize | <code>Sequelize</code> | The Sequelize instance to use |
+
+<a name="module_boilerplate..syncDatabase"></a>
+
+### boilerplate~syncDatabase(sequelize)
+Ensures the database tables match the models.
+
+**Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sequelize | <code>Sequelize</code> | The Sequelize instance to use |
+
 <a name="module_boilerplate..startServer"></a>
 
 ### boilerplate~startServer()
@@ -81,7 +106,11 @@ Model definitions.
         * [.setPassword(v)](#module_models..User+setPassword)
         * [.passwordMatches(v)](#module_models..User+passwordMatches) ⇒ <code>boolean</code>
     * [~Address](#module_models..Address) ⇐ <code>sequelize.Model</code>
-        * [.getCoordinates()](#module_models..Address+getCoordinates)
+        * _instance_
+            * [.stringValue()](#module_models..Address+stringValue) ⇒ <code>string</code>
+            * [.getCoordinates()](#module_models..Address+getCoordinates) ⇒ <code>object</code>
+        * _static_
+            * [.geocode(addressString)](#module_models..Address.geocode) ⇒ <code>object</code>
 
 <a name="module_models..User"></a>
 
@@ -94,7 +123,7 @@ Represents a user.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| module:models~User#first_name | <code>string</code> | The user's first name |
+| first_name | <code>string</code> | The user's first name |
 | last_name | <code>string</code> | The user's last name |
 | email | <code>string</code> | The user's email, used for logging in |
 | password_hash | <code>string</code> | A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches(). |
@@ -147,9 +176,37 @@ Represents an address.
 | geocoded_lat | <code>double</code> | the latitude value from geocoding - not user set |
 | geocoded_lon | <code>double</code> | the longitude value from geocoding - not user set |
 
-<a name="module_models..Address+getCoordinates"></a>
 
-#### address.getCoordinates()
-Geocodes the address and sets [toolshed.models.Address](toolshed.models.Address) [toolshed.models.Address#geocoded_lat](toolshed.models.Address#geocoded_lat).
+* [~Address](#module_models..Address) ⇐ <code>sequelize.Model</code>
+    * _instance_
+        * [.stringValue()](#module_models..Address+stringValue) ⇒ <code>string</code>
+        * [.getCoordinates()](#module_models..Address+getCoordinates) ⇒ <code>object</code>
+    * _static_
+        * [.geocode(addressString)](#module_models..Address.geocode) ⇒ <code>object</code>
+
+<a name="module_models..Address+stringValue"></a>
+
+#### address.stringValue() ⇒ <code>string</code>
+Returns a string representing the address.
 
 **Kind**: instance method of [<code>Address</code>](#module_models..Address)  
+**Returns**: <code>string</code> - A string representing the address, suitable for display or geocoding.  
+<a name="module_models..Address+getCoordinates"></a>
+
+#### address.getCoordinates() ⇒ <code>object</code>
+Gets coordinates for the address.
+
+**Kind**: instance method of [<code>Address</code>](#module_models..Address)  
+**Returns**: <code>object</code> - coordinate The coordinate the address geocodes to (`{lat, lon}`)  
+<a name="module_models..Address.geocode"></a>
+
+#### Address.geocode(addressString) ⇒ <code>object</code>
+Gets coordinates for a string address.
+
+**Kind**: static method of [<code>Address</code>](#module_models..Address)  
+**Returns**: <code>object</code> - coordinate The coordinate the address geocodes to (`{lat, lon}`)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| addressString | <code>string</code> | An address in string form, similar to but not necessarily formatted like "123 Example Street, Exampleton, CA 12345" |
+

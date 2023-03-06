@@ -11,7 +11,7 @@ const genModels = (sequelize, DataTypes) => {
 	 * @class User
          * @classdesc Represents a user.
 	 * @augments sequelize.Model
-         * @property {string} module:models~User#first_name The user's first name
+         * @property {string} first_name The user's first name
 	 * @property {string} last_name The user's last name
          * @property {string} email The user's email, used for logging in
          * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().

@@ -38,9 +38,19 @@ module.exports = (app, models) => {
 	app.get('/account', asyncHandler(async (req, res) => {
 		res.render('account.html', {error: null});
 	}));
-	
-	/* Not tested if this works */
-	app.delete('/user/:id', asyncHandler(async (req, res) => {
+
+	// for debugging purposes
+	app.get('/account/:id', asyncHandler(async(req, res) => {
+		try{
+			let u = await User.findByPk(req.params.id);
+			return res.status(200).json(u);	
+		} catch (err){
+			return res.status(500).json({ message: 'Error'});
+		}
+	}));
+
+	//delete an account
+	app.delete('/account/:id', asyncHandler(async (req, res) => {
 		const id = req.params.id;
 		try {
 			let u = await models.User.findOne({where: {id: id}});
@@ -49,5 +59,24 @@ module.exports = (app, models) => {
 		}catch(err){
 			res.render('account.html', { error: 'Something went wrong'});
 		}
+	}));
+    
+	//edit an account
+	app.put('/account/:id', asyncHandler(async (req, res) => {
+		const id = req.params.id;
+		try {
+			const USER_MODEL = {
+				first_name: req.body.first_name,
+				last_name: req.body.last_name,
+				email: req.body.email,
+				password_hash: req.body.password_hash,
+			};
+			try{
+				const u = await models.User.update(USER_MODEL, { where: {id: id }});
+				return res.status(200).json(u);
+			} catch (err){}
+			} catch (err){
+				return res.status(500).json(err);
+			}
 	}));
 };

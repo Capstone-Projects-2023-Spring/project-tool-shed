@@ -3,6 +3,7 @@ sidebar_position: 3
 ---
 # Acceptance test
 
+
 #### 1. Creating an account
 - Enter the url: TBD
 - Click on the "login" option on the navigation bar

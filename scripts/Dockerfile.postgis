@@ -21,8 +21,8 @@ psql -c "SELECT loader_generate_nation_script('stretch')" -tA > /tmp/tiger_loade
 # Must be ran before generating the state scripts
 sh /tmp/tiger_loader.sh
 
-#psql -c "SELECT loader_generate_script(ARRAY['NJ', 'PA'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
-psql -c "SELECT loader_generate_script(ARRAY['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FL','GA','GU','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','MP','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','VI','WA','WV','WI','WY'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
+psql -c "SELECT loader_generate_script(ARRAY['NY', 'NJ', 'PA', 'DE', 'CT', 'MD', 'DC', 'VA'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
+#psql -c "SELECT loader_generate_script(ARRAY['AL','AK','AS','AZ','AR','CA','CO','CT','DE','DC','FL','GA','GU','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','MP','OH','OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VT','VA','VI','WA','WV','WI','WY'], 'stretch')" -tA > /tmp/tiger_loader_states.sh
 
 sh /tmp/tiger_loader_states.sh
 

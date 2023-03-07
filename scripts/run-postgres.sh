@@ -17,7 +17,7 @@ elif [[ $EUID = 0 ]]; then
 	PFX=''
 fi
 
-HASH=$(DOCKER_BUILDKIT=1 docker build -q - < scripts/Dockerfile.postgis)
+HASH=$(DOCKER_BUILDKIT=1 $PFX docker build -q - < scripts/Dockerfile.postgis)
 
 $PFX docker run \
   -v $(pwd)/.pgdata:/var/lib/postgresql/data \

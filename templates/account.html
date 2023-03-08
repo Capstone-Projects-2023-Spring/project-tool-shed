@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block body %}
-
 <body>
 <!--Navigation bar-->
+<div id="nav"></div>    
+<script type="text/babel">
+const element = (
 <div>
     <nav>
         <label class="logo">ToolShed</label>
@@ -15,24 +17,32 @@
             <li><a href="/">Home</a></li>
             <li><a href="#tools">Tools</a></li>
             <li><a href="#about">About</a></li>
-            <li><a class="active" href="/account">Account</a></li>
+            <li><a href="/account">Account</a></li>
             <li><a href="#">Log In</a></li>
             <li><a href="#">Log Off</a></li>
         </ul>        
     </nav>
-</div>   
+</div>  );
+ReactDOM.render(element, document.getElementById('nav'));
+</script>
 <!--End navigation bar-->
-    
-<div>
-<h2>Account</h2>
-<div class="dropdown">
-    <button class="dropbtn">Settings</button>
-    <div class="dropdown-content">
-        <a href="#edit">Edit Account</a>
-        <a href="#delete">Delete Account</a>
-    </div>
-</div>
-</div>
+<!--Drop down menu-->
+<div id="dropdownmenu"></div>
+<script type="text/babel">
+const menu = (
+    <div>
+        <h2>Account Settings</h2>
+        <div class="dropdown">
+            <button class="dropbtn">Settings</button>
+            <div class="dropdown-content">
+                <a href="#edit">Edit Account</a>
+                <a href="#deactivate">Deactivate Account</a>
+            </div>
+        </div>
+    </div>  
+);
+ReactDOM.render(menu, document.getElementById('dropdownmenu'));
+</script>
 </body>
 
 <style>
@@ -74,12 +84,6 @@ nav ul li a{
     border-radius: 3px;
     text-transform: uppercase;
 }
-
-a.active, a:hover{
-    background: #1b9bff;
-    transition: .5s;
-}
-
 
 ul {
     list-style-type: none;

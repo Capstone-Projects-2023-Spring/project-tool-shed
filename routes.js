@@ -44,6 +44,25 @@ module.exports = (app, models) => {
 
 	//end Adding a user
 
+	// Activate and deactivate
+
+	app.post('/users/:user_id/activate', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const { active } = req.body;
+	  
+		const user = await models.User.findByPk(user_id);
+		if (!user) {
+		  return res.status(404).json({ error: 'User not found' });
+		}
+	  
+		user.active = active === 'on'; // check if the box is checked
+		await user.save();
+	  
+		res.json(user);
+	  }));
+
+	//
+
 	app.get('/user/login', asyncHandler(async (req, res) => {
 		res.render('login.html', {error: null});
 	}));

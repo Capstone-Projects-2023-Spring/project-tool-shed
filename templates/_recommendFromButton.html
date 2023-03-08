@@ -42,6 +42,7 @@
 
 	<div id="player"></div>
 
+	<script src="config.js"></script>
 	<script>
 		// Get all the buttons
 		const buttons = document.querySelectorAll('.button');
@@ -55,7 +56,7 @@
 			var searchTerm = button.textContent;
 
             // Construct the YouTube API request URL with the search term
-            var apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&key=AIzaSyC0PrPBKpvi_y_91vc_GWRl_0UgNbXQRAg&q=" + encodeURIComponent("how to use" + searchTerm);
+			var apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&key=" + config.apiKey + "&q=" + encodeURIComponent("how to use" + searchTerm);
 
             // Send a GET request to the YouTube API and process the response
             fetch(apiUrl)

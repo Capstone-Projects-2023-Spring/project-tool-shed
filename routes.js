@@ -60,7 +60,7 @@ module.exports = (app, models) => {
 		user.email = email;
 		user.active = active === 'on';
 		await user.save();
-	  
+		res.redirect('/users');
 		res.json(user);
 	  }));
 

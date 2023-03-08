@@ -39,6 +39,7 @@ module.exports = (app, models) => {
 	app.post('/users', asyncHandler(async (req, res) => {
 		const { first_name, last_name, email, password } = req.body;
 		const user = await models.User.create({ first_name, last_name, email, password_hash: password });
+		res.redirect('/users');
 		res.json(user);
 	  }));
 

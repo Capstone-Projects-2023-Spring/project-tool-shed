@@ -44,18 +44,21 @@ module.exports = (app, models) => {
 
 	//end Adding a user
 
-	// Activate and deactivate
+	// Edit a user
 
-	app.post('/users/:user_id/activate', asyncHandler(async (req, res) => {
+	app.post('/users/:user_id/edit', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const { active } = req.body;
+		const { first_name, last_name, email, active } = req.body;
 	  
 		const user = await models.User.findByPk(user_id);
 		if (!user) {
 		  return res.status(404).json({ error: 'User not found' });
 		}
 	  
-		user.active = active === 'on'; // check if the box is checked
+		user.first_name = first_name;
+		user.last_name = last_name;
+		user.email = email;
+		user.active = active === 'on';
 		await user.save();
 	  
 		res.json(user);

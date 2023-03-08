@@ -18,6 +18,32 @@ module.exports = (app, models) => {
 		res.render('index.html', {user: req.user});
 	}));
 
+	//Testing User Access
+	app.get('/getusers', asyncHandler(async (req, res) => {
+		res.render('_getusers.html', {error: null});
+	}));
+
+	app.get('/users', asyncHandler(async (req, res) => {
+		const users = await models.User.findAll();
+		res.render('_getusers.html', { users });
+	  }));
+
+	// Ending User Access - JG
+
+	//Adding a user
+
+	app.get('/adduser', asyncHandler(async (req, res) => {
+		res.render('_adduser.html', {error: null});
+	}));
+
+	app.post('/users', asyncHandler(async (req, res) => {
+		const { first_name, last_name, email, password } = req.body;
+		const user = await models.User.create({ first_name, last_name, email, password_hash: password });
+		res.json(user);
+	  }));
+
+	//end Adding a user
+
 	app.get('/user/login', asyncHandler(async (req, res) => {
 		res.render('login.html', {error: null});
 	}));

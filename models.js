@@ -18,6 +18,11 @@ const genModels = (sequelize, DataTypes) => {
 	 * @property {int} address_id The ID of an Address record for the user.
          */
 	const User = sequelize.define('User', {
+		user_id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true
+		},
 		first_name: {
 			type: DataTypes.STRING,
 			allowNull: false
@@ -33,11 +38,24 @@ const genModels = (sequelize, DataTypes) => {
 		password_hash: {
 			type: DataTypes.STRING,
 			allowNull: true
+		},
+		active: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: true
+		},
+		shipping_address_id: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
+		billing_address_id: {
+			type: DataTypes.INTEGER,
+			allowNull: true
 		}
 	}, {
 		tableName: "user",
 		paranoid: true, // soft delete enabled
 	});
+	
 
 	// TODO: rewrite setPassword into a setter on password_hash
 	// https://sequelize.org/docs/v6/core-concepts/getters-setters-virtuals/#setters

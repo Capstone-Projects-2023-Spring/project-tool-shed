@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Equipment Categories</title>
+        <style>
+            .grid-container {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                grid-gap: 10px;
+                margin: 20px;
+            }
+            
+        </style>
+{% endblock %}
+
+{% block body %}
+	<div class="grid-container">
+		<button class="button">Aerators</button>
+		<button class="button">Aerial Lifts</button>
+		<button class="button">Augers</button>
+		<button class="button">Climate Control</button>
+		<button class="button">Concrete Tools</button>
+		<button class="button">Earth Moving</button>
+		<button class="button">Fasteners</button>
+		<button class="button">Floor Care</button>
+		<button class="button">General Construction</button>
+		<button class="button">Ladders &amp; Scaffolding</button>
+		<button class="button">Lawn Care</button>
+		<button class="button">Material Handling</button>
+		<button class="button">Paint &amp; Drywall</button>
+		<button class="button">Plumbing &amp; Pumps</button>
+		<button class="button">Portable Power</button>
+		<button class="button">Power Tools</button>
+		<button class="button">Pressure Washers</button>
+		<button class="button">Rotary/Demolition</button>
+		<button class="button">Tile Saws</button>
+		<button class="button">Trailers</button>
+		<button class="button">Tree Care</button>
+		<button class="button">Trenchers</button>
+		<button class="button">Welding</button>
+	</div>
+
+	<div id="player"></div>
+
+	<script src="config.js"></script>
+	<script>
+		// Get all the buttons
+		const buttons = document.querySelectorAll('.button');
+	
+		// Add event listeners to each button
+		buttons.forEach(button => {
+		  button.addEventListener('click', () => {
+			console.log(`Clicked button: ${button.textContent}`);
+
+			event.preventDefault();
+			var searchTerm = button.textContent;
+
+            // Construct the YouTube API request URL with the search term
+			var apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&key=" + config.apiKey + "&q=" + encodeURIComponent("how to use" + searchTerm);
+
+            // Send a GET request to the YouTube API and process the response
+            fetch(apiUrl)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    var videoId = data.items[0].id.videoId;
+                    var playerDiv = document.getElementById("player");
+                    playerDiv.innerHTML = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+                })
+                .catch(function(error) {
+                    console.error(error);
+                });
+
+
+		  });
+		});
+	  </script>
+
+	  
+
+
+{% endblock %}

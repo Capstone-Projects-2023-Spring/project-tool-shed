@@ -5,8 +5,9 @@
 
 const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const genModels = (sequelize, DataTypes) => {
+const genModels = sequelize => {
 	/**
 	 * @class User
          * @classdesc Represents a user.
@@ -18,11 +19,6 @@ const genModels = (sequelize, DataTypes) => {
 	 * @property {int} address_id The ID of an Address record for the user.
          */
 	const User = sequelize.define('User', {
-		user_id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true
-		},
 		first_name: {
 			type: DataTypes.STRING,
 			allowNull: false
@@ -42,14 +38,6 @@ const genModels = (sequelize, DataTypes) => {
 		active: {
 			type: DataTypes.BOOLEAN,
 			defaultValue: true
-		},
-		shipping_address_id: {
-			type: DataTypes.INTEGER,
-			allowNull: true
-		},
-		billing_address_id: {
-			type: DataTypes.INTEGER,
-			allowNull: true
 		}
 	}, {
 		tableName: "user",
@@ -127,7 +115,8 @@ const genModels = (sequelize, DataTypes) => {
 		}
 	}, {tableName: 'address', paranoid: true});
 
-	Address.hasMany(User, {foreignKey: 'address_id'});
+	User.belongsTo(Address, {foreignKey: 'address_id', as: 'address'});
+	User.belongsTo(Address, {foreignKey: 'billing_address_id', as: 'billing_address'});
 
 	/**
 	 * Gets coordinates for a string address.
@@ -137,13 +126,23 @@ const genModels = (sequelize, DataTypes) => {
 	 * @async
 	 */
 	Address.geocode = async function(addressString) {
-		const [res, metadata] = await sequelize.query(`SELECT g.rating as rating, ST_Y(g.geomout) as lat,ST_X(g.geomout) as lon, (addy).* FROM geocode(?) As g`, {replacements: [addressString]});
-		if (res.length > 0) {
-			const {lat, lon, rating} = res[0];
-			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${100 - rating}%)`);
+		let coord = null;
+		let err = null;
+		try {
+			const {coordinate, error} = await fetch(`http://0.0.0.0:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
+			coord = coordinate;
+			err = error;
+		} catch (e) {
+			err = e.toString();
+		}
+
+		if (coord) {
+			const {lat, lon, accuracyPercent} = coord;
+			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${accuracyPercent}%)`);
 			return {lat, lon};
 		}
-		console.log(`Failed to geocode "${addressString}".`);
+
+		console.log(`Failed to geocode "${addressString}: ${err ? err : "unknown error"}".`);
 		return null;
 	};
 
@@ -177,7 +176,39 @@ const genModels = (sequelize, DataTypes) => {
 		}
 	});
 
-	return {User, Address};
+	const ToolMaker = sequelize.define('ToolMaker', {
+
+	}, {tableName: 'tool_maker', paranoid: true});
+
+	const ToolCategory = sequelize.define("ToolCategory", {
+		name: {type: DataTypes.STRING, allowNull: false}
+	}, {tableName: "tool_category", paranoid: true});
+
+	const Tool = sequelize.define('Tool', {
+		description: {type: DataTypes.STRING, allowNull: true},
+	}, {tableName: 'tool', paranoid: true});
+	Tool.belongsTo(User, {
+		foreignKey: {
+			name: 'owner_id',
+			allowNull: false
+		},
+		as: 'owner'
+	});
+	User.hasMany(Tool, {as: "tools"});
+
+	const Listing = sequelize.define("Listing", {
+		price: {type: DataTypes.DECIMAL, allowNull: false},
+	}, {tableName: 'listing', paranoid: true});
+	Listing.belongsTo(Tool, {
+		foreignKey: {
+			name: 'tool_id',
+			allowNull: false
+		},
+		as: 'tool'
+	});
+	Tool.hasMany(Listing, {as: 'listings'});
+
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing};
 };
 
 module.exports = genModels;

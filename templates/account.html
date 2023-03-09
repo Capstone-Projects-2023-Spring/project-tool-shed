@@ -29,7 +29,7 @@ ReactDOM.render(element, document.getElementById('nav'));
 <!--Drop down menu-->
 <div id="dropdownmenu"></div>
 <script type="text/babel">
-const menu = (
+const Menu = props => (
     <div>
         <h2>Account Settings</h2>
         <div class="dropdown">
@@ -41,7 +41,7 @@ const menu = (
         </div>
     </div>  
 );
-ReactDOM.render(menu, document.getElementById('dropdownmenu'));
+ReactDOM.render(<Menu />, document.getElementById('dropdownmenu'));
 </script>
 </body>
 

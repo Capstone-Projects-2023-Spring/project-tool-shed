@@ -9,6 +9,7 @@ const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migratio
 const { MoldyMeat } = require('moldymeat');
 const authMiddleware = require('./middleware/auth.js');
 const cookieParser = require('cookie-parser');
+const asyncHandler = require('express-async-handler');
 
 /*
 	TODO:
@@ -22,7 +23,9 @@ const cookieParser = require('cookie-parser');
  * @property {number} port - The port the server binds to
  */
 const settings = {
-    port: process.env.PORT ?? 5000 // port the webapp listens on
+	port: process.env.PORT ?? 5000, // port the webapp listens on
+	watchTemplates: false,
+	cacheTemplates: true
 };
 
 /**
@@ -41,7 +44,36 @@ const databaseSettings = {
 };
 
 /**
- * Initializes a sequelize instance
+ * Create middleware to render nunjucks templates.
+ * @param {Express} app The express app you're adding things to.
+ * @return {function} Middleware function
+ */
+function nunjucksMiddleware(app) {
+	// Configure expressjs to use nunjucks when rendering html.
+	const env = nunjucks.configure(path.join(__dirname, 'templates'), {
+		autoescape: true,
+		watch: settings.watchTemplates,
+		throwOnUndefined: true,
+		noCache: !settings.cacheTemplates,
+		express: app
+	});
+
+	env.addFilter('json', function(value, spaces) {
+		if (value instanceof nunjucks.runtime.SafeString) {
+			value = value.toString();
+		}
+		const jsonString = JSON.stringify(value, null, spaces).replace(/</g, '\\u003c');
+		return nunjucks.runtime.markSafe(jsonString);
+	});
+
+	return function(req, res, next) {
+		env.addGlobal('authUser', req.user ?? null);
+		next();
+	};
+}
+
+/**
+ * Initializes a sequelize instance. Loads models and syncs the database schema.
  * @return {Sequelize} An instance of Sequelize that's ready to use.
  * @async
  */
@@ -96,7 +128,7 @@ async function initSequelize() {
  * @async
  */
 async function loadModels(sequelize) {
-	return require('./models.js')(sequelize, DataTypes); 
+	return require('./models.js')(sequelize); 
 }
 
 /**
@@ -119,12 +151,6 @@ async function syncDatabase(sequelize) {
 async function startServer() {
 	const app = express();
 
-	// Configure expressjs to use nunjucks when rendering html.
-	nunjucks.configure(path.join(__dirname, 'templates'), {
-		autoescape: true,
-		express: app
-	});
-
 	const sequelize = await initSequelize();
 
 	// middleware to respond to errors with page
@@ -140,6 +166,7 @@ async function startServer() {
 	app.use(express.urlencoded({extended: true}));
 	app.use(cookieParser());
 	app.use(authMiddleware(sequelize.models.User));
+	app.use(nunjucksMiddleware(app));
 
 	require('./routes.js')(app, sequelize.models);
 

@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="/users" method="post">
+<form action="/user/new" method="post">
     <label for="first_name">First Name:</label>
     <input type="text" id="first_name" name="first_name" required>
     <br>
@@ -19,6 +19,6 @@
     <input type="password" id="password" name="password" required>
     <br>
     <button type="submit">Create User</button>
-  </form>
+ </form>
   
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<div id="root"></div>
+
+<script src="/public/user.jsx" type="text/babel"></script>
+
+<script type="text/babel">
+	const root = ReactDOM.createRoot(document.getElementById('root'));
+
+	const user = {{ user|json }};
+	console.log(user);
+	root.render(<User {...user} />);
+</script>
+
+{% endblock %}

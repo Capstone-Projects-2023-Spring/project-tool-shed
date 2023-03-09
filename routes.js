@@ -150,4 +150,30 @@ module.exports = (app, models) => {
 	app.get('/account', asyncHandler(async (req, res) => {
 		res.render('account.html', {error: null});
 	}));
+
+
+
+	/*
+	 * Listings
+	 */
+	app.get('/listings/search', asyncHandler(async (req, res) => {
+		const {
+			searchRadius, // kilometers
+			lat, lon, // degrees
+			q: fulltextSearch // string
+		} = req.query;
+
+		let results = await models.Listing.findAll({
+			include: [
+				{model: models.Tool, as: 'tool', include: [
+					{model: models.User, as: 'owner', required: false, include: [
+						{model: models.Address, as: 'address', required: true, attributes: [
+[
+sequelize.literal(`6371 * acos(cos(radians(${lat})) * cos(radians("tool->owner->address"."geocoded_lat")) * cos(radians(${lon}) - radians("tool->owner->address"."geocoded_lon")) + sin(radians(${lat})) * sin(radians("tool->owner->address"."geocoded_lat")))`)
+,'distance_km']], order: sequelize.col('distance_km')}
+						]}]}]
+		});
+
+		res.render('listings_search.html', {results});
+	}));
 };

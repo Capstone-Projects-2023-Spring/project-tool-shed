@@ -6,15 +6,23 @@
 
 {% block body %}
 <!--enctype="multipart/form-data"-->
-<form action="/user/:user_id/newtool" method="POST">
+<form action="/user/{owner_id}/tools" method="POST">
     <div>
       <label for="tool_name">Tool Name:</label>
       <input type="text" id="tool_name" name="tool_name" required>
     </div>
   
     <div>
-      <label for="description">Type:</label>
+      <label for="description">Description of Tool:</label>
       <input type="text" id="description" name="description" required>
+    </div>
+
+
+    <div>
+      <label for="owner_id">User Id:</label>
+      <input type="text" id="owner_id" name="owner_id"required>
+    </div>
+
       <!-- <select id="tool_type" name="tool_type" required>
         <option value="">Select a type</option>
         <option value="Aerators">Aerators</option>
@@ -44,6 +52,11 @@
       
     </div>
   
+    <div>
+      <label for="images">Upload Images:</label>
+      <input type="file" id="images" name="toolImages" accept="image/*" multiple>
+    </div>
+
     <div>
       <label for="tool_status">Sell or Rent or Non Active:</label>
       -<input type="text" id="tool_status" name="tool_status" required>

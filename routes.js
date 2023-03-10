@@ -147,16 +147,17 @@ module.exports = (app, models) => {
 
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const user = await models.User.findByPk(user_id, { include: 'Tool' });
+		const user = await models.User.findByPk(user_id, {
+										include: [{ model: Tool, as: 'tools' }]
+		  });
 		
 		if (!user) {
 		  return res.status(404).json({ error: 'User not found' });
 		}
 
-		const { name, description } = req.body;
-		const tool = await models.Tool.create({ name, description });
+		const usertools = user.tools;
 
-		res.render('tool_list.html', {tools});
+		res.render('tool_list.html', {usertools});
 	}));
 	  
 
@@ -181,6 +182,19 @@ module.exports = (app, models) => {
 		res.render('_addtool.html', {error: null});
 	}));
 
+	app.post('/user/:user_id/tools', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const usertools = await models.User.findAll({ include: {model: Tool, as: 'tools', foreignKey: 'owner_id'}});
+		
+		if (!usertools) {
+		  return res.status(404).json({ error: "User's tools not found" });
+		}
+
+		const { tool_name, description, owner_id } = req.body;
+		const tool = await models.Tool.create({ tool_name, description, owner_id });
+
+		res.redirect('/user/:user_id/tools');
+	}));
 
 	/*
 	 * Settings Pages

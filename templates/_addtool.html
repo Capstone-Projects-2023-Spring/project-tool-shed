@@ -5,16 +5,17 @@
 {% endblock %}
 
 {% block body %}
-
-<form action="/submit-form" method="POST" enctype="multipart/form-data">
+<!--enctype="multipart/form-data"-->
+<form action="/user/:user_id/newtool" method="POST">
     <div>
-      <label for="tool-name">Tool Name:</label>
-      <input type="text" id="tool-name" name="toolName" required>
+      <label for="tool_name">Tool Name:</label>
+      <input type="text" id="tool_name" name="tool_name" required>
     </div>
   
     <div>
-      <label for="type">Type:</label>
-      <select id="type" name="toolType" required>
+      <label for="description">Type:</label>
+      <input type="text" id="description" name="description" required>
+      <!-- <select id="tool_type" name="tool_type" required>
         <option value="">Select a type</option>
         <option value="Aerators">Aerators</option>
         <option value="Aerial Lifts">Aerial Lifts</option>
@@ -39,32 +40,44 @@
         <option value="Tree Care">Tree Care</option>
         <option value="Trenchers">Trenchers</option>
         <option value="Welding">Welding</option>
-      </select>
+      </select> 
+      
     </div>
   
     <div>
-      <label>Sell or Rent:</label>
+      <label for="tool_status">Sell or Rent or Non Active:</label>
+      -<input type="text" id="tool_status" name="tool_status" required>
+
       <input type="radio" id="sell" name="sellOrRent" value="Sell" required>
       <label for="sell">Sell</label>
       <input type="radio" id="rent" name="sellOrRent" value="Rent" required>
-      <label for="rent">Rent</label>
+      <label for="rent">Rent</label> 
+      
     </div>
   
     <div>
-      <label for="price">Price:</label>
-      <input type="number" id="price" name="toolPrice" required>
-    </div>
-  
+      <label for="tool_price">Price:</label>
+      <input type="text" id="tool_price" name="tool_price" required>
+      <input type="number" id="tool_price" name="tool_price" required>
+    </div> 
+  -->
+    
+    <!--
     <div>
       <label for="images">Upload Images:</label>
       <input type="file" id="images" name="toolImages" accept="image/*" multiple>
     </div>
+    -->
   
     <div>
-      <button type="submit">Submit</button>
+      <button type="submit" onclick="getString()">Submit</button>
     </div>
   </form>
-  
+  <!--
+  <script>
+    var radio = document.querySelector('input[name="sellOrRent"]:checked').value
+  </script>
+-->
   <style>
     form div {
       margin-bottom: 10px;

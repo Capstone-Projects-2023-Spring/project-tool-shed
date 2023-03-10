@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<div id="root"></div>
+
+<script src="/public/tool.jsx" type="text/babel"></script>
+
+<script type="text/babel">
+	const UserToolList = ({tools}) => {
+	
+		return <div>
+			<form action="/user/:user_id/tools" method="get">
+				<button type="submit">Get Tools</button>
+			</form>
+            {tools.map(t => <li key={t.id}>{t.description}</li>)}
+		</div>;
+	};
+
+	const root = ReactDOM.createRoot(document.getElementById('root'));
+
+	const usertools = { tools };
+	console.log(usertools);
+	root.render(<UserToolList usertools={tools} />);
+</script>
+
+{% endblock %}`

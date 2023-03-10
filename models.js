@@ -185,7 +185,20 @@ const genModels = sequelize => {
 	}, {tableName: "tool_category", paranoid: true});
 
 	const Tool = sequelize.define('Tool', {
-		description: {type: DataTypes.STRING, allowNull: true},
+		tool_id:{
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true
+		},
+		tool_name: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		description: {
+			type: DataTypes.STRING, 
+			allowNull: true
+		},
+
 	}, {tableName: 'tool', paranoid: true});
 	Tool.belongsTo(User, {
 		foreignKey: {

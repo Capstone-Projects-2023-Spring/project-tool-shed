@@ -20,7 +20,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing} = models;
 	app.get('/', asyncHandler(async (req, res) => {
 		// render the template at templates/index.html
 		// with the parameters:
@@ -141,6 +141,45 @@ module.exports = (app, models) => {
 		res.render('user_singular.html', { user });
 	}));
 
+	/*
+	 * Tool viewing
+	 */
+
+	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const user = await models.User.findByPk(user_id, { include: 'Tool' });
+		
+		if (!user) {
+		  return res.status(404).json({ error: 'User not found' });
+		}
+
+		const { name, description } = req.body;
+		const tool = await models.Tool.create({ name, description });
+
+		res.render('tool_list.html', {tools});
+	}));
+	  
+
+/* app.get('/usertools', asyncHandler(async (req, res) => {
+	 	const users = await models.User.findAll();
+	 	res.render('tool_list.html', { users });
+	}));
+
+	app.get('/user/:user_id', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const user = await models.Tool.findByPk(tool_id);
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+		res.render('tools_list', { user });
+	}));
+*/
+	/*
+		Add Tools to User
+	*/
+	app.get('/user/:user_id/newtool', asyncHandler(async (req, res) => {
+		res.render('_addtool.html', {error: null});
+	}));
 
 
 	/*

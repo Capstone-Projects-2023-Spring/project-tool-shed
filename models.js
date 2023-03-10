@@ -17,6 +17,7 @@ const genModels = sequelize => {
          * @property {string} email The user's email, used for logging in
          * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
 	 * @property {int} address_id The ID of an Address record for the user.
+	 * @property {int} billing_address_id The ID of an Address record for the user.
          */
 	const User = sequelize.define('User', {
 		first_name: {
@@ -147,6 +148,28 @@ const genModels = sequelize => {
 	};
 
 	/**
+	 * Ensures the address is geocoded
+	 * @param {boolean} shouldSave Whether or not to call `this.save()` after successfully geocoding (default: true)
+	 * @returns {boolean} Whether or not the address was successfully geocoded.
+	 * @async
+	 */
+	Address.prototype.ensureGeocoded = async function(shouldSave=true) {
+		if (this.geocoded) return true;
+
+		const coords = await this.getCoordinates();
+		this.geocoded = !!coords;
+		if (this.geocoded) {
+			this.geocoded_lat = coords.lat;
+			this.geocoded_lon = coords.lon;
+			if (shouldSave) {
+				await this.save();
+			}
+			return true;
+		}
+		return false;
+	};
+
+	/**
 	 * Returns a string representing the address.
 	 * @method module:models~Address#stringValue
 	 * @returns {string} A string representing the address, suitable for display or geocoding.
@@ -162,43 +185,63 @@ const genModels = sequelize => {
 	 * Gets coordinates for the address.
 	 * @returns {object} coordinate The coordinate the address geocodes to (`{lat, lon}`)
 	 * @method module:models~Address#getCoordinates
+	 * @async
 	 */
 	Address.prototype.getCoordinates = async function() {
-		return Address.geocode(this.stringValue());
+		return await Address.geocode(this.stringValue());
 	};
 
 	Address.addHook('beforeSave', 'do_geocoding', async (a, opts) => {
-		const coords = await a.getCoordinates();
-		a.geocoded = !!coords;
-		if (a.geocoded) {
-			a.geocoded_lat = coords.lat;
-			a.geocoded_lon = coords.lon;
-		}
+		await a.ensureGeocoded(false);
 	});
 
-	const ToolMaker = sequelize.define('ToolMaker', {
 
+
+	/**
+	 * @class ToolMaker
+         * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
+	 * @augments sequelize.Model
+         * @property {string} name The name of the manufacturer
+         */
+	const ToolMaker = sequelize.define('ToolMaker', {
+		name: {type: DataTypes.STRING, allowNull: false}
 	}, {tableName: 'tool_maker', paranoid: true});
 
+
+
+	/**
+	 * @class ToolCategory
+         * @classdesc Represents a kind of tool - like hammer, saw, or drill.
+	 * @augments sequelize.Model
+         * @property {string} name The name of the category
+         */
 	const ToolCategory = sequelize.define("ToolCategory", {
 		name: {type: DataTypes.STRING, allowNull: false}
 	}, {tableName: "tool_category", paranoid: true});
 
+
+
+	// TODO: write indeces for TSVector field (depends on implementing it in moldymeat)
+
+	/**
+	 * @class Tool
+         * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
+	 * @augments sequelize.Model
+         * @property {string} description An arbitrary description of the tool and its condition.
+
+         * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+         * @property {integer} owner_id The id of the User record that owns this tool
+         * @property {integer} tool_category_id The id the category related to this tool
+	 * @property {integer} tool_maker_id The id of the maker of this tool.
+         */
 	const Tool = sequelize.define('Tool', {
-		tool_id:{
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true
-		},
-		tool_name: {
-			type: DataTypes.STRING,
-			allowNull: false
-		},
 		description: {
-			type: DataTypes.STRING, 
+			type: DataTypes.STRING,
 			allowNull: true
 		},
-
+		searchVector: {
+			type: DataTypes.TSVECTOR
+		}
 	}, {tableName: 'tool', paranoid: true});
 	Tool.belongsTo(User, {
 		foreignKey: {
@@ -207,10 +250,55 @@ const genModels = sequelize => {
 		},
 		as: 'owner'
 	});
-	User.hasMany(Tool, {as: "tools"});
+	Tool.hasOne(ToolCategory, {
+		as: "category",
+		foreignKey: {name: 'tool_category_id'}
+	});
+	Tool.hasOne(ToolMaker, {
+		as: 'maker',
+		foreignKey: {name: 'tool_maker_id'}
+	});
 
+	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
+		const toolCategory = tool.getCategory();
+		const toolMaker = tool.getMaker();
+
+		let content = '';
+		content += tool.description ?? '';
+
+		if (toolMaker) {
+			content += toolMaker.name ?? '';
+		}
+
+		if (toolCategory) {
+			content += toolCategory.name ?? '';
+		}
+	
+		tool.searchVector = sequelize.fn('to_tsvector', content);
+	});
+
+
+	/**
+	 * @class Listing
+         * @classdesc Represents a tool's being listed for sale.
+	 * @augments sequelize.Model
+         * @property {number} price The amount the listing costs per `billingInterval`
+	 * @property {string} billingInterval The interval at which you're going to pay `price`
+	 * @property {integer} maxBillingIntervals The maximum number of billing intervals the tool is available for.
+         */
 	const Listing = sequelize.define("Listing", {
-		price: {type: DataTypes.DECIMAL, allowNull: false},
+		price: {
+			type: DataTypes.DECIMAL,
+			allowNull: false
+		},
+		billingInterval: {
+			type: DataTypes.ENUM('hourly', 'daily', 'weekly', 'forever'),
+			defaultValue: 'daily'
+		},
+		maxBillingIntervals: {
+			type: DataTypes.INTEGER,
+			defaultValue: 1
+		}
 	}, {tableName: 'listing', paranoid: true});
 	Listing.belongsTo(Tool, {
 		foreignKey: {
@@ -219,7 +307,6 @@ const genModels = sequelize => {
 		},
 		as: 'tool'
 	});
-	Tool.hasMany(Listing, {as: 'listings'});
 
 	return {User, Address, ToolCategory, ToolMaker, Tool, Listing};
 };

@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
-const loginUserSchema = require('./validators/loginUser');
+const {loginUserSchema, searchListingsSchema} = require('./validators');
+const sequelize = require('sequelize');
+const {Op} = sequelize;
 
 /*
 	Routes
@@ -202,5 +204,69 @@ module.exports = (app, models) => {
 
 	app.get('/account', asyncHandler(async (req, res) => {
 		res.render('account.html', {error: null});
+	}));
+
+
+
+	/*
+	 * Listings
+	 */
+	app.get('/listings/search.json', asyncHandler(async (req, res) => {
+		const {
+			searchQuery, // string
+			searchRadius, // kilometers
+			userLat, userLon, // degrees
+			useUserAddress // boolean
+		} = await searchListingsSchema.validate(req.query);
+
+		let lat = userLat;
+		let lon = userLon;
+		if (req.user && useUserAddress) {
+			let a = req.user.getAddress();
+			if (a) {
+				if (a.ensureGeocoded()) {
+					lat = a.geocoded_lat;
+					lon = a.geocoded_lon;
+				}
+			}
+		}
+
+		lat = `radians(${lat})`;
+		lon = `radians(${lon})`;
+		let ownersLat = `radians("tool->owner->address"."geocoded_lat")`;
+		let ownersLon = `radians("tool->owner->address"."geocoded_lon")`;
+
+		const distanceKm = `(6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
+
+		let results = await models.Listing.findAll({
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: !searchQuery ? {} : {
+					searchVector: {
+						[Op.match]: sequelize.fn('to_tsquery', searchQuery)
+					}
+				},
+				include: [{
+					model: models.User,
+					as: 'owner',
+					required: true,
+					include: [{
+						model: models.Address,
+						as: 'address',
+						required: true,
+						attributes: {
+							include: [[
+								sequelize.literal(distanceKm),
+								'distance'
+							]]
+						},
+						order: sequelize.col('distance'),
+						where: sequelize.literal(`${distanceKm} < ${searchRadius}`)
+					}]
+				}]
+			}]
+		});
+		res.json({results});
 	}));
 };

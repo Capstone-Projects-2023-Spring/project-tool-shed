@@ -7,26 +7,7 @@
 {% block body %}
 
 <body>
-    <!--Navigation bar-->
-    <div id="nav"></div>
-    <script type="text/babel">
-        const element = (
-            <div>
-                <nav>
-                    <label class="logo">ToolShed</label>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="#tools">Tools</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="/account">Account</a></li>
-                        <li><a href="#">Log In</a></li>
-                        <li><a href="#">Log Off</a></li>
-                    </ul>
-                </nav>
-            </div>);
-        ReactDOM.render(element, document.getElementById('nav'));
-    </script>
-    <!--End navigation bar-->
+
     <!--Drop down menu-->
     <div id="dropdownmenu"></div>
     <script type="text/babel">
@@ -47,68 +28,7 @@
 </body>
 
 <style>
-    * {
-        padding: 0;
-        margin: 0;
-        text-decoration: none;
-        list-style: none;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: montserrat;
-    }
-
-    nav {
-        background: #0082e6;
-        height: 80px;
-        width: 100%;
-    }
-
-    label.logo {
-        color: white;
-        font-size: 35px;
-        line-height: 80px;
-        padding: 0 100px;
-        font-weight: bold;
-    }
-
-    nav ul {
-        float: right;
-        margin-right: 20px;
-    }
-
-    nav ul li {
-        display: inline-block;
-        line-height: 80px;
-        margin: 0 5px;
-    }
-
-    nav ul li a {
-        color: white;
-        font-size: 17px;
-        padding: 7px 13px;
-        border-radius: 3px;
-        text-transform: uppercase;
-    }
-
-    ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    li {
-        float: left;
-    }
-
-    li a {
-        display: block;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-    }
+ 
 
     /* style of dropdown button */
     .dropbtn {
@@ -124,6 +44,7 @@
     .dropdown {
         position: relative;
         display: inline-block;
+        padding: 16px;
     }
 
     /* Dropdown content, hidden */

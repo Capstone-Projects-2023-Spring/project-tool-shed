@@ -20,11 +20,15 @@ const Tool = (function () {
         return <div style={style}>
             <h2>{id} {name} {description} {owner}</h2>
             <form action="/users/{owner}/tools/edit" method="post">
-                <label for="tool_name">Tool:</label>
-                <input type="text" id="tool_name" name="tool_name" value={ name }/>
-                <label for="description">Description of Tool:</label>
-                <input type="text" id="description" name="description" value={ description }/>
+                <label for="description">Description:</label>
+                <input type="text" id="description" name="description"/>
+
+                <label for="category">Category:</label>
+                <input type="text" id="category" name="category"/>
+
+                <label for="maker">Maker:</label>
+                <input type="text" id="maker" name="maker"/>
             </form>
-        </div>
+                    </div>
 	};
 })();

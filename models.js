@@ -228,7 +228,11 @@ const genModels = sequelize => {
          * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
          * @property {string} description An arbitrary description of the tool and its condition.
+
          * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+         * @property {integer} owner_id The id of the User record that owns this tool
+         * @property {integer} tool_category_id The id the category related to this tool
+	 * @property {integer} tool_maker_id The id of the maker of this tool.
          */
 	const Tool = sequelize.define('Tool', {
 		description: {
@@ -246,15 +250,18 @@ const genModels = sequelize => {
 		},
 		as: 'owner'
 	});
-	User.hasMany(Tool, {as: "tools"});
 	Tool.hasOne(ToolCategory, {
-		as: "tool_category",
+		as: "category",
 		foreignKey: {name: 'tool_category_id'}
+	});
+	Tool.hasOne(ToolMaker, {
+		as: 'maker',
+		foreignKey: {name: 'tool_maker_id'}
 	});
 
 	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
-		const toolCategory = tool.getToolCategory();
-		const toolMaker = tool.getToolMaker();
+		const toolCategory = tool.getCategory();
+		const toolMaker = tool.getMaker();
 
 		let content = '';
 		content += tool.description ?? '';
@@ -300,7 +307,6 @@ const genModels = sequelize => {
 		},
 		as: 'tool'
 	});
-	Tool.hasMany(Listing, {as: 'listings'});
 
 	return {User, Address, ToolCategory, ToolMaker, Tool, Listing};
 };

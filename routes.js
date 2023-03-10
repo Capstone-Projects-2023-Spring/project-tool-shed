@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const {loginUserSchema, searchListingsSchema} = require('./validators');
 const sequelize = require('sequelize');
+const {Op} = sequelize;
 
 /*
 	Routes
@@ -182,17 +183,16 @@ module.exports = (app, models) => {
 		let ownersLat = `radians("tool->owner->address"."geocoded_lat")`;
 		let ownersLon = `radians("tool->owner->address"."geocoded_lon")`;
 
-		const distanceKm = `6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat}))`;
-
-		// TODO: implement fulltext search
-		// https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
+		const distanceKm = `(6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
 
 		let results = await models.Listing.findAll({
 			include: [{
 				model: models.Tool,
 				as: 'tool',
-				where: !searchQuery ? undefined : {
-					searchVector: { [Op.match]: sequelize.fn('to_tsquery', searchQuery)}
+				where: !searchQuery ? {} : {
+					searchVector: {
+						[Op.match]: sequelize.fn('to_tsquery', searchQuery)
+					}
 				},
 				include: [{
 					model: models.User,
@@ -202,16 +202,14 @@ module.exports = (app, models) => {
 						model: models.Address,
 						as: 'address',
 						required: true,
-						attributes: [
-							[
+						attributes: {
+							include: [[
 								sequelize.literal(distanceKm),
-								'distance_km'
-							]
-						],
-						order: sequelize.col('distance_km'),
-						where: {
-							[Op.lte]: searchRadius
-						}
+								'distance'
+							]]
+						},
+						order: sequelize.col('distance'),
+						where: sequelize.literal(`${distanceKm} < ${searchRadius}`)
 					}]
 				}]
 			}]

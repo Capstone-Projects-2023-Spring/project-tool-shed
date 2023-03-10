@@ -146,7 +146,7 @@ module.exports = (app, models) => {
 	/*
 	 * Tool viewing
 	 */
-
+	//untested
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const user = await models.User.findByPk(user_id, {
@@ -180,6 +180,7 @@ module.exports = (app, models) => {
 	/*
 		Add Tools to User
 	*/
+	//untested
 	app.get('/user/:user_id/newtool', asyncHandler(async (req, res) => {
 		res.render('_addtool.html', {error: null});
 	}));

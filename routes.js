@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
-const loginUserSchema = require('./validators/loginUser');
+const {loginUserSchema, searchListingsSchema} = require('./validators');
+const sequelize = require('sequelize');
 
 /*
 	Routes
@@ -156,24 +157,65 @@ module.exports = (app, models) => {
 	/*
 	 * Listings
 	 */
-	app.get('/listings/search', asyncHandler(async (req, res) => {
+	app.get('/listings/search.json', asyncHandler(async (req, res) => {
 		const {
+			searchQuery, // string
 			searchRadius, // kilometers
-			lat, lon, // degrees
-			q: fulltextSearch // string
-		} = req.query;
+			userLat, userLon, // degrees
+			useUserAddress // boolean
+		} = await searchListingsSchema.validate(req.query);
+
+		let lat = userLat;
+		let lon = userLon;
+		if (req.user && useUserAddress) {
+			let a = req.user.getAddress();
+			if (a) {
+				if (a.ensureGeocoded()) {
+					lat = a.geocoded_lat;
+					lon = a.geocoded_lon;
+				}
+			}
+		}
+
+		lat = `radians(${lat})`;
+		lon = `radians(${lon})`;
+		let ownersLat = `radians("tool->owner->address"."geocoded_lat")`;
+		let ownersLon = `radians("tool->owner->address"."geocoded_lon")`;
+
+		const distanceKm = `6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat}))`;
+
+		// TODO: implement fulltext search
+		// https://www.compose.com/articles/mastering-postgresql-tools-full-text-search-and-phrase-search/
 
 		let results = await models.Listing.findAll({
-			include: [
-				{model: models.Tool, as: 'tool', include: [
-					{model: models.User, as: 'owner', required: false, include: [
-						{model: models.Address, as: 'address', required: true, attributes: [
-[
-sequelize.literal(`6371 * acos(cos(radians(${lat})) * cos(radians("tool->owner->address"."geocoded_lat")) * cos(radians(${lon}) - radians("tool->owner->address"."geocoded_lon")) + sin(radians(${lat})) * sin(radians("tool->owner->address"."geocoded_lat")))`)
-,'distance_km']], order: sequelize.col('distance_km')}
-						]}]}]
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: !searchQuery ? undefined : {
+					searchVector: { [Op.match]: sequelize.fn('to_tsquery', searchQuery)}
+				},
+				include: [{
+					model: models.User,
+					as: 'owner',
+					required: true,
+					include: [{
+						model: models.Address,
+						as: 'address',
+						required: true,
+						attributes: [
+							[
+								sequelize.literal(distanceKm),
+								'distance_km'
+							]
+						],
+						order: sequelize.col('distance_km'),
+						where: {
+							[Op.lte]: searchRadius
+						}
+					}]
+				}]
+			}]
 		});
-
-		res.render('listings_search.html', {results});
+		res.json({results});
 	}));
 };

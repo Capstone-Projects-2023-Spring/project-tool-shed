@@ -6,11 +6,11 @@
 
 {% block body %}
 <!--enctype="multipart/form-data"-->
-<form action="/user/{user_id}/tools" method="POST">
+<form action="/user/{{user_id}}/tools" method="POST">
 
-  <label for="category">Category:</label>
+  <!-- <label for="category">Category:</label>
   <input type="text" name="category" id="category"/>
-  <!-- <label for="category_id">Category:</label>
+  <label for="category_id">Category:</label>
   <select name="category_id" id="category_id">
     <option value="">Select a category</option>
     
@@ -20,19 +20,18 @@
       </option>
       <% }); %>
   </select> -->
+  <label for="name">Name:</label>
+  <input type="text" name="name" id="name"/>
 
   <label for="description">Description:</label>
   <input type="text" name="description" id="description"/>
 
-  <label for="maker_id">Maker:</label>
-  <input type="hidden" name="Maker" value = "user_id"/>
-  
-
-  <button type="submit">Add Tool</button>
-</form>
+  <label for="owner_id">Owner:</label>
+  <input type="text" name="owner_id" id = "owner_id"/>
 
 <div>
-  <button type="submit" onclick="getString()">Submit</button>
+  <!--onclick="getString()"-->
+  <button type="submit" >Submit</button>
 </div>
 </form>
 <!--

@@ -19,7 +19,7 @@ const Tool = (function () {
 
         return <div style={style}>
             <h2>{id} {name} {description} {owner}</h2>
-            <form action="/users/{owner}/tools/edit" method="post">
+            <form action="/users/{id}/tools/edit" method="post">
                 <label for="description">Description:</label>
                 <input type="text" id="description" name="description"/>
 

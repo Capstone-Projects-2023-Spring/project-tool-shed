@@ -23,7 +23,7 @@
 
 	const root = ReactDOM.createRoot(document.getElementById('root'));
 
-	const tools = {{ usertools|json }};
+	const tools = {{ tools|json }};
 	console.log(tools);
 	root.render(<ToolList tools={tools} />);
 </script>

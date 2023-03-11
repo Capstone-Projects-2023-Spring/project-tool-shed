@@ -149,25 +149,44 @@ module.exports = (app, models) => {
 	//untested
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const user = await models.User.findByPk(user_id);
-		const tools = await models.Tool.findAll({
-			where: { owner_id: user_id },
-			include: [
-			  {
-				model: User,
-				as: 'owner'
-			  },
-			  {
-				model: ToolCategory,
-				as: 'category'
-			  },
-			  {
-				model: ToolMaker,
-				as: 'maker'
-			  }
-			]
-		  });
-		res.render('tool_list.html', {tools});
+		const user= await models.User.findOne({ where: { id: user_id },
+			//												include: { model: Tool}
+														});
+			
+			if (!user) {
+			  return res.status(404).json({ error: "User's tools not found" });
+			}
+
+		const tools = await models.Tool.findAll({ where: { owner_id: user_id } });
+		// const tools = await models.Tool.findAll({
+		// 										where: {
+		// 										id: user_id
+		// 										}});
+		// const tools = await models.User.findOne({ where: { id: user_id },
+		// 											include:{
+		// 												model: Tool, 
+		// 												as: 'owner' }});
+	
+
+
+		// const tools = await models.Tool.findAll({
+		// 	where: { id: user_id },
+		// 	include: [
+		// 	  {
+		// 		model: User,
+		// 		as: 'owner'
+		// 	  },
+		// 	  {
+		// 		model: ToolCategory,
+		// 		as: 'category'
+		// 	  },
+		// 	  {
+		// 		model: ToolMaker,
+		// 		as: 'maker'
+		// 	  }
+		// 	]
+		//   });
+		res.render('tool_list.html', {tools, user});
 	}));
 	  
 
@@ -190,24 +209,35 @@ module.exports = (app, models) => {
 	*/
 	//untested
 	app.get('/user/:user_id/newtool', asyncHandler(async (req, res) => {
-		res.render('_addtool.html', {error: null});
+		const { user_id } = req.params;
+
+		const user = await models.User.findByPk(user_id);
+		if (!user) {
+		  return res.status(404).json({ error: "User not found" });
+		}
+
+		res.render('_add_tool.html', {error: null, user_id});
 	}));
 
 	app.post('/user/:user_id/tools', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const usertools = await models.User.findOne({include: {model: Tool, as: 'tools', foreignKey: 'owner_id'},
-														where: { user_id : owner_id},});
+		// const { user_id } = req.params;
+		// const user= await models.User.findOne({ where: { id: user_id },
+		// //												include: { model: Tool}
+		// 											});
 		
-		if (!usertools) {
-		  return res.status(404).json({ error: "User's tools not found" });
-		}
+		// if (!user) {
+		//   return res.status(404).json({ error: "User's tools not found" });
+		// }
 
-		const { maker, description, owner_id, category } = req.body;
-		const newTool = await models.Tool.create({
-			owner_id: user_id, description, maker, category
+		const { name, description} = req.body;
+		const owner_id = req.params.user_id;
+
+		const tools = await models.Tool.create({
+			name, description, owner_id
 		});
 
-		res.redirect('/user/:user_id/tools');
+		res.redirect(`/user/${owner_id}/tools`);
+		res.json(tools);
 	}));
 
 	/*

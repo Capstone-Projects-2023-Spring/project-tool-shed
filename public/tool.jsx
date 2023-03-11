@@ -18,16 +18,13 @@ const Tool = (function () {
         // }
 
         return <div style={style}>
-            <h2>{id} {name} {description} {owner}</h2>
-            <form action="/users/{id}/tools/edit" method="post">
+            <h2>{name} {owner}</h2>
+            <form action={`/users/${id}/tools/edit`} method="post">
                 <label for="description">Description:</label>
-                <input type="text" id="description" name="description"/>
+                <input type="text" id="description" name="description" value={description} />
 
-                <label for="category">Category:</label>
-                <input type="text" id="category" name="category"/>
-
-                <label for="maker">Maker:</label>
-                <input type="text" id="maker" name="maker"/>
+                {/* <label for="maker">Owner:</label>
+                <input type="text" id="maker" name="maker" value={owner}/> */}
             </form>
                     </div>
 	};

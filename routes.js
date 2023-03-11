@@ -158,34 +158,7 @@ module.exports = (app, models) => {
 			}
 
 		const tools = await models.Tool.findAll({ where: { owner_id: user_id } });
-		// const tools = await models.Tool.findAll({
-		// 										where: {
-		// 										id: user_id
-		// 										}});
-		// const tools = await models.User.findOne({ where: { id: user_id },
-		// 											include:{
-		// 												model: Tool, 
-		// 												as: 'owner' }});
-	
-
-
-		// const tools = await models.Tool.findAll({
-		// 	where: { id: user_id },
-		// 	include: [
-		// 	  {
-		// 		model: User,
-		// 		as: 'owner'
-		// 	  },
-		// 	  {
-		// 		model: ToolCategory,
-		// 		as: 'category'
-		// 	  },
-		// 	  {
-		// 		model: ToolMaker,
-		// 		as: 'maker'
-		// 	  }
-		// 	]
-		//   });
+		
 		res.render('tool_list.html', {tools, user});
 	}));
 	  
@@ -220,14 +193,6 @@ module.exports = (app, models) => {
 	}));
 
 	app.post('/user/:user_id/tools', asyncHandler(async (req, res) => {
-		// const { user_id } = req.params;
-		// const user= await models.User.findOne({ where: { id: user_id },
-		// //												include: { model: Tool}
-		// 											});
-		
-		// if (!user) {
-		//   return res.status(404).json({ error: "User's tools not found" });
-		// }
 
 		const { name, description} = req.body;
 		const owner_id = req.params.user_id;

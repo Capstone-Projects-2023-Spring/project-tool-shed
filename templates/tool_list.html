@@ -14,10 +14,8 @@
 	const ToolList = ({tools}) => {
 	
 		return <div>
-			<form action="/user/:user_id/tools" method="get">
-				<button type="submit">Show Tools</button>
-			</form>
 			{tools.map(t => <Tool key={t.id} {...t} />)}
+            
 		</div>;
 	};
 

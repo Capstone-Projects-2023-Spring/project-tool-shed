@@ -153,6 +153,14 @@ module.exports = (app, models) => {
 		res.render('account.html', {error: null});
 	}));
 
+	/*
+	 * API Pages
+	 */
+
+	app.get('/search', asyncHandler(async (req, res) => {
+		res.render('_recommendFromSearch.html', {error: null});
+	}));
+
 
 
 	/*

@@ -146,7 +146,7 @@ module.exports = (app, models) => {
 	/*
 	 * Tool viewing
 	 */
-	//untested
+	
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const user= await models.User.findOne({ where: { id: user_id },
@@ -162,25 +162,10 @@ module.exports = (app, models) => {
 		res.render('tool_list.html', {tools, user});
 	}));
 	  
-
-/* app.get('/usertools', asyncHandler(async (req, res) => {
-	 	const users = await models.User.findAll();
-	 	res.render('tool_list.html', { users });
-	}));
-
-	app.get('/user/:user_id', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const user = await models.Tool.findByPk(tool_id);
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
-		res.render('tools_list', { user });
-	}));
-*/
 	/*
 		Add Tools to User
 	*/
-	//untested
+	
 	app.get('/user/:user_id/newtool', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 

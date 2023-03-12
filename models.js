@@ -236,7 +236,7 @@ const genModels = sequelize => {
 	 * @property {integer} tool_maker_id The id of the maker of this tool.
          */
 	const Tool = sequelize.define('Tool', {
-        name: {
+        	name: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
@@ -261,6 +261,7 @@ const genModels = sequelize => {
 		as: "category",
 		foreignKey: {name: 'tool_category_id'}
 	});
+
 	Tool.hasOne(ToolMaker, {
 		as: 'maker',
 		foreignKey: {name: 'tool_maker_id'}
@@ -271,7 +272,8 @@ const genModels = sequelize => {
 		const toolMaker = tool.getMaker();
 
 		let content = '';
-		content += tool.description ?? '';
+		content += (tool.description ?? '') + ' ';
+		content += (tool.name ?? '') + ' ';
 
 		if (toolMaker) {
 			content += toolMaker.name ?? '';

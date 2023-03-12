@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<div id="root"></div>
+
+<script src="/public/tool.jsx" type="text/babel"></script>
+
+<script type="text/babel">
+	const ToolList = ({tools}) => {
+	
+		return <div>
+			{tools.map(t => <Tool key={t.id} {...t} />)}
+            
+		</div>;
+	};
+
+	const root = ReactDOM.createRoot(document.getElementById('root'));
+
+	const tools = {{ tools|json }};
+	console.log(tools);
+	root.render(<ToolList tools={tools} />);
+</script>
+
+{% endblock %}

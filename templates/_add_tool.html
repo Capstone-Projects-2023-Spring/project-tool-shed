@@ -5,71 +5,45 @@
 {% endblock %}
 
 {% block body %}
+<!--enctype="multipart/form-data"-->
+<form action="/user/{{user_id}}/tools" method="POST">
 
-<form action="/submit-form" method="POST" enctype="multipart/form-data">
-    <div>
-      <label for="tool-name">Tool Name:</label>
-      <input type="text" id="tool-name" name="toolName" required>
-    </div>
-  
-    <div>
-      <label for="type">Type:</label>
-      <select id="type" name="toolType" required>
-        <option value="">Select a type</option>
-        <option value="Aerators">Aerators</option>
-        <option value="Aerial Lifts">Aerial Lifts</option>
-        <option value="Augers">Augers</option>
-        <option value="Climate Control">Climate Control</option>
-        <option value="Concrete Tools">Concrete Tools</option>
-        <option value="Earth Moving">Earth Moving</option>
-        <option value="Fasteners">Fasteners</option>
-        <option value="Floor Care">Floor Care</option>
-        <option value="General Construction">General Construction</option>
-        <option value="Ladders &amp; Scaffolding">Ladders &amp; Scaffolding</option>
-        <option value="Lawn Care">Lawn Care</option>
-        <option value="Material Handling">Material Handling</option>
-        <option value="Paint &amp; Drywall">Paint &amp; Drywall</option>
-        <option value="Plumbing &amp; Pumps">Plumbing &amp; Pumps</option>
-        <option value="Portable Power">Portable Power</option>
-        <option value="Power Tools">Power Tools</option>
-        <option value="Pressure Washers">Pressure Washers</option>
-        <option value="Rotary/Demolition">Rotary/Demolition</option>
-        <option value="Tile Saws">Tile Saws</option>
-        <option value="Trailers">Trailers</option>
-        <option value="Tree Care">Tree Care</option>
-        <option value="Trenchers">Trenchers</option>
-        <option value="Welding">Welding</option>
-      </select>
-    </div>
-  
-    <div>
-      <label>Sell or Rent:</label>
-      <input type="radio" id="sell" name="sellOrRent" value="Sell" required>
-      <label for="sell">Sell</label>
-      <input type="radio" id="rent" name="sellOrRent" value="Rent" required>
-      <label for="rent">Rent</label>
-    </div>
-  
-    <div>
-      <label for="price">Price:</label>
-      <input type="number" id="price" name="toolPrice" required>
-    </div>
-  
-    <div>
-      <label for="images">Upload Images:</label>
-      <input type="file" id="images" name="toolImages" accept="image/*" multiple>
-    </div>
-  
-    <div>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
-  
-  <style>
-    form div {
-      margin-bottom: 10px;
-    }
-  </style>
+  <!-- <label for="category">Category:</label>
+  <input type="text" name="category" id="category"/>
+  <label for="category_id">Category:</label>
+  <select name="category_id" id="category_id">
+    <option value="">Select a category</option>
+    
+    <% toolCategories.forEach(function(category) { %>
+      <option value="<%= category.id %>">
+        <%= category.name %>
+      </option>
+      <% }); %>
+  </select> -->
+  <label for="name">Name:</label>
+  <input type="text" name="name" id="name"/>
+
+  <label for="description">Description:</label>
+  <input type="text" name="description" id="description"/>
+
+  <label for="owner_id">Owner:</label>
+  <input type="text" name="owner_id" id = "owner_id"/>
+
+<div>
+  <!--onclick="getString()"-->
+  <button type="submit" >Submit</button>
+</div>
+</form>
+<!--
+  <script>
+    var radio = document.querySelector('input[name="sellOrRent"]:checked').value
+  </script>
+-->
+<style>
+  form div {
+    margin-bottom: 10px;
+  }
+</style>
 
 
 {% endblock %}

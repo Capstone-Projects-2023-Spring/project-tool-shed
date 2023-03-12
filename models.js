@@ -227,6 +227,7 @@ const genModels = sequelize => {
 	 * @class Tool
          * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
+         * @property {string} name Name of the tool.
          * @property {string} description An arbitrary description of the tool and its condition.
 
          * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
@@ -235,6 +236,10 @@ const genModels = sequelize => {
 	 * @property {integer} tool_maker_id The id of the maker of this tool.
          */
 	const Tool = sequelize.define('Tool', {
+        name: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
 		description: {
 			type: DataTypes.STRING,
 			allowNull: true
@@ -243,6 +248,7 @@ const genModels = sequelize => {
 			type: DataTypes.TSVECTOR
 		}
 	}, {tableName: 'tool', paranoid: true});
+    
 	Tool.belongsTo(User, {
 		foreignKey: {
 			name: 'owner_id',
@@ -250,6 +256,7 @@ const genModels = sequelize => {
 		},
 		as: 'owner'
 	});
+
 	Tool.hasOne(ToolCategory, {
 		as: "category",
 		foreignKey: {name: 'tool_category_id'}

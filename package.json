@@ -17,6 +17,7 @@
     "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@googlemaps/js-api-loader": "^1.15.1",
     "babel-standalone": "^6.26.0",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",

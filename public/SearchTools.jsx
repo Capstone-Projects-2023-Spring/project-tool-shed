@@ -43,11 +43,11 @@ const SearchTools = (function(apiKey) {
 
 		useEffect(() => {
 			if (!coords) return;
+			console.log(coords, searchQuery, searchRadius);
 			fetch(`/listings/search.json?searchQuery=${encodeURIComponent(searchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`).then(x => x.json()).then(x => {
-				debugger;
 				setResults(x.results);
 			});
-		}, [coords]);
+		}, [coords, searchQuery, searchRadius]);
 
 		useLayoutEffect(() => {
 			if (!coords || !mapRef.current) return;
@@ -89,11 +89,12 @@ const SearchTools = (function(apiKey) {
 	
 		return <div className="SearchTools">
 				<div className="SearchTools__Filters" style={style.filters}>
-
+					<input placeholder='Search query...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
+					<input value={searchRadius} type="range" min="1" max="30" step="0.25" onChange={x => setSearchRadius(x.target.value)} />
 				</div>
 				<div className="SearchTools__Map" style={style.map} ref={mapRef} />
 			</div>;
 	};
 
 	return SearchTools;
-})('<api key here>');
+})('<google maps api key>');

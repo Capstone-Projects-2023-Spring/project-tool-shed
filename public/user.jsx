@@ -14,7 +14,7 @@ const User = (function() {
 		return <div style={style}>
 			<h2>{first_name} {last_name} {id} {active}</h2>
 			<p>Email: {email}</p>
-			<form action="/users/{id}/edit" method="post">
+			<form action={`/users/${id}/edit`} method="post">
 				<label for="first_name">First Name:</label>
 				<input type="text" id="first_name" name="first_name" value={first_name} />
 				<label for="last_name">Last Name:</label>

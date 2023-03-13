@@ -307,6 +307,10 @@ const genModels = sequelize => {
 		maxBillingIntervals: {
 			type: DataTypes.INTEGER,
 			defaultValue: 1
+		},
+		active: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: true
 		}
 	}, {tableName: 'listing', paranoid: true});
 	Listing.belongsTo(Tool, {

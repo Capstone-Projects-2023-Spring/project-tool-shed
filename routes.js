@@ -214,6 +214,7 @@ module.exports = (app, models) => {
 		const distanceKm = `(6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
 
 		let results = await models.Listing.findAll({
+			where: {active: true},
 			include: [{
 				model: models.Tool,
 				as: 'tool',

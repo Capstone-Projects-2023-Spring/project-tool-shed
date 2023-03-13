@@ -130,6 +130,7 @@ module.exports = (app, models) => {
 	/*
 	 * View A user's tools
 	 */
+	
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);

@@ -6,6 +6,9 @@
 
 {% block body %}
 <form method="POST" action="/user/login">
+	{% if redirectURI %}
+	<input name="redirectURI" type="hidden" value="{{ redirectURI }}">
+	{% endif %}
 	<input name="email">
 	<input name="password" type="password">
 	<input type="submit">

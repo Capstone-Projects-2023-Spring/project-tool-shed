@@ -11,10 +11,14 @@ const {Op} = sequelize;
 	to wrap it with asyncHandler().
 */
 
+function redirectLogin(req, res) {
+	return res.redirect(`/user/login?redirectURI=${encodeURIComponent(req.originalUrl)}`);
+}
+
 function requiresAuth(routeFunc) {
 	return async (req, res) => {
 		if (!req.user) {
-			res.status(401).json({error: "Unauthenticated"});
+			redirectLogin(req, res);
 		} else {
 			await routeFunc(req, res);
 		}
@@ -22,53 +26,42 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing} = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing } = models;
+
 	app.get('/', asyncHandler(async (req, res) => {
-		// render the template at templates/index.html
-		// with the parameters:
-		// user: the logged in user (if logged in)
 		res.render('index.html', {});
 	}));
 
 	/*
-	 * User Creation
+	 * User Creation/Editing
 	 */
 
 	app.get('/user/new', asyncHandler(async (req, res) => {
 		if (req.user) {
 			res.redirect('/');
 		} else {
-			res.render('new_user.html', {error: null});
+			res.render('new_user.html', {});
 		}
 	}));
 
 	app.post('/user/new', asyncHandler(async (req, res) => {
-		const { first_name, last_name, email, password } = req.body;
-		const user = await models.User.create({ first_name, last_name, email });
+		const { first_name, last_name, email, password,
+			line_one, line_two, city, state, zip_code } = req.body;
+
+		const address = await Address.create({ line_one, line_two, city, state, zip_code });
+
+		const user = await User.create({ active: true, first_name, last_name, email, address_id: address.id });
 		await user.setPassword(password);
 		await user.save();
-		res.redirect('/user');
+		await res.setUser(user);
+		res.redirect('/user/me');
 	}));
 
+	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { first_name, last_name, email, password, active,
+			line_one, line_two, city, state, zip_code } = req.body;
 
-
-	/*
-	 * User Editing
-	 */
-
-	app.post('/user/:user_id/edit', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const { first_name, last_name, email, password, active } = req.body;
-	  
-		const user = await models.User.findByPk(user_id);
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
-
-		if (user.id === req.user.id) {
-			return res.status(403).json({ error: "This isn't your account." });
-		} 
-	  
+		const user = req.user; 
 		user.first_name = first_name;
 		user.last_name = last_name;
 		user.email = email;
@@ -79,26 +72,8 @@ module.exports = (app, models) => {
 		}
 
 		await user.save();
-		res.redirect(`/user/${user_id}`);
+		res.redirect(`/user/me`);
 	})));
-
-
-
-	/*
-	 * User Deletion
-	 */
-	// TODO: maybe rethink this into an account deactivation kinda thing later
-	// untested
-	app.delete('/user/:id', asyncHandler(async (req, res) => {
-		const id = req.params.id;
-		try {
-			let u = await models.User.findOne({where: {id: id}});
-			await u.destroy();
-			return res.json({ message: 'User deleted'})
-		}catch(err){
-			res.render('account.html', { error: 'Something went wrong'});
-		}
-	}));
 
 
 
@@ -107,17 +82,22 @@ module.exports = (app, models) => {
 	 */
 
 	app.get('/user/login', asyncHandler(async (req, res) => {
-		res.render('login.html', {error: null});
+		const {redirectURI} = req.query;
+		if (req.user) {
+			res.redirect(redirectURI ?? '/');
+		} else {
+			res.render('login.html', {error: null, redirectURI});
+		}
 	}));
 
 	app.post('/user/login', asyncHandler(async (req, res) => {
-		const {email, password} = await loginUserSchema.validate(req.body);
+		const {email, password, redirectURI} = await loginUserSchema.validate(req.body);
 		let u = await models.User.findAll({where: {email: email}});
 		u = u.length > 0 ? u[0] : null;
 		
 		if (u && u.passwordMatches(password)) {
 			await res.setUser(u);
-			res.redirect('/');
+			res.redirect(redirectURI ?? '/');
 		} else {
 			res.render('login.html', {error: "Invalid username or password."});
 		} 
@@ -126,7 +106,7 @@ module.exports = (app, models) => {
 
 
 	/*
-	 * User viewing
+	 * User/Account viewing
 	 */
 
 	app.get('/user', asyncHandler(async (req, res) => {
@@ -134,9 +114,13 @@ module.exports = (app, models) => {
 		res.render('users_list.html', { users });
 	}));
 
+	app.get('/user/me', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('user_singular.html', { user: req.user });
+	})));
+
 	app.get('/user/:user_id', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const user = await models.User.findByPk(user_id);
+		const user = await User.findByPk(user_id);
 		if (!user) {
 			return res.status(404).json({ error: 'User not found' });
 		}
@@ -144,51 +128,44 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * Tool viewing
+	 * View A user's tools
 	 */
 	
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const user= await models.User.findOne({ where: { id: user_id },
-			//												include: { model: Tool}
-														});
-			
-			if (!user) {
-			  return res.status(404).json({ error: "User's tools not found" });
-			}
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 
-		const tools = await models.Tool.findAll({ where: { owner_id: user_id } });
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const tools = await Tool.findAll({ where: { owner_id: owner.id } });
 		
-		res.render('tool_list.html', {tools, user});
+		res.render('tool_list.html', {tools, user: owner});
 	}));
 	  
 	/*
 		Add Tools to User
 	*/
-	
-	app.get('/user/:user_id/newtool', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
+	app.get('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+		const toolCategories = ToolCategory.findAll();
+		const toolMakers = ToolMaker.findAll();
 
-		const user = await models.User.findByPk(user_id);
-		if (!user) {
-		  return res.status(404).json({ error: "User not found" });
-		}
+		res.render('_add_tool.html', {toolCategories, toolMakers});
+	})));
 
-		res.render('_add_tool.html', {error: null, user_id});
-	}));
+	app.post('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
-	app.post('/user/:user_id/tools', asyncHandler(async (req, res) => {
-
-		const { name, description} = req.body;
-		const owner_id = req.params.user_id;
-
-		const tools = await models.Tool.create({
-			name, description, owner_id
+		const tool = await models.Tool.create({
+			name, description, owner_id: req.user.id,
+			tool_maker_id, tool_category_id
 		});
 
-		res.redirect(`/user/${owner_id}/tools`);
-		res.json(tools);
-	}));
+		res.redirect(`/user/me/tools`);
+	})));
+
+	// TODO: tool editing endpoints
 
 	/*
 	 * Settings Pages
@@ -205,8 +182,6 @@ module.exports = (app, models) => {
 	app.get('/search', asyncHandler(async (req, res) => {
 		res.render('_recommendFromSearch.html', {error: null});
 	}));
-
-
 
 	/*
 	 * Listings
@@ -239,6 +214,7 @@ module.exports = (app, models) => {
 		const distanceKm = `(6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
 
 		let results = await models.Listing.findAll({
+			where: {active: true},
 			include: [{
 				model: models.Tool,
 				as: 'tool',

@@ -10,23 +10,7 @@
 <body>
 	<!--Navigation bar-->
 	<div id="nav"></div>
-	<script type="text/babel">
-		const element = (
-			<div>
-				<nav>
-					<label class="logo">ToolShed</label>
-					<ul>
-						<li><a href="/">Home</a></li>
-						<li><a href="/user/1/newtool">Tools</a></li>
-                        <li><a href="/user/${user_id}/newtool">List Tool</a></li>
-						<li><a href="#about">About</a></li>
-						<li><a href="/account">Account</a></li>
-						<li><a href="/user/login">Log In</a></li>
-					</ul>
-				</nav>
-			</div>);
-		ReactDOM.render(element, document.getElementById('nav'));
-	</script>
+
 	{% block body %}
 
 	{% endblock %}
@@ -35,6 +19,32 @@
 	<script src="/node_modules/babel-standalone/babel.min.js"></script>
 	<script src="/node_modules/@chakra-ui/provider/dist/chakra-provider.js"></script>
 	
+	<script type="text/babel">
+		const user = {{ authUser|json }};
+		const NavBar = ({user}) => {
+			let navItems = {};
+
+			if (user) {
+				navItems['/account'] = 'Account';
+				navItems["/user/me/tools"] = "Tools";
+                navItems["/tool/new"] = "List Tool";
+			} else {
+				navItems['/user/login'] = 'Log In';
+				navItems['/user/new'] = 'Sign Up';
+			}
+
+			return <div>
+				<nav>
+					<label className="logo"><a href="/">ToolShed</a></label>
+					<ul>
+						{Object.entries(navItems).map(([url, label]) =>
+							<li key={url}><a href={url}>{label}</a></li>)}
+					</ul>
+				</nav>
+			</div>;
+		};
+		ReactDOM.createRoot(document.getElementById('nav')).render(<NavBar user={user}/>);
+	</script>
 </body>
 
 <style>

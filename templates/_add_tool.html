@@ -8,14 +8,27 @@
 <!--enctype="multipart/form-data"-->
 <form action="/user/{{user_id}}/tools" method="POST">
 
+   <!-- <label for="category">Category:</label>
+  <input type="text" name="category" id="category"/>
+  <label for="category_id">Category:</label>
+  <select name="category_id" id="category_id">
+    <option value="">Select a category</option>
+    
+    <% toolCategories.forEach(function(category) { %>
+      <option value="<%= category.id %>">
+        <%= category.name %>
+      </option>
+      <% }); %>
+  </select> -->
+
   <label for="name">Name:</label>
   <input type="text" name="name" id="name"/>
 
   <label for="description">Description:</label>
   <input type="text" name="description" id="description"/>
 
-  <label for="owner_id">Owner:</label>
-  <input type="text" name="owner_id" id = "owner_id"/>
+  <label for="owner_id"></label>
+  <input type="hidden" name="owner_id" value = {{user_id}}>
 
 <div>
   <!--onclick="getString()"-->

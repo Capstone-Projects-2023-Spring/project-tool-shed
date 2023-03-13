@@ -146,7 +146,7 @@ module.exports = (app, models) => {
 	/*
 	 * Tool viewing
 	 */
-	
+
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const user= await models.User.findOne({ where: { id: user_id },
@@ -159,7 +159,7 @@ module.exports = (app, models) => {
 
 		const tools = await models.Tool.findAll({ where: { owner_id: user_id } });
 		
-		res.render('tool_list.html', {tools, user});
+		res.render('tool_list.html', {tools, user_id});
 	}));
 	  
 	/*

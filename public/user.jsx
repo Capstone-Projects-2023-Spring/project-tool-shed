@@ -7,24 +7,41 @@ const User = (function() {
 		boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
 	};
 
-	return ({first_name, last_name, email, id, active, detailed=false}) => {
+	const FormInput = ({type='text', name, label: l, value, setter}) => {
+		const ps = {
+			type, id: name, name
+		};
+		if (type === 'checkbox') {
+			ps.checked = value;
+		} else {
+			ps.value = value;
+		}
+		return <React.Fragment>
+			<label for={name}>{l}</label>
+			<input type={type} value={value} id={name} name={name} />
+		</React.Fragment>;
+	};
+
+	return ({isEditable, first_name, last_name, email: _email, id, active: _active, detailed=false}) => {
 		if (detailed) {
 			return "TODO";
 		}
+
+		const [firstName, setFirstName] = useState(first_name);
+		const [lastName, setLastName] = useState(last_name);
+		const [email, setEmail] = useState(_email);
+		const [active, setActive] = useState(_active);
 		return <div style={style}>
-			<h2>{first_name} {last_name} {id} {active}</h2>
+			<h2>{firstName} {lastName} {id} {active}</h2>
 			<p>Email: {email}</p>
-			<form action={`/users/${id}/edit`} method="post">
-				<label for="first_name">First Name:</label>
-				<input type="text" id="first_name" name="first_name" value={first_name} />
-				<label for="last_name">Last Name:</label>
-				<input type="text" id="last_name" name="last_name" value={last_name} />
-				<label for="email">Email:</label>
-				<input type="email" id="email" name="email" value={email} />
-				<label for="active">Active:</label>
-				<input type="checkbox" id="active" name="active" checked={active} />
+			{isEditable && 
+			<form action="/users/edit" method="post" style={{display: 'flex', flexFlow: 'column nowrap'}}>
+				<FormInput name='first_name' label="First Name:" value={firstName} setter={setFirstName} />
+				<FormInput name='last_name' label="Last Name:" value={lastName} setter={setLastName} />
+				<FormInput name='email' label="Email:" value={email} setter={setEmail} />
+				<FormInput name='active' label='Active:' value={active} setter={setActive} />
 				<button type="submit">Submit</button>
-			</form>
+			</form>}
 		</div>
 	};
 })();

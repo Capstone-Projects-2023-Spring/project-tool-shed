@@ -6,39 +6,38 @@
 
 {% block body %}
 <!--enctype="multipart/form-data"-->
-<form action="/user/{{user_id}}/tools" method="POST">
-
-  <!-- <label for="category">Category:</label>
-  <input type="text" name="category" id="category"/>
-  <label for="category_id">Category:</label>
-  <select name="category_id" id="category_id">
-    <option value="">Select a category</option>
-    
-    <% toolCategories.forEach(function(category) { %>
-      <option value="<%= category.id %>">
-        <%= category.name %>
-      </option>
-      <% }); %>
-  </select> -->
+<form action="/tool/new" method="POST">
   <label for="name">Name:</label>
   <input type="text" name="name" id="name"/>
 
   <label for="description">Description:</label>
   <input type="text" name="description" id="description"/>
 
-  <label for="owner_id">Owner:</label>
-  <input type="text" name="owner_id" id = "owner_id"/>
+  <label for="tool_category_id">Category:</label>
+  <select name="tool_category_id" id="tool_category_id">
+    <option value="">Select a category</option> 
+    <% toolCategories.forEach(function(category) { %>
+      <option value="<%= category.id %>">
+        <%= category.name %>
+      </option>
+    <% }); %>
+  </select>
+  <label for="tool_maker_id">Maker:</label>
+  <select name="tool_maker_id" id="tool_maker_id">
+    <option value="">Select a maker</option> 
+    <% toolMakers.forEach(function(x) { %>
+      <option value="<%= x.id %>">
+        <%= x.name %>
+      </option>
+    <% }); %>
+  </select>
 
+  <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}"/>
 <div>
   <!--onclick="getString()"-->
   <button type="submit" >Submit</button>
 </div>
 </form>
-<!--
-  <script>
-    var radio = document.querySelector('input[name="sellOrRent"]:checked').value
-  </script>
--->
 <style>
   form div {
     margin-bottom: 10px;

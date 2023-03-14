@@ -165,6 +165,27 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
+	/*
+		Edit Exisiting User Tools
+	*/
+	app.get('/tool/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const toolCategories = ToolCategory.findAll();
+		const toolMakers = ToolMaker.findAll();
+
+		res.render('_edit_tool.html', {toolCategories, toolMakers});
+	})));
+
+	app.post('/tool/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { name, description, tool_category_id, tool_maker_id } = req.body;
+
+		const tool = await models.Tool.update({ //unsure of .update
+			name, description, owner_id: req.user.id,
+			tool_maker_id, tool_category_id
+		});
+
+		res.redirect(`/user/me/tools`);
+	})));
+
 	// TODO: tool editing endpoints
 
 	/*

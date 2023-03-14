@@ -37,7 +37,11 @@ const SearchTools = (function(apiKey) {
 		const mapRef = useRef();
 
 		useEffect(() => {
-			getBrowserCoords().then(setCoords);
+			if (window.isSecureContext) {
+				getBrowserCoords().then(setCoords);
+			} else {
+				setCoords({lat: 39.98020784788337, lon: -75.15746555080395});
+			}
 		}, []);
 
 

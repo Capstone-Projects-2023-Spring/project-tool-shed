@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div id="root">{{ aboutHtml|safe }}</div>
+<script src="/public/about.jsx" type="text/babel"></script>
+<script type="text/babel">
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+</script>
+
+{% endblock %}

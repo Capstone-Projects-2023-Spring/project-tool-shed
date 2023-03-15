@@ -8,7 +8,9 @@ module.exports = {
 	target: 'web',
 	mode: 'production',
 	entry: {
-		index_page: path.resolve(__dirname, 'webpack/index_page.jsx')
+		index_page: path.resolve(__dirname, 'webpack/index_page.jsx'),
+		about: path.resolve(__dirname, 'webpack/about.jsx')
+
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

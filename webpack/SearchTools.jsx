@@ -1,4 +1,5 @@
-
+import {Loader} from '@googlemaps/js-api-loader';
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
 
 const SearchTools = (function(apiKey) {
 	const getBrowserCoords = () => new Promise((resolve, reject) => {
@@ -10,11 +11,6 @@ const SearchTools = (function(apiKey) {
 			});
 		}
 	});
-
-        const loadUMDScript = async (url, module = {exports:{}}) =>
-  (Function('module', 'exports', await (await fetch(url)).text()).call(module, module, module.exports), module).exports
-
-	const {useState, useEffect, useLayoutEffect, useRef} = React;
 
 	const style = {
 		map: {
@@ -56,7 +52,7 @@ const SearchTools = (function(apiKey) {
 		useLayoutEffect(() => {
 			if (!coords || !mapRef.current) return;
 
-			loadUMDScript('/node_modules/@googlemaps/js-api-loader/dist/index.umd.js').then(({Loader, Map}) => {
+			//loadUMDScript('/node_modules/@googlemaps/js-api-loader/dist/index.umd.js').then(({Loader, Map}) => {
 			const loader = new Loader({
 				apiKey,
 				version: 'weekly'
@@ -68,7 +64,7 @@ const SearchTools = (function(apiKey) {
 				});
 				setMap(_map);
 			});
-});
+//});
 		}, [coords, mapRef.current]);
 
 		useLayoutEffect(() => {
@@ -101,4 +97,8 @@ const SearchTools = (function(apiKey) {
 	};
 
 	return SearchTools;
-})('<google maps api key>');
+})(GOOGLE_MAPS_API_KEY); // see webpack.config.js
+
+export default SearchTools;
+
+

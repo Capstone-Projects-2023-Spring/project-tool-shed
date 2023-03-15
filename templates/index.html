@@ -6,31 +6,7 @@
 
 {% block body %}
 
-<script src="/public/SearchTools.jsx" type="text/babel"></script>
 <div id="root"></div>
-
-<!-- you can also use type="text/babel" for scripts with an src -->
-<!-- these scripts will have Babel transpile them automatically -->
-<script type="text/babel">
-	const isLoggedIn = {% if user %}true{%else%}false{%endif%};
-	const firstName = {% if user %}"{{ user.first_name }}"{%else%}null{%endif%};
-	const lastName = {% if user %}"{{ user.last_name }}"{%else%}null{%endif%};
-
-	const Welcome = ({isLoggedIn, firstName, lastName}) => {
-		if (isLoggedIn) {
-			return <div className="Welcome">Hello, {firstName} {lastName}</div>;
-		}
-		return <div className="Welcome">Hello, World!</div>;
-	};
-
-	const root = ReactDOM.createRoot(document.getElementById('root'));
-	root.render(<div>
-		<Welcome
-			isLoggedIn={isLoggedIn}
-			firstName={firstName}
-			lastName={lastName} />
-		<SearchTools />
-		</div>);
-</script>
+<script src="/webpack/index_page.js" type="application/javascript"></script>
 
 {% endblock %}

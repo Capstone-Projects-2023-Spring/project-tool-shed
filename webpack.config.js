@@ -1,10 +1,14 @@
-const path = require('path')
+const path = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 module.exports = {
 	target: 'web',
 	mode: 'production',
 	entry: {
-		SearchTools: path.resolve(__dirname, 'webpack/SearchTools.jsx')
+		index_page: path.resolve(__dirname, 'webpack/index_page.jsx')
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),
@@ -25,6 +29,11 @@ module.exports = {
 			}
 		]
 	},
+	plugins: [
+		new webpack.DefinePlugin({
+			GOOGLE_MAPS_API_KEY: JSON.stringify(process.env.GOOGLE_MAPS_API_KEY)
+		}),
+	],
 	resolve: {
 		extensions: ['*', '.js', '.jsx']
 	},

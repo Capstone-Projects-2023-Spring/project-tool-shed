@@ -175,6 +175,26 @@ module.exports = (app, models) => {
 		res.render('account.html', {error: null});
 	}));
 
+		/*
+	 * About Pages
+	 */
+
+	app.get('/about', asyncHandler(async (req, res) => {
+		res.render('about.html', {error: null});
+	}));
+	
+	app.get('/about/terms_of_use', asyncHandler(async (req, res) => {
+		res.render('terms_of_use.html', {error: null});
+	}));
+
+	app.get('/about/faqs', asyncHandler(async (req, res) => {
+		res.render('faqs.html', {error: null});
+	}));
+
+	app.get('/about/avoid_scams', asyncHandler(async (req, res) => {
+		res.render('avoid_scams.html', {error: null});
+	}));
+
 	/*
 	 * API Pages
 	 */

@@ -1,5 +1,7 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Stack, useColorModeValue } from '@chakra-ui/react';
-import { Formik, Form, Field } from 'formik';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ChakraProvider, Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from '@chakra-ui/react';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
@@ -84,4 +86,9 @@ function NewUserForm () {
                 </Formik>
                 </Box>
 )};
-export default NewUserForm;
+const root = document.getElementById('root');
+ReactDOM.createRoot(root).render(
+  <ChakraProvider>
+      <NewUserForm />
+  </ChakraProvider>
+);

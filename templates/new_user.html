@@ -6,5 +6,8 @@
 
 {% block body %}
 <div id="root"></div>
-<script src="/webpack/dist/new_user.js" type="application/javascript"></script>
+<script src="/webpack/NewUserForm.js" type="application/javascript"></script>
+<script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+</script>
 {% endblock %}

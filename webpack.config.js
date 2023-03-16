@@ -9,7 +9,9 @@ module.exports = {
 	mode: 'production',
 	entry: {
 		index_page: path.resolve(__dirname, 'webpack/index_page.jsx'),
-		new_user: path.resolve(__dirname, 'webpack/new_user.jsx')
+		NewUserForm: path.resolve(__dirname, 'webpack/NewUserForm.jsx'),
+		about: path.resolve(__dirname, 'webpack/about.jsx')
+
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

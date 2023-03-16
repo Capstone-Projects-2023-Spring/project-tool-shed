@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Edit Tool</title>
+{% endblock %}
+{% block body %}
+
+<h1>Edit Tool</h1>
+<form action="/tool/edit/{{ tool.id }}" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" name="name" id="name" value="{{ tool.name }}" />
+
+    <label for="description">Description:</label>
+    <input type="text" name="description" id="description" value="{{ tool.description }}" />
+
+    <label for="tool_category_id">Category:</label>
+    <select name="tool_category_id" id="tool_category_id">
+        <option value="">Select a category</option>
+        <% toolCategories.forEach(function(category) { %>
+            <option value="<%= category.id %>" <% if (category.id===tool.tool_category_id) { %> selected <% } %>
+                    >
+                    <%= category.name %>
+            </option>
+            <% }); %>
+    </select>
+
+    <label for="tool_maker_id">Maker:</label>
+    <select name="tool_maker_id" id="tool_maker_id">
+        <option value="">Select a maker</option>
+        <% toolMakers.forEach(function(x) { %>
+            <option value="<%= x.id %>" <% if (x.id===tool.tool_maker_id) { %> selected <% } %>
+                    >
+                    <%= x.name %>
+            </option>
+            <% }); %>
+    </select>
+
+    <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}" />
+    <div>
+        <button type="submit">Save Changes</button>
+    </div>
+
+</form>
+{% endblock %}

@@ -12,20 +12,16 @@ const Tool = (function () {
             return "TODO";
         }
 
-        // Only display tools owned by the specific user
-        // if (owner && owner !== id) {
-        //     return null;
-        // }
-
         return <div style={style}>
             <h2>{name} {owner}</h2>
             <form action={`/users/${id}/tools/edit`} method="post">
                 <label for="description">Description:</label>
                 <input type="text" id="description" name="description" value={description} />
-
-                {/* <label for="maker">Owner:</label>
-                <input type="text" id="maker" name="maker" value={owner}/> */}
             </form>
-                    </div>
+
+            <a href={`/tool/edit/${id}`}>
+                <button>Edit</button>
+            </a>
+        </div>
 	};
 })();

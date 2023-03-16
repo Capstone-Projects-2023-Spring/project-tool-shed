@@ -1,40 +1,10 @@
 {% extends "base.html" %}
 
 {% block head %}
-<meta charset="UTF-8">
-<title>Create User</title>
+
 {% endblock %}
 
 {% block body %}
-<h1>Create User</h1>
-<form method="POST" action="/user/new">
-  <label for="first_name">First Name:</label>
-  <input type="text" id="first_name" name="first_name" required><br>
-
-  <label for="last_name">Last Name:</label>
-  <input type="text" id="last_name" name="last_name" required><br>
-
-  <label for="email">Email:</label>
-  <input type="email" id="email" name="email" required><br>
-
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required><br>
-
-  <label for="line_one">Address Line 1:</label>
-  <input type="text" id="line_one" name="line_one" required><br>
-
-  <label for="last_two">Address Line 2:</label>
-  <input type="text" id="line_two" name="line_two"><br>
-
-  <label for="city">City</label>
-  <input type="text" id="city" name="city" required><br>
-
-  <label for="state">State</label>
-  <input type="state" id="state" name="state" required><br>
-
-  <label for="zip_code">Zip Code</label>
-  <input type="zip_code" id="zip_code" name="zip_code" required><br>
-
-  <button type="submit">Create</button>
-</form>
+<div id="root"></div>
+<script src="/webpack/dist/new_user.js" type="application/javascript"></script>
 {% endblock %}

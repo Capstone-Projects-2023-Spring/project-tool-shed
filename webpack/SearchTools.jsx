@@ -1,13 +1,13 @@
-import {Loader} from '@googlemaps/js-api-loader';
-import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
-const SearchTools = (function(apiKey) {
+const SearchTools = (function (apiKey) {
 	const getBrowserCoords = () => new Promise((resolve, reject) => {
 		if (!navigator.geolocation) {
 			reject(new Error('Browser doesn\'t support geolocation.'));
 		} else {
 			navigator.geolocation.getCurrentPosition(pos => {
-				resolve({lat: pos.coords.latitude, lon: pos.coords.longitude});
+				resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
 			});
 		}
 	});
@@ -22,7 +22,7 @@ const SearchTools = (function(apiKey) {
 		}
 	};
 
-	const SearchTools = ({}) => {
+	const SearchTools = ({ }) => {
 		const [results, setResults] = useState([]);
 		const [coords, setCoords] = useState();
 		const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +36,7 @@ const SearchTools = (function(apiKey) {
 			if (window.isSecureContext) {
 				getBrowserCoords().then(setCoords);
 			} else {
-				setCoords({lat: 39.98020784788337, lon: -75.15746555080395});
+				setCoords({ lat: 39.98020784788337, lon: -75.15746555080395 });
 			}
 		}, []);
 
@@ -64,7 +64,7 @@ const SearchTools = (function(apiKey) {
 				});
 				setMap(_map);
 			});
-//});
+			//});
 		}, [coords, mapRef.current]);
 
 		useLayoutEffect(() => {
@@ -72,10 +72,10 @@ const SearchTools = (function(apiKey) {
 
 			let markers = [];
 			for (const res of results) {
-				const {geocoded_lat, geocoded_lon} = res.tool.owner.address;
+				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 				const title = 'Tool';
-				const position = {lat: geocoded_lat, lng: geocoded_lon};
-				const marker = new google.maps.Marker({position, map, title});
+				const position = { lat: geocoded_lat, lng: geocoded_lon };
+				const marker = new google.maps.Marker({ position, map, title });
 
 				markers.push(marker);
 			}
@@ -86,14 +86,33 @@ const SearchTools = (function(apiKey) {
 				}
 			};
 		}, [map, results]);
-	
+
 		return <div className="SearchTools">
-				<div className="SearchTools__Filters" style={style.filters}>
-					<input placeholder='Search query...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
-					<input value={searchRadius} type="range" min="1" max="30" step="0.25" onChange={x => setSearchRadius(x.target.value)} />
-				</div>
-				<div className="SearchTools__Map" style={style.map} ref={mapRef} />
-			</div>;
+			<div className="SearchTools__Filters" style={style.filters}>
+				<label>
+					Search query:
+					<input
+						placeholder='Enter search query here...'
+						value={searchQuery}
+						onChange={x => setSearchQuery(x.target.value)}
+					/>
+				</label>
+				<label>
+					Search radius (miles):
+					<input
+						value={searchRadius}
+						type="range"
+						min="1"
+						max="30"
+						step="0.25"
+						onChange={x => setSearchRadius(x.target.value)}
+					/>
+					<span>{searchRadius} miles</span>
+				</label>
+			</div>
+
+			<div className="SearchTools__Map" style={style.map} ref={mapRef} />
+		</div>;
 	};
 
 	return SearchTools;

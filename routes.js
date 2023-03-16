@@ -128,7 +128,7 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * View A user's tools
+	 * View a User's Tools
 	 */
 	
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
@@ -164,6 +164,56 @@ module.exports = (app, models) => {
 
 		res.redirect(`/user/me/tools`);
 	})));
+
+	/*
+		Edit a Tool
+	*/
+
+	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { tool_id } = req.params;
+	  
+		const tool = await models.Tool.findByPk(tool_id);
+	  
+		if (!tool) {
+		  return res.status(404).json({ error: "Tool not found." });
+		}
+	  
+		const toolCategories = await ToolCategory.findAll();
+		const toolMakers = await ToolMaker.findAll();
+	  
+		// Only allow the owner to edit the tool
+		if (tool.owner_id !== req.user.id) {
+		  return res.status(403).json({ error: "You are not authorized to edit this tool." });
+		}
+	  
+		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
+	  })));
+
+	  app.post('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { tool_id } = req.params;
+		const { name, description, tool_category_id, tool_maker_id } = req.body;
+	  
+		const tool = await models.Tool.findByPk(tool_id);
+	  
+		if (!tool) {
+		  return res.status(404).json({ error: "Tool not found." });
+		}
+	  
+		// Only allow the owner to edit the tool
+		if (tool.owner_id !== req.user.id) {
+		  return res.status(403).json({ error: "You are not authorized to edit this tool." });
+		}
+	  
+		// Update the tool with the new data
+		tool.name = name;
+		tool.description = description;
+		tool.tool_category_id = tool_category_id;
+		tool.tool_maker_id = tool_maker_id;
+		await tool.save();
+	  
+		res.redirect(`/user/me/tools`);
+	  })));
+
 
 	// TODO: tool editing endpoints
 

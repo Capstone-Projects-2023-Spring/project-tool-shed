@@ -1,5 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { categories } from '../public/categories'; // Import the categories array
+
 
 const SearchTools = (function (apiKey) {
 	const getBrowserCoords = () => new Promise((resolve, reject) => {
@@ -27,6 +29,9 @@ const SearchTools = (function (apiKey) {
 		const [coords, setCoords] = useState();
 		const [searchQuery, setSearchQuery] = useState('');
 		const [searchRadius, setSearchRadius] = useState(10);
+		const [selectedCategory, setSelectedCategory] = useState('');
+
+
 
 		const [map, setMap] = useState();
 
@@ -43,11 +48,32 @@ const SearchTools = (function (apiKey) {
 
 		useEffect(() => {
 			if (!coords) return;
-			console.log(coords, searchQuery, searchRadius);
-			fetch(`/listings/search.json?searchQuery=${encodeURIComponent(searchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`).then(x => x.json()).then(x => {
-				setResults(x.results);
-			});
-		}, [coords, searchQuery, searchRadius]);
+
+			let newSearchQuery = '';
+			// Determine the new search query based on the current searchQuery and selectedCategory values
+			if (searchQuery === '' && selectedCategory !== '') {
+				newSearchQuery = selectedCategory;
+			} else if (searchQuery !== '' && selectedCategory === '') {
+				newSearchQuery = searchQuery.replace(/\s+/g, '&');
+			} else if (searchQuery !== '' && selectedCategory !== '') {
+				// Replace any occurrences of multiple '&' symbols with a single '&' symbol
+				newSearchQuery = (searchQuery.replace(/\s+/g, '&') + '&' + selectedCategory).replace(/&+/g, '&');
+			}
+
+			// Remove any leading or trailing '&' symbols
+			newSearchQuery = newSearchQuery.replace(/^&+|&+$/g, '');
+
+			fetch(`/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
+				.then(x => x.json())
+				.then(x => {
+					setResults(x.results);
+				});
+		}, [coords, searchQuery, searchRadius, selectedCategory]);
+
+
+
+
+
 
 		useLayoutEffect(() => {
 			if (!coords || !mapRef.current) return;
@@ -97,6 +123,7 @@ const SearchTools = (function (apiKey) {
 						onChange={x => setSearchQuery(x.target.value)}
 					/>
 				</label>
+
 				<label>
 					Search radius (miles):
 					<input
@@ -109,7 +136,22 @@ const SearchTools = (function (apiKey) {
 					/>
 					<span>{searchRadius} miles</span>
 				</label>
+
+				<label>
+					Categories:
+					<select
+						value={selectedCategory}
+						onChange={(e) => setSelectedCategory(e.target.value)}
+					>
+						{categories.map((category) => (
+							<option key={category.value} value={category.value}>
+								{category.label}
+							</option>
+						))}
+					</select>
+				</label>
 			</div>
+
 
 			<div className="SearchTools__Map" style={style.map} ref={mapRef} />
 		</div>;

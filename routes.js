@@ -261,7 +261,8 @@ module.exports = (app, models) => {
 			searchQuery, // string
 			searchRadius, // kilometers
 			userLat, userLon, // degrees
-			useUserAddress // boolean
+			useUserAddress, // boolean
+			selectedCategory // string from dropdown menu // find out why this is undefined
 		} = await searchListingsSchema.validate(req.query);
 
 		let lat = userLat;

@@ -19,8 +19,8 @@ const initialValues = {
 
 function NewUserForm () {
     
+    //Handles submission of form, posts to DB
     const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
-        console.log(values);
         try {
             console.log("In try")
             const response = await fetch('/user/new.json', {
@@ -31,13 +31,11 @@ function NewUserForm () {
             body: JSON.stringify(values),
             credentials: "same-origin"
         });
-        console.log(values);
-        console.log("hello im waiting");
         const data = await response.json();
-            console.log('Response data:', data);
-
-            //Clear form and show successful creation message
-            window.location.href = '/'
+        //May want to change response in future
+        console.log('Response data:', data);
+        //Push user back to main page
+        window.location.href = '/'
         } catch (error) {
             console.error(error);
             setSubmitting(false);

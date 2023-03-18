@@ -14,33 +14,48 @@ const initialValues = {
   line_two: '',
   city: '',
   state: '',
-  zip_code: '',
+  zip_code: ''
 };
 
 function NewUserForm () {
     
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
+        console.log(values);
         try {
+            console.log("In try")
             const response = await fetch('/user/new', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(values)
+            body: JSON.stringify(values),
+            credentials: "same-origin"
         });
+        console.log(values);
+        console.log("hello im waiting");
         const data = await response.json();
-            console.log(data);
-            return data;
+            console.log('Response data:', data);
+
+            // Parse the response data
+            //const parsedData = JSON.parse(data);
+    
+            //console.log('Parsed data:', parsedData);
+
+            //Clear form and show successful creation message
+            resetForm();
+            setStatus(data);
         } catch (error) {
             console.error(error);
+            setSubmitting(false);
+            setErrors({ submit: error.message });
         }
     };
 
   return (
     <Box maxW={{ sm: '90%', md: '80%', lg: '50%' }} mx="auto" my='8'>
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={(values) => console.log(values)}>
-        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
-          <Form onSubmit={handleSubmit}>
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+        {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+          <Form>
             <Stack spacing={3}>
             <FormControl isInvalid={errors.first_name && touched.first_name}>
                 <FormLabel htmlFor="first_name">First Name:</FormLabel>
@@ -87,7 +102,7 @@ function NewUserForm () {
                 <Input id="zip_code" name="zip_code" type="text" value={values.zip_code} onChange={handleChange} onBlur={handleBlur} />
                 <FormErrorMessage>{errors.zip_code}</FormErrorMessage>
             </FormControl>
-            <Button mt={4} colorScheme="teal" isLoading={isSubmitting} type="submit">Submit</Button>
+            <Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">Submit</Button>
                 </Stack>
                 </Form>
                 )}

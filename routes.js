@@ -54,7 +54,7 @@ module.exports = (app, models) => {
 		await user.setPassword(password);
 		await user.save();
 		await res.setUser(user);
-		res.redirect('/user/me');
+		res.redirect('/');
 	}));
 
 	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {

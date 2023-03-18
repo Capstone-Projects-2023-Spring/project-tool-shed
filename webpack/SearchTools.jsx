@@ -104,7 +104,7 @@ const SearchTools = (function (apiKey) {
 		  
 			  // create a custom marker icon
 			  const icon = {
-				url: '/path/to/your/custom/icon.png',
+				url: '../public/handman_icon.png',
 				scaledSize: new google.maps.Size(50, 50),
 				origin: new google.maps.Point(0, 0),
 				anchor: new google.maps.Point(25, 25),

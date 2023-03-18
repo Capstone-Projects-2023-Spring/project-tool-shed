@@ -37,13 +37,14 @@ function NewUserForm () {
             console.log('Response data:', data);
 
             // Parse the response data
-            //const parsedData = JSON.parse(data);
+            const parsedData = JSON.parse(data);
     
             //console.log('Parsed data:', parsedData);
 
             //Clear form and show successful creation message
             resetForm();
             setStatus(data);
+            window.location.href = '/'
         } catch (error) {
             console.error(error);
             setSubmitting(false);

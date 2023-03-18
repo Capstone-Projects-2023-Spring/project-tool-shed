@@ -44,7 +44,7 @@ module.exports = (app, models) => {
 		}
 	}));
 
-	app.post('/user/new', asyncHandler(async (req, res) => {
+	app.post('/user/new.json', asyncHandler(async (req, res) => {
 		const { first_name, last_name, email, password,
 			line_one, line_two, city, state, zip_code } = req.body;
 
@@ -54,7 +54,7 @@ module.exports = (app, models) => {
 		await user.setPassword(password);
 		await user.save();
 		await res.setUser(user);
-		res.redirect('/');
+		res.json({user});
 	}));
 
 	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {

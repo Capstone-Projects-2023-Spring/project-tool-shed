@@ -73,6 +73,15 @@ function nunjucksMiddleware(app) {
 }
 
 /**
+ * Sleeps.
+ * @param {integer} ms How many milliseconds to sleep for.
+ * @async
+ */
+async function sleep(ms) {
+	return new Promise(x => setTimeout(x, ms));
+}
+
+/**
  * Initializes a sequelize instance. Loads models and syncs the database schema.
  * @return {Sequelize} An instance of Sequelize that's ready to use.
  * @async
@@ -83,12 +92,23 @@ async function initSequelize() {
 	// first, connect to postgres manually.
 	const { Client } = require("pg");
 
-	const client = new Client({
-		user: username,
-		password: password,
-		host: host
-	});
-	await client.connect();
+	let client = null;
+
+	for (let i = 10; i--;) {
+		try {
+			client = new Client({
+				user: username,
+				password,
+				host
+			});
+
+			await client.connect();
+			break;
+		} catch (e) {
+			await client.end();
+			await sleep(1000);
+		} 
+	}
 
 	// then, create the database specified in dbSettings.
 	// if it fails, we're assuming it failed because the

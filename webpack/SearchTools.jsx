@@ -1,81 +1,178 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { ChakraProvider, Select, Box, Heading, Divider, Container,
+	 FormControl, FormLabel, FormErrorMessage, FormHelperText,
+	 Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb } from '@chakra-ui/react';
 
-const SearchTools = (function (apiKey) {
-	const getBrowserCoords = () => new Promise((resolve, reject) => {
-		if (!navigator.geolocation) {
-			reject(new Error('Browser doesn\'t support geolocation.'));
-		} else {
-			navigator.geolocation.getCurrentPosition(pos => {
-				resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-			});
+import getBrowserCoords from './util/getBrowserCoords';
+
+const defaultApiKey = GOOGLE_MAPS_API_KEY; // see webpack.config.js, module.exports.plugins
+const defaultCoordinates = {lat: 39.98020784788337, lon: -75.15746555080395 }; // temple university
+const defaultSearchRadius = 10;
+
+const SearchTools = ({ apiKey = defaultApiKey, categories=[], makers=[] }) => {
+	const [results, setResults] = useState([]);
+	const [coords, setCoords] = useState();
+	const [searchQuery, setSearchQuery] = useState('');
+	const [searchRadius, setSearchRadius] = useState(defaultSearchRadius);
+	const [selectedCategory, setSelectedCategory] = useState('');
+
+	const [map, setMap] = useState();
+	const mapRef = useRef();
+
+	useEffect(() => {
+		getBrowserCoords(defaultCoordinates).then(setCoords);
+	}, []);
+
+	useEffect(() => {
+		if (!coords) return;
+
+		let newSearchQuery = '';
+		// Determine the new search query based on the current searchQuery and selectedCategory values
+		if (searchQuery === '' && selectedCategory !== '') {
+			newSearchQuery = selectedCategory;
+		} else if (searchQuery !== '' && selectedCategory === '') {
+			newSearchQuery = searchQuery.replace(/\s+/g, '&');
+		} else if (searchQuery !== '' && selectedCategory !== '') {
+			// Replace any occurrences of multiple '&' symbols with a single '&' symbol
+			newSearchQuery = (searchQuery.replace(/\s+/g, '&') + '&' + selectedCategory).replace(/&+/g, '&');
 		}
-	});
 
-	const style = {
-		map: {
-			height: 500,
-			width: '100%'
-		},
-		filters: {
+		// Remove any leading or trailing '&' symbols
+		newSearchQuery = newSearchQuery.replace(/^&+|&+$/g, '');
 
+		fetch(`/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
+			.then(x => x.json())
+			.then(x => setResults(x.results));
+	}, [coords, searchQuery, searchRadius, selectedCategory]);
+
+	useLayoutEffect(() => {
+		if (!mapRef.current) return;
+
+		const loader = new Loader({apiKey,version: 'weekly'});
+		loader.load().then(() => {
+			const _map = new google.maps.Map(mapRef.current, {
+				zoom: 8,
+				streetViewControl: false,
+				mapTypeControl: false,
+				mapTypeControlOptions: { mapTypeIds: ['roadmap'] }
+			});
+			_map.addListener('center_changed', () => {
+				const pt = _map.getCenter();
+				let update = {
+					lat: pt.lat(),
+					lon: pt.lng()
+				};
+				setCoords(update);
+			});
+
+			_map.addListener('zoom_changed', () => {
+
+			});
+			setMap(_map);
+		});
+	}, [mapRef.current]);
+
+	useLayoutEffect(() => {
+		if (!coords || !map) return;
+	
+		const pt = map.getCenter();
+		if (!pt || pt.lng() !== coords.lon || pt.lat() !== coords.lat) {
+			console.log(coords, map);
+			map.setCenter({lng: coords.lon, lat: coords.lat});
 		}
-	};
 
-	const SearchTools = ({ }) => {
-		const [results, setResults] = useState([]);
-		const [coords, setCoords] = useState();
-		const [searchQuery, setSearchQuery] = useState('');
-		const [searchRadius, setSearchRadius] = useState(10);
+		let radiusVisualization = new google.maps.Circle({
+			center: {lng: coords.lon, lat: coords.lat},
+			radius: searchRadius * 1000, // in meters
+			strokeColor: "#FFF",
+			strokeOpacity: 0.0,
+			strokeWeight: 0,
+			fillColor: "#0000FF",
+			fillOpacity: 0.2
+		});
+		radiusVisualization.setMap(map);
 
-		const [map, setMap] = useState();
+		return () => {
+			radiusVisualization.setMap(null);
+		}
 
-		const mapRef = useRef();
+	}, [searchRadius, coords, map]);
 
-		useEffect(() => {
-			if (window.isSecureContext) {
-				getBrowserCoords().then(setCoords);
-			} else {
-				setCoords({ lat: 39.98020784788337, lon: -75.15746555080395 });
-			}
-		}, []);
+		// useLayoutEffect(() => {
+		// 	if (!map) return;
 
+		// 	let markers = [];
+		// 	for (const res of results) {
+		// 	  const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
+		// 	  const title = 'Tool';
+		// 	  const position = { lat: geocoded_lat, lng: geocoded_lon };
 
-		useEffect(() => {
-			if (!coords) return;
-			console.log(coords, searchQuery, searchRadius);
-			fetch(`/listings/search.json?searchQuery=${encodeURIComponent(searchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`).then(x => x.json()).then(x => {
-				setResults(x.results);
-			});
-		}, [coords, searchQuery, searchRadius]);
+		// 	  // create a custom marker icon
+		// 	  const icon = {
+		// 		url: '../public/handman_icon.png',
+		// 		scaledSize: new google.maps.Size(50, 50),
+		// 		origin: new google.maps.Point(0, 0),
+		// 		anchor: new google.maps.Point(25, 25),
+		// 	  };
 
-		useLayoutEffect(() => {
-			if (!coords || !mapRef.current) return;
+		// 	  // set the custom marker icon as the icon of the marker
+		// 	  const marker = new google.maps.Marker({
+		// 		position,
+		// 		map,
+		// 		title,
+		// 		icon, // <-- set the custom icon here
+		// 	  });
 
-			//loadUMDScript('/node_modules/@googlemaps/js-api-loader/dist/index.umd.js').then(({Loader, Map}) => {
-			const loader = new Loader({
-				apiKey,
-				version: 'weekly'
-			});
-			return loader.load().then(() => {
-				const _map = new google.maps.Map(mapRef.current, {
-					center: { lat: coords.lat, lng: coords.lon },
-					zoom: 8
-				});
-				setMap(_map);
-			});
-			//});
-		}, [coords, mapRef.current]);
+		// 	  markers.push(marker);
+		// 	}
 
-		useLayoutEffect(() => {
+		// 	return () => {
+		// 	  for (const m of markers) {
+		// 		m.setMap(null);
+		// 	  }
+		// 	};
+		//   }, [map, results]);
+
+		useLayoutEffect(() => { // TEST WITH TOOL NAMES
 			if (!map) return;
 
 			let markers = [];
 			for (const res of results) {
 				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
-				const title = 'Tool';
+				const name = res.tool.name;
+				const description = res.tool.description;
 				const position = { lat: geocoded_lat, lng: geocoded_lon };
-				const marker = new google.maps.Marker({ position, map, title });
+
+				// create a custom marker icon
+				const icon = {
+					url: '../public/handman_icon.png',
+					scaledSize: new google.maps.Size(50, 50),
+					origin: new google.maps.Point(0, 0),
+					anchor: new google.maps.Point(25, 25),
+				};
+
+				// set the custom marker icon as the icon of the marker and add title
+				const marker = new google.maps.Marker({
+					position,
+					map,
+					title: name, // <-- set the tool name as the marker title
+					// icon, // <-- set the custom icon here
+				});
+
+				const infoWindow = new google.maps.InfoWindow({
+					content: `<div><h3>${name}</h3><p>${description}</p></div>`,
+				});
+
+				// add an event listener for the "mouseover" event
+				marker.addListener("mouseover", () => {
+					infoWindow.open(map, marker);
+				});
+
+				// add an event listener for the "mouseout" event
+				marker.addListener("mouseout", () => {
+					infoWindow.close();
+				});
 
 				markers.push(marker);
 			}
@@ -87,36 +184,65 @@ const SearchTools = (function (apiKey) {
 			};
 		}, [map, results]);
 
-		return <div className="SearchTools">
-			<div className="SearchTools__Filters" style={style.filters}>
-				<label>
-					Search query:
-					<input
-						placeholder='Enter search query here...'
-						value={searchQuery}
-						onChange={x => setSearchQuery(x.target.value)}
-					/>
-				</label>
-				<label>
-					Search radius (miles):
-					<input
-						value={searchRadius}
-						type="range"
-						min="1"
-						max="30"
-						step="0.25"
-						onChange={x => setSearchRadius(x.target.value)}
-					/>
-					<span>{searchRadius} miles</span>
-				</label>
-			</div>
+	
+	const labelStyles = {mt: '2', ml: '-2.5', fontSize: 'sm'};
+	const sliderValueStyle = {textAlign: 'center', bg: 'blue.500', color: 'white', mt: '-10', ml: '-5', w: '12'};
+	const maxDist = 200;
+	return (
+<ChakraProvider>
+	<Box className="SearchTools" w="100%">
+		<Container className="SearchTools__Filters" w='100%'>
+			<FormControl>
+				<FormLabel>Search Query</FormLabel>
+				<Input placeholder='Enter search query here...'
+					value={searchQuery}
+					onChange={x => setSearchQuery(x.target.value)} />
+				<FormHelperText>This is full text search.</FormHelperText>
+			</FormControl>
 
-			<div className="SearchTools__Map" style={style.map} ref={mapRef} />
-		</div>;
-	};
-
-	return SearchTools;
-})(GOOGLE_MAPS_API_KEY); // see webpack.config.js
+			<FormControl>
+				<FormLabel>Search Radius</FormLabel>
+				<Box>
+				<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
+					<SliderMark value={50} {...labelStyles}>50km</SliderMark>
+					<SliderMark value={100} {...labelStyles}>100km</SliderMark>
+					<SliderMark value={150} {...labelStyles}>150km</SliderMark>
+					<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
+					<SliderTrack>
+						<SliderFilledTrack />
+					</SliderTrack>
+					<SliderThumb />
+				</Slider>
+				</Box>
+				<FormHelperText>How far away to search for tools.</FormHelperText>
+			</FormControl>
+			<FormControl>
+				<FormLabel>Tool Category</FormLabel>
+				<Select placeholder="Select category" onChange={x => setSelectedCategory(x)}>
+				{categories.map(c => (
+					<option key={c.value} value={c.value}>
+						{c.label}
+					</option>
+				))}
+				</Select>
+			</FormControl>
+			<FormControl>
+				<FormLabel>Tool Maker</FormLabel>
+				<Select placeholder="Select maker" onChange={x => setSelectedCategory(x)}>
+				{makers.map(x => (
+					<option key={x.value} value={x.value}>
+						{x.label}
+					</option>
+				))}
+				</Select>
+			</FormControl>	
+		</Container>
+		<Divider />
+		<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} />
+	</Box>
+</ChakraProvider>
+	);
+};
 
 export default SearchTools;
 

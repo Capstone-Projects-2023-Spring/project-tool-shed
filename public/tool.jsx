@@ -36,10 +36,13 @@ const Tool = (function () {
             <p>Description: {description}</p>
             <p>Category ID: {tool_category_id}</p>
             <p>Maker ID: {tool_maker_id}</p>
-            <p>Description: {description}</p>
         
             <a href={`/tool/edit/${id}`}>
-                <button>Edit</button>
+                <button>Edit Tool</button>
+            </a>
+
+            <a href={`/tool/delete/${id}`}>
+                <button>Delete Tool</button>
             </a>
         </div>
     };

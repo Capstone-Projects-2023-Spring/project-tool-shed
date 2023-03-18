@@ -23,7 +23,7 @@ function NewUserForm () {
         console.log(values);
         try {
             console.log("In try")
-            const response = await fetch('/user/new', {
+            const response = await fetch('/user/new.json', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -36,14 +36,7 @@ function NewUserForm () {
         const data = await response.json();
             console.log('Response data:', data);
 
-            // Parse the response data
-            const parsedData = JSON.parse(data);
-    
-            //console.log('Parsed data:', parsedData);
-
             //Clear form and show successful creation message
-            resetForm();
-            setStatus(data);
             window.location.href = '/'
         } catch (error) {
             console.error(error);

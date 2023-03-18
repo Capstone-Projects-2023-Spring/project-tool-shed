@@ -95,23 +95,39 @@ const SearchTools = (function (apiKey) {
 
 		useLayoutEffect(() => {
 			if (!map) return;
-
+		  
 			let markers = [];
 			for (const res of results) {
-				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
-				const title = 'Tool';
-				const position = { lat: geocoded_lat, lng: geocoded_lon };
-				const marker = new google.maps.Marker({ position, map, title });
-
-				markers.push(marker);
+			  const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
+			  const title = 'Tool';
+			  const position = { lat: geocoded_lat, lng: geocoded_lon };
+		  
+			  // create a custom marker icon
+			  const icon = {
+				url: '/path/to/your/custom/icon.png',
+				scaledSize: new google.maps.Size(50, 50),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(25, 25),
+			  };
+		  
+			  // set the custom marker icon as the icon of the marker
+			  const marker = new google.maps.Marker({
+				position,
+				map,
+				title,
+				icon, // <-- set the custom icon here
+			  });
+		  
+			  markers.push(marker);
 			}
-
+		  
 			return () => {
-				for (const m of markers) {
-					m.setMap(null);
-				}
+			  for (const m of markers) {
+				m.setMap(null);
+			  }
 			};
-		}, [map, results]);
+		  }, [map, results]);
+		  
 
 		return <div className="SearchTools">
 			<div className="SearchTools__Filters" style={style.filters}>

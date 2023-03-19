@@ -196,7 +196,7 @@ const SearchTools = (function (apiKey) {
 						value={searchRadius}
 						type="range"
 						min="1"
-						max="60"
+						max="200"
 						step="1"
 						onChange={x => setSearchRadius(x.target.value)}
 					/>

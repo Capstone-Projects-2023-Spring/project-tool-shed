@@ -95,13 +95,13 @@ const SearchTools = (function (apiKey) {
 
 		// useLayoutEffect(() => {
 		// 	if (!map) return;
-		  
+
 		// 	let markers = [];
 		// 	for (const res of results) {
 		// 	  const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 		// 	  const title = 'Tool';
 		// 	  const position = { lat: geocoded_lat, lng: geocoded_lon };
-		  
+
 		// 	  // create a custom marker icon
 		// 	  const icon = {
 		// 		url: '../public/handman_icon.png',
@@ -109,7 +109,7 @@ const SearchTools = (function (apiKey) {
 		// 		origin: new google.maps.Point(0, 0),
 		// 		anchor: new google.maps.Point(25, 25),
 		// 	  };
-		  
+
 		// 	  // set the custom marker icon as the icon of the marker
 		// 	  const marker = new google.maps.Marker({
 		// 		position,
@@ -117,10 +117,10 @@ const SearchTools = (function (apiKey) {
 		// 		title,
 		// 		icon, // <-- set the custom icon here
 		// 	  });
-		  
+
 		// 	  markers.push(marker);
 		// 	}
-		  
+
 		// 	return () => {
 		// 	  for (const m of markers) {
 		// 		m.setMap(null);
@@ -130,14 +130,14 @@ const SearchTools = (function (apiKey) {
 
 		useLayoutEffect(() => { // TEST WITH TOOL NAMES
 			if (!map) return;
-		
+
 			let markers = [];
 			for (const res of results) {
 				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 				const name = res.tool.name;
 				const description = res.tool.description;
 				const position = { lat: geocoded_lat, lng: geocoded_lon };
-		
+
 				// create a custom marker icon
 				const icon = {
 					url: '../public/handman_icon.png',
@@ -145,7 +145,7 @@ const SearchTools = (function (apiKey) {
 					origin: new google.maps.Point(0, 0),
 					anchor: new google.maps.Point(25, 25),
 				};
-		
+
 				// set the custom marker icon as the icon of the marker and add title
 				const marker = new google.maps.Marker({
 					position,
@@ -154,24 +154,30 @@ const SearchTools = (function (apiKey) {
 					icon, // <-- set the custom icon here
 				});
 
+				const infoWindow = new google.maps.InfoWindow({
+					content: `<div><h3>${name}</h3><p>${description}</p></div>`,
+				});
+
 				// add an event listener for the "mouseover" event
 				marker.addListener("mouseover", () => {
-					const infoWindow = new google.maps.InfoWindow({
-					  content: `<div><h3>${name}</h3><p>${description}</p></div>`, // <-- display the tool name and description in the InfoWindow
-					});
 					infoWindow.open(map, marker);
-				  });
-		
+				});
+
+				// add an event listener for the "mouseout" event
+				marker.addListener("mouseout", () => {
+					infoWindow.close();
+				});
+
 				markers.push(marker);
 			}
-		
+
 			return () => {
 				for (const m of markers) {
 					m.setMap(null);
 				}
 			};
 		}, [map, results]);
-		  
+
 
 		return <div className="SearchTools">
 			<div className="SearchTools__Filters" style={style.filters}>

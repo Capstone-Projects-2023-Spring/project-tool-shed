@@ -135,6 +135,7 @@ const SearchTools = (function (apiKey) {
 			for (const res of results) {
 				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 				const name = res.tool.name;
+				const description = res.tool.description;
 				const position = { lat: geocoded_lat, lng: geocoded_lon };
 		
 				// create a custom marker icon
@@ -152,6 +153,14 @@ const SearchTools = (function (apiKey) {
 					title: name, // <-- set the tool name as the marker title
 					icon, // <-- set the custom icon here
 				});
+
+				// add an event listener for the "mouseover" event
+				marker.addListener("mouseover", () => {
+					const infoWindow = new google.maps.InfoWindow({
+					  content: `<div><h3>${name}</h3><p>${description}</p></div>`, // <-- display the tool name and description in the InfoWindow
+					});
+					infoWindow.open(map, marker);
+				  });
 		
 				markers.push(marker);
 			}

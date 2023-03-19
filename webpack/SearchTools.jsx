@@ -151,7 +151,7 @@ const SearchTools = (function (apiKey) {
 					position,
 					map,
 					title: name, // <-- set the tool name as the marker title
-					icon, // <-- set the custom icon here
+					// icon, // <-- set the custom icon here
 				});
 
 				const infoWindow = new google.maps.InfoWindow({

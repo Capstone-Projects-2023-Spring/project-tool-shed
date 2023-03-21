@@ -7,7 +7,7 @@ dotenv.config();
 
 module.exports = {
 	target: 'web',
-	mode: 'production',
+	mode: 'development',
 	entry: {
 		index_page: path.resolve(__dirname, 'webpack/index_page.jsx'),
 		about: path.resolve(__dirname, 'webpack/about.jsx')

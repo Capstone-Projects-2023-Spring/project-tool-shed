@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -35,6 +36,7 @@ module.exports = {
 		new webpack.DefinePlugin({
 			GOOGLE_MAPS_API_KEY: JSON.stringify(process.env.GOOGLE_MAPS_API_KEY)
 		}),
+//		new BundleAnalyzerPlugin()
 	],
 	resolve: {
 		extensions: ['*', '.js', '.jsx']

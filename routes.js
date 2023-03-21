@@ -116,10 +116,18 @@ app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 		return res.status(404).json({ error: "User not found." });
 	}
 
-	const listings = await Listing.findAll({ where: { owner_id: owner.id } });
-	
-	res.render('listing_list.html', {listings, user: owner});
-}));
+	const listings = await models.Listing.findAll({
+		where: {active: true},
+		include: [{
+			model: models.Tool,
+			as: 'tool',
+			where: {
+				owner_id: owner.id
+			}
+		}]
+	})
+		res.render('listing_list.html', {listings, user: owner});
+	}));
 
 	/*
 	 * User/Account viewing

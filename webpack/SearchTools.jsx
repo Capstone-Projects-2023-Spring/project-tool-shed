@@ -1,7 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { categories } from '../public/categories'; // Import the categories array
-
+import { Select } from '@chakra-ui/react';
 
 const SearchTools = (function (apiKey) {
 	const getBrowserCoords = () => new Promise((resolve, reject) => {
@@ -31,8 +31,6 @@ const SearchTools = (function (apiKey) {
 		const [searchRadius, setSearchRadius] = useState(10);
 		const [selectedCategory, setSelectedCategory] = useState('');
 
-
-
 		const [map, setMap] = useState();
 
 		const mapRef = useRef();
@@ -44,7 +42,6 @@ const SearchTools = (function (apiKey) {
 				setCoords({ lat: 39.98020784788337, lon: -75.15746555080395 });
 			}
 		}, []);
-
 
 		useEffect(() => {
 			if (!coords) return;
@@ -70,15 +67,9 @@ const SearchTools = (function (apiKey) {
 				});
 		}, [coords, searchQuery, searchRadius, selectedCategory]);
 
-
-
-
-
-
 		useLayoutEffect(() => {
 			if (!coords || !mapRef.current) return;
 
-			//loadUMDScript('/node_modules/@googlemaps/js-api-loader/dist/index.umd.js').then(({Loader, Map}) => {
 			const loader = new Loader({
 				apiKey,
 				version: 'weekly'
@@ -90,7 +81,6 @@ const SearchTools = (function (apiKey) {
 				});
 				setMap(_map);
 			});
-			//});
 		}, [coords, mapRef.current]);
 
 		// useLayoutEffect(() => {
@@ -179,7 +169,8 @@ const SearchTools = (function (apiKey) {
 		}, [map, results]);
 
 
-		return <div className="SearchTools">
+		return <ChakraProvider>
+			<div className="SearchTools">
 			<div className="SearchTools__Filters" style={style.filters}>
 				<label>
 					Search query:
@@ -220,7 +211,8 @@ const SearchTools = (function (apiKey) {
 
 
 			<div className="SearchTools__Map" style={style.map} ref={mapRef} />
-		</div>;
+		</div>
+		</ChakraProvider>;
 	};
 
 	return SearchTools;

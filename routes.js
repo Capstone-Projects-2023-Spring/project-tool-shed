@@ -214,6 +214,22 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	  })));
 
+	/*
+	 * View a User's Listings
+	 */
+	
+	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await Listing.findAll({ where: { owner_id: owner.id } });
+		
+		res.render('listing_list.html', {listings, user: owner});
+	}));
 
 	// TODO: tool editing endpoints
 

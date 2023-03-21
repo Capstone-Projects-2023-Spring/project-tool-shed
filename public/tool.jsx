@@ -41,6 +41,12 @@ const Tool = (function () {
             <a href={`/tool/edit/${id}`}>
                 <button>Edit</button>
             </a>
+            <a href={`/user/:user_id/listings`}>
+                <button onClick={() => {
+                    window.location.reload();
+                    window.alert('The listing was created.'); // edit to check it was created
+                }}>List Tool</button>
+            </a>
         </div>
     };
 })();

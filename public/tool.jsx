@@ -36,15 +36,13 @@ const Tool = (function () {
             <p>Description: {description}</p>
             <p>Category ID: {tool_category_id}</p>
             <p>Maker ID: {tool_maker_id}</p>
-            <p>Description: {description}</p>
         
             <a href={`/tool/edit/${id}`}>
                 <button>Edit</button>
             </a>
-            <a href={`/user/:user_id/listings`}>
-                <button onClick={() => {
-                    window.location.reload();
-                    window.alert('The listing was created.'); // edit to check it was created
+            <a href={`/user/me/publishListings`}> 
+                <button onClick={() => { //href address is hard coded, will need to adjust for different users
+                    //window.alert('The listing was created.'); // edit to check it was created
                 }}>List Tool</button>
             </a>
         </div>

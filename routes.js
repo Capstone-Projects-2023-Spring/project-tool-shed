@@ -231,6 +231,29 @@ module.exports = (app, models) => {
 		res.render('listing_list.html', {listings, user: owner});
 	}));
 
+	/*
+		Add Listings to User
+	*/
+	/*
+	app.get('/user/me/publishListings', asyncHandler(requiresAuth(async (req, res) => {
+		const toolCategories = ToolCategory.findAll();
+		const toolMakers = ToolMaker.findAll();
+
+		res.render('???.html', {toolCategories, toolMakers});
+	})));
+
+	app.post('/user/me/publishListings', asyncHandler(requiresAuth(async (req, res) => {
+		const { name, description, tool_category_id, tool_maker_id } = req.body;
+
+		const tool = await models.Tool.create({
+			name, description, owner_id: req.user.id,
+			tool_maker_id, tool_category_id
+		});
+
+		res.redirect(`/user/me/listings`);
+	})));
+	*/
+
 	// TODO: tool editing endpoints
 
 	/*
@@ -241,7 +264,7 @@ module.exports = (app, models) => {
 		res.render('account.html', {error: null});
 	}));
 
-		/*
+	/*
 	 * About Pages
 	 */
 

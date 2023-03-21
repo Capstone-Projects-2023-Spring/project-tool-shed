@@ -107,8 +107,9 @@ module.exports = (app, models) => {
 	 * View a User's Listings
 	 */
 	
-app.get('/user/me/listing', asyncHandler(async (req, res) => {
+app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 	const { user_id } = req.params;
+	console.log(req.params);
 	const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 
 	if (!owner) {

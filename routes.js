@@ -251,19 +251,19 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-		Add Listings to User
+		Add Listings to User DOES NOT WORK
 	*/
 	app.get('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 
-		const toolNames = Tool.findAll();
+		const toolNames = await Tool.findAll();
 		//const toolCategories = ToolCategory.findAll();
 
 		res.render('_add_listing.html', {toolNames});
 	})));
 
-	app.post('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/user/me/newListing', asyncHandler(requiresAuth(async (req, res) => {
 		//const { user_id } = req.params;
 		//const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 
@@ -277,7 +277,7 @@ module.exports = (app, models) => {
 	
 
 	/*
-	 * View a User's Listings
+	 * View a User's Listings 
 	 */
 	
 	app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {

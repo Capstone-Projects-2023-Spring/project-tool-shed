@@ -103,32 +103,6 @@ module.exports = (app, models) => {
 		} 
 	}));
 
-    /*
-	 * View a User's Listings
-	 */
-	
-app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
-	const { user_id } = req.params;
-	console.log(req.params);
-	const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-	if (!owner) {
-		return res.status(404).json({ error: "User not found." });
-	}
-
-	const listings = await models.Listing.findAll({
-		where: {active: true},
-		include: [{
-			model: models.Tool,
-			as: 'tool',
-			where: {
-				owner_id: owner.id
-			}
-		}]
-	})
-		res.render('listing_list.html', {listings, user: owner});
-	}));
-
 	/*
 	 * User/Account viewing
 	 */
@@ -238,31 +212,6 @@ app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 		res.redirect(`/user/me/tools`);
 	  })));
 
-	
-
-	/*
-		Add Listings to User
-	*/
-	/*
-	app.get('/user/me/publishListings', asyncHandler(requiresAuth(async (req, res) => {
-		const toolCategories = ToolCategory.findAll();
-		const toolMakers = ToolMaker.findAll();
-
-		res.render('???.html', {toolCategories, toolMakers});
-	})));
-
-	app.post('/user/me/publishListings', asyncHandler(requiresAuth(async (req, res) => {
-		const { name, description, tool_category_id, tool_maker_id } = req.body;
-
-		const tool = await models.Tool.create({
-			name, description, owner_id: req.user.id,
-			tool_maker_id, tool_category_id
-		});
-
-		res.redirect(`/user/me/listings`);
-	})));
-	*/
-
 	// TODO: tool editing endpoints
 
 	/*
@@ -299,6 +248,57 @@ app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 
 	app.get('/search', asyncHandler(async (req, res) => {
 		res.render('_recommendFromSearch.html', {error: null});
+	}));
+
+	/*
+		Add Listings to User
+	*/
+	app.get('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		const toolNames = Tool.findAll();
+		//const toolCategories = ToolCategory.findAll();
+
+		res.render('_add_listing.html', {toolNames});
+	})));
+
+	app.post('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
+		//const { user_id } = req.params;
+		//const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		const { name }  = req.body;
+		const listing = await models.Listing.create({
+			name
+		});
+
+		res.redirect(`/user/me/listing`);
+	})));
+	
+
+	/*
+	 * View a User's Listings
+	 */
+	
+	app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await models.Listing.findAll({
+			where: {active: true},
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: {
+					owner_id: owner.id
+				}
+			}]
+		})
+		res.render('listing_list.html', {listings, user: owner});
 	}));
 
 	/*

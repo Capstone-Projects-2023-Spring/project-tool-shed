@@ -350,11 +350,10 @@ module.exports = (app, models) => {
     })));
 
     app.post('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
-		const reviewee_id = req.params.reviewee_id
-		console.log(str);
+		const {reviewee_id} = req.params.reviewee_id
         const { content, ratings } = req.body;
         const UserReviews = await models.UserReviews.create({
-            content, ratings, reviewer_id: req.user.id
+            content, ratings, reviewee_id, reviewer_id: req.user.id
         });
         if(UserReviews){
             res.redirect(`/user/me`);

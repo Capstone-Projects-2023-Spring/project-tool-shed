@@ -349,9 +349,8 @@ module.exports = (app, models) => {
         res.render('create_user_review.html', { reviewee_id });
     })));
 
-    app.post('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
-		const {reviewee_id} = req.params.reviewee_id
-        const { content, ratings } = req.body;
+    app.post('/review/new/', asyncHandler(requiresAuth(async (req, res) => {
+        const { content, ratings, reviewee_id } = req.body;
         const UserReviews = await models.UserReviews.create({
             content, ratings, reviewee_id, reviewer_id: req.user.id
         });

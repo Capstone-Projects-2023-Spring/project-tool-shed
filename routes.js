@@ -26,7 +26,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReviews } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -338,16 +338,23 @@ module.exports = (app, models) => {
 		res.json({ results });
 	}));
 
+	/* Create a review on another user*/
+	app.get('/user_to_review', asyncHandler(async (req, res) => {
+		const users = await models.User.findAll();
+		res.render('user_reviews.html', { users });
+	}));
 
-	app.get('/review/new', asyncHandler(requiresAuth(async (req, res) => {
-        res.render('create_user_review.html', {error: null});
+	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { reviewee_id } = req.params;
+        res.render('create_user_review.html', { reviewee_id });
     })));
 
-    /* Create a review */
-    app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
-        const { content, ratings, reviewee_id } = req.body;
+    app.post('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
+		const reviewee_id = req.params.reviewee_id
+		console.log(str);
+        const { content, ratings } = req.body;
         const UserReviews = await models.UserReviews.create({
-            content, ratings, reviewee_id, reviewer_id: req.user.id
+            content, ratings, reviewer_id: req.user.id
         });
         if(UserReviews){
             res.redirect(`/user/me`);

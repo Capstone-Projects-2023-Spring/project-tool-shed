@@ -337,4 +337,22 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
+
+	app.get('/review/new', asyncHandler(requiresAuth(async (req, res) => {
+        res.render('create_user_review.html', {error: null});
+    })));
+
+    /* Create a review */
+    app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
+        const { content, ratings, reviewee_id } = req.body;
+        const UserReviews = await models.UserReviews.create({
+            content, ratings, reviewee_id, reviewer_id: req.user.id
+        });
+        if(UserReviews){
+            res.redirect(`/user/me`);
+        } else{
+            res.status(500);
+        }
+    })));   
 };

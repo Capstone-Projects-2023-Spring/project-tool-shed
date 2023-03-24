@@ -22,7 +22,7 @@ const User = (function() {
 		</React.Fragment>;
 	};
 
-	return ({isEditable, first_name, last_name, email: _email, id, active: _active, detailed=false}) => {
+	return ({first_name, last_name, email: _email, id, active: _active, detailed=false}) => {
 		if (detailed) {
 			return "TODO";
 		}
@@ -37,14 +37,6 @@ const User = (function() {
             <a href={`/review/new/${id}`}>
                 <button>Review User</button>
             </a>
-			{isEditable && 
-			<form action="/users/edit" method="post" style={{display: 'flex', flexFlow: 'column nowrap'}}>
-				<FormInput name='first_name' label="First Name:" value={firstName} setter={setFirstName} />
-				<FormInput name='last_name' label="Last Name:" value={lastName} setter={setLastName} />
-				<FormInput name='email' label="Email:" value={email} setter={setEmail} />
-				<FormInput name='active' label='Active:' value={active} setter={setActive} />
-				<button type="submit">Submit</button>
-			</form>}
 		</div>
 	};
 })();

@@ -7,19 +7,23 @@ sidebar_position: 5
 
 A user wants to search their local neighborhood for a hedge trimmer. They use tool shed to find the tool so that they get the job done today and do not go over their budget to purchase a brand-new one. 
 
-1. The user navigates to (URL:TBD) and enters their username and password. 
+1. The user navigates to sharemytoolshed.com/
 
-2. The user clicks the (LOGIN) button. 
+2. The user clicks the (LOGIN) button in the nav bar
 
-3. The user clicks on the (button: RENT_TOOL) and completes the following fields. 
+3. The user enters their email and password. 
 
-    - Zip Code: ##### 
+4. The user clicks the (LOGIN) button. They're redirected back to sharemytooshed.com/.
 
-    - Search Radius: 15 miles 
+5. The user adjusts the search parameters in the search form to: 
 
-4. The user clicks the (button: SEARCH_TOOL) which will complete the request and execute the database query. 
+    - Search Radius: 15 kilometers
 
-5. The user is presented with 3 search results 
+    - Maker: Rigid
+
+6. The user clicks the (button: SEARCH_TOOL) which will complete the request and execute the database query. 
+
+7. The user is presented with 3 search results 
 
     - AVAILABLE: <i>Gas Hedge Trimmer (NAME) (CONTACT)</i> 
 
@@ -27,11 +31,11 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 
     - AVAILABLE: <i>Electric (Wireless) Hedge Trimmer (NAME) (CONTACT)</i> 
 
-6. The user clicks option 3, which is within their budget so they can afford the tool, and clicks the (button: CONTACT) and is presented with the contact information for Electric (Wireless) Hedge Trimmer. 
+8. The user clicks option 3, which is within their budget so they can afford the tool, and clicks the (button: CONTACT) and is presented with the contact information for Electric (Wireless) Hedge Trimmer. 
 
-7. The user contacts the person responsible for Electric (Wireless) Hedge Trimmer. 
+9. The user contacts the person responsible for Electric (Wireless) Hedge Trimmer. 
 
-8. The user clicks the (button: LOG_OFF) and closes the website. 
+10. The user clicks the (button: LOG_OFF) and closes the website. 
 
  
 

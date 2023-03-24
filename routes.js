@@ -251,8 +251,53 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-		Add Listings to User DOES NOT WORK
+	 * View a User's Listings 
 	*/
+	
+	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await models.Listing.findAll({
+			where: { owner_id: userId},
+			include: [{
+				model: models.Tool,
+				as: 'tool'
+			}]
+		});
+		
+		res.render('listing_list.html', {listings, user: owner});
+	}));
+
+	/*
+		Adding tools to a listing
+	*/
+	app.get('/listings/new', asyncHandler(async (req, res) => {
+		const listing = await models.Listing.findByPk(req.params.listingId);
+		const tools = await models.Tool.findAll();
+	  
+		res.render('_add_listing.html', {
+		  listing,
+		  tools
+		});
+	  }));
+	  
+	  app.post('/listings/new', asyncHandler(async (req, res) => {
+		const listing = await models.Listing.findByPk(req.params.listingId);
+		const tool = await models.Tool.findByPk(req.body.toolId);
+	  
+		await listing.addTool(tool);
+	  
+		res.redirect(`/listings/${listing.id}`);
+	  }));
+
+	/*
+		Add Listings to User DOES NOT WORK
+	
 	app.get('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
@@ -274,11 +319,11 @@ module.exports = (app, models) => {
 
 		res.redirect(`/user/me/listing`);
 	})));
-	
+	*/	
 
 	/*
 	 * View a User's Listings 
-	 */
+	
 	
 	app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
@@ -300,7 +345,7 @@ module.exports = (app, models) => {
 		})
 		res.render('listing_list.html', {listings, user: owner});
 	}));
-
+	*/
 	/*
 	 * Listings
 	 */

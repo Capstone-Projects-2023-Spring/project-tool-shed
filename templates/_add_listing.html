@@ -5,39 +5,17 @@
 {% endblock %}
 
 {% block body %}
-<!--enctype="multipart/form-data"-->
-<form action="/user/me/newListing" method="POST">
-  <label for="name">Your Tools:</label>
-  <select name="name" id="name">
-    <option value="">Select a tool</option> 
-    <% toolNames.forEach(function(tool) { %>
-      <option value="<%= tool.id %>">
-        <%= tool.name %>
-      </option>
-    <% }); %>
 
+<h1>Add Tool to Listing</h1>
 
-    <label for="tool_category_id">Category:</label>
-    <select name="tool_category_id" id="tool_category_id">
-      <option value="">Select a category</option> 
-      <% toolCategories.forEach(function(category) { %>
-        <option value="<%= category.id %>">
-          <%= category.name %>
-        </option>
-      <% }); %>
-
-
-  <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}"/>
-<div>
-  <!--onclick="getString()"-->
-  <button type="submit" >Submit</button>
-</div>
+<form method="POST">
+  <label for="tool">Tool:</label>
+  <select name="toolId">
+    {% for tool in tools %}
+      <option value="{{ tool.id }}">{{ tool.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Add</button>
 </form>
-<style>
-  form div {
-    margin-bottom: 10px;
-  }
-</style>
-
 
 {% endblock %}

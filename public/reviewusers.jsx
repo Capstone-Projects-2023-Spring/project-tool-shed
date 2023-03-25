@@ -32,7 +32,7 @@ const User = (function() {
 		const [email, setEmail] = useState(_email);
 		const [active, setActive] = useState(_active);
 		return <div style={style}>
-			<h2>{firstName} {lastName} {id} {active}</h2>
+			<h2>{firstName} {lastName} {active}</h2>
 			<p>Email: {email}</p>
             <a href={`/review/new/${id}`}>
                 <button>Review User</button>

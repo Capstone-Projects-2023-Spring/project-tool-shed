@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { loginUserSchema, searchListingsSchema } = require('./validators');
+const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
 const { Op } = sequelize;
 
@@ -26,7 +26,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReviews } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -339,7 +339,7 @@ module.exports = (app, models) => {
 	}));
 
 	/* Create a review on another user*/
-	app.get('/user_to_review', asyncHandler(async (req, res) => {
+	app.get('/review/users', asyncHandler(async (req, res) => {
 		const users = await models.User.findAll();
 		res.render('user_reviews.html', { users });
 	}));
@@ -350,11 +350,11 @@ module.exports = (app, models) => {
     })));
 
     app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
-        const { content, ratings, reviewee_id } = req.body;
-        const UserReviews = await models.UserReviews.create({
+        const { content, ratings, reviewee_id } = await newReviewSchema.validate(req.body);
+        const one_review = await models.UserReview.create({
             content, ratings, reviewee_id, reviewer_id: req.user.id
         });
-        if(UserReviews){
+        if(one_review){
             res.redirect(`/user/me`);
         } else{
             res.status(500);

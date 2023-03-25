@@ -329,7 +329,7 @@ const genModels = sequelize => {
      * @property {integer} ratings The star ratings of another user
      * 
      */
-	const UserReviews = sequelize.define('UserReviews', {
+	const UserReview = sequelize.define('UserReview', {
 		content: {
 			type: DataTypes.TEXT,
 			allowNull: false
@@ -342,22 +342,22 @@ const genModels = sequelize => {
 			}
 		},
 		}, {
-			tableName: "userreviews",
+			tableName: "userreview",
 			paranoid: true, 
 		});
-	
-		User.hasMany(UserReviews, {
+
+		User.hasMany(UserReview, {
 			foreignKey: 'reviewee_id'
 		});
-	
-		UserReviews.belongsTo(User, {
+
+		UserReview.belongsTo(User, {
 			foreignKey: {
 				name: 'reviewer_id',
 				allowNull: false
 			},
 			as: 'reviewer'
 		});
-		UserReviews.belongsTo(User, {
+		UserReview.belongsTo(User, {
 			foreignKey: {
 				name: 'reviewee_id',
 				allowNull: false
@@ -365,7 +365,7 @@ const genModels = sequelize => {
 			as: 'reviewee'
 		});
 	
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReviews};
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview};
 
 };
 

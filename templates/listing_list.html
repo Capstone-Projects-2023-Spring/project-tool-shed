@@ -14,9 +14,7 @@
 	const ListingsList = ({ listings }) => {
 
 		return <div>
-			{listings.map((listing) => (
-				<Listing key={listing.id} {...listing.dataValues} tool={listing.tool} />
-			))}
+			{listings.map(l => <Listing key={l.id} detailed={true} {...l} />)}
 		</div>;
 	};
 
@@ -24,7 +22,7 @@
 
 	const listings = {{ listings| json }};
 	console.log(listings);
-	root.render(<ListingsList listings={listings} />);
+	root.render(<ListingsList listings={listings} detailed={true} />);
 </script>
 
 {% endblock %}

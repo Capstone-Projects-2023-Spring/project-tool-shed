@@ -251,29 +251,6 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * View a User's Listings 
-	
-	
-	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		if (!owner) {
-			return res.status(404).json({ error: "User not found." });
-		}
-
-		const listings = await models.Listing.findAll({
-			where: { owner_id: userId},
-			include: [{
-				model: models.Tool,
-				as: 'tool'
-			}]
-		});
-		
-		res.render('listing_list.html', {listings, user: owner});
-	}));
-	*/
-	/*
 		Create a listing for a tool
 	*/
 	app.get('/listings/new', asyncHandler(async (req, res) => {

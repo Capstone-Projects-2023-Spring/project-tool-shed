@@ -6,7 +6,7 @@
 
 {% block body %}
 
-<h1>Add Tool to Listing</h1>
+<h1>Create a Listing</h1>
 
 <form method="POST">
   <label for="tool">Tool:</label>
@@ -15,6 +15,21 @@
       <option value="{{ tool.id }}">{{ tool.name }}</option>
     {% endfor %}
   </select>
+
+  <label for="Price">Price:</label>
+  <input type="number" name="price" id="price"/>
+  
+  <label for="billingInterval">Billing Interval:</label>
+  <select name="billingInterval"> 
+    <option value="hourly">Hourly</option>
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="forever">Forever</option>
+  </select>
+
+  <label for="maxBillingIntervals">Max Billing Interval:</label>
+  <input type="number" name="maxBillingIntervals" id="maxBillingIntervals"/>
+  
   <button type="submit">Add</button>
 </form>
 

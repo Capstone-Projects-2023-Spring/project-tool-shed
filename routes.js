@@ -252,7 +252,7 @@ module.exports = (app, models) => {
 
 	/*
 	 * View a User's Listings 
-	*/
+	
 	
 	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
@@ -272,27 +272,24 @@ module.exports = (app, models) => {
 		
 		res.render('listing_list.html', {listings, user: owner});
 	}));
-
+	*/
 	/*
 		Adding tools to a listing
 	*/
 	app.get('/listings/new', asyncHandler(async (req, res) => {
-		const listing = await models.Listing.findByPk(req.params.listingId);
 		const tools = await models.Tool.findAll();
 	  
-		res.render('_add_listing.html', {
-		  listing,
-		  tools
-		});
+		res.render('_add_listing.html', {tools});
 	  }));
 	  
 	  app.post('/listings/new', asyncHandler(async (req, res) => {
-		const listing = await models.Listing.findByPk(req.params.listingId);
-		const tool = await models.Tool.findByPk(req.body.toolId);
+		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
+		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
+		const tool = await models.Tool.findByPk(toolId);
 	  
-		await listing.addTool(tool);
+		await listing.setTool(tool);
 	  
-		res.redirect(`/listings/${listing.id}`);
+		res.redirect(`/user/me/listing`);
 	  }));
 
 	/*
@@ -323,7 +320,7 @@ module.exports = (app, models) => {
 
 	/*
 	 * View a User's Listings 
-	
+	*/
 	
 	app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
@@ -345,7 +342,7 @@ module.exports = (app, models) => {
 		})
 		res.render('listing_list.html', {listings, user: owner});
 	}));
-	*/
+	
 	/*
 	 * Listings
 	 */

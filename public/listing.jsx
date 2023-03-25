@@ -4,34 +4,21 @@
 const Listing = ({
   name,
   description,
-  id,
-  detailed = false,
   owner,
   price,
   billingInterval,
   maxBillingIntervals,
-  tools = [],
+  tool,
 }) => {
+  console.log('tools:', tool)
   return (
     <div>
       <h2>
-        {name} {owner}
+        <p>{tool.name} {owner}</p>
       </h2>
-      <p>Description: {description}</p>
+      <p>Tool Description: {tool.description}</p>
       <p>Price & Rate : ${price} {billingInterval}</p>
       <p>Available For: {maxBillingIntervals} units</p>
-
-      {detailed && (
-        <div>
-          <h3>Tool:</h3>
-          {tools.map((tool) => (
-            <div key={tool.id}>
-              <p>{tool.name}</p>
-              <p>{tool.description}</p>
-            </div>
-          ))}
-        </div>
-      )}
     </div >
   );
 };

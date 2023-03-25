@@ -314,7 +314,7 @@ module.exports = (app, models) => {
 				}
 			}]
 		})
-		res.render('listing_list.html', {listings, user: owner});
+		res.render('listing_list.html', {listings, user: owner, tool: listings.map(l => l.tool)});
 	}));
 	
 	/*

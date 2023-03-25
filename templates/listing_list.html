@@ -11,18 +11,20 @@
 <script src="/public/listing.jsx" type="text/babel"></script>
 
 <script type="text/babel">
-	const ListingsList = ({ listings }) => {
+	const ListingsList = ({ listings, tool }) => {
 
 		return <div>
-			{listings.map(l => <Listing key={l.id} detailed={true} {...l} />)}
+			{listings.map(l => <Listing key={l.id} tool={tool[l.id]} {...l} />)}
 		</div>;
 	};
 
 	const root = ReactDOM.createRoot(document.getElementById('root'));
 
 	const listings = {{ listings| json }};
+	const tool = {{ tool | json }};
 	console.log(listings);
-	root.render(<ListingsList listings={listings} detailed={true} />);
+	console.log(tool);
+	root.render(<ListingsList listings={listings} tool={tool} />);
 </script>
 
 {% endblock %}

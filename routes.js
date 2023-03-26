@@ -103,8 +103,6 @@ module.exports = (app, models) => {
 		}
 	}));
 
-
-
 	/*
 	 * User/Account viewing
 	 */
@@ -235,7 +233,6 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
-
 	// TODO: tool editing endpoints
 
 	/*
@@ -272,6 +269,51 @@ module.exports = (app, models) => {
 
 	app.get('/search', asyncHandler(async (req, res) => {
 		res.render('_recommendFromSearch.html', { error: null });
+	}));
+
+	/*
+		Create a listing for a tool
+	*/
+	app.get('/listing/new', asyncHandler(async (req, res) => {
+		const tools = await models.Tool.findAll();
+	  
+		res.render('_add_listing.html', {tools});
+	  }));
+	  
+	  app.post('/listing/new', asyncHandler(async (req, res) => {
+		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
+		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
+		const tool = await models.Tool.findByPk(toolId);
+	  
+		await listing.setTool(tool);
+	  
+		res.redirect(`/user/me/listings`);
+	  }));
+
+
+	/*
+	 * View a User's Listings 
+	*/
+
+	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await models.Listing.findAll({
+			where: { active: true },
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: {
+					owner_id: owner.id
+				}
+			}]
+		})
+		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
 	}));
 
 	/*

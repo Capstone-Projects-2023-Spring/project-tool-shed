@@ -1,9 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 
+import { categories } from '../public/categories'; // Import the categories array
 import SearchTools from './SearchTools';
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<SearchTools />);
+createRoot(document.getElementById('root')).render(<SearchTools categories={categories} />);
 

@@ -38,7 +38,11 @@ const Tool = (function () {
             <p>Maker ID: {tool_maker_id}</p>
         
             <a href={`/tool/edit/${id}`}>
-                <button>Edit</button>
+                <button>Edit Tool</button>
+            </a>
+
+            <a href={`/tool/delete/${id}`}>
+                <button>Delete Tool</button>
             </a>
             <a href={`/user/me/listing`}> 
                 <button onClick={() => { //href address is hard coded, will need to adjust for different users

@@ -1,5 +1,4 @@
 export const categories = [
-	{ value: "", label: "All Categories" },
 	{ value: "aerators", label: "Aerators" },
 	{ value: "aerial-lifts", label: "Aerial Lifts" },
 	{ value: "augers", label: "Augers" },

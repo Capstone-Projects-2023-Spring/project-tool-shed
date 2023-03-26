@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<title>Edit Tool</title>
+{% endblock %}
+{% block body %}
+
+<h1>Edit Listing</h1>
+<form action="/user/:user_id/edit/{{ listing_id }}" method="POST">
+    <label for="price">Price:</label>
+    <input type="text" name="price" id="price" value="{{ listing.price }}" />
+
+    <label for="billingInterval">Billing Interval:</label>
+    <select name="billingInterval" id="billingInterval">
+        <option value="hourly">Hourly</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="forever">Forever</option>
+    </select>
+
+    <label for="maxbillingIntervals">Max Billing Interval:</label>
+    <input type="text" name="maxbillingIntervals" id="maxbillingIntervals" value="{{ listing.maxBillingIntervals }}" />
+
+    <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}" />
+    <div>
+        <button type="submit">Save Changes</button>
+    </div>
+
+</form>
+{% endblock %}

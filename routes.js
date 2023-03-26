@@ -317,6 +317,57 @@ module.exports = (app, models) => {
 	}));
 
 	/*
+		Edit a Tool
+	*/
+
+	app.get('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+		const { listing_id } = req.params;
+	  
+		const listing = await models.Listing.findByPk(listing_id);
+	  console.log(listing)
+		if (!listing) {
+		  return res.status(404).json({ error: "Listing not found." });
+		}
+	  
+		// Only allow the owner to edit the listing
+		if (listing.user_id !== req.user.id) {
+		  return res.status(403).json({ error: "You are not authorized to edit this listing." });
+		}
+	  
+		res.render('_edit_listing.html', { listing });
+	  })));
+
+	  app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+		const { listing_id } = req.params;
+		const { price, billingInterval, maxBillingIntervals } = req.body;
+	  
+		const listing = await models.Listing.findByPk(listing_id);
+	  
+		if (!listing) {
+		  return res.status(404).json({ error: "Listing not found." });
+		}
+	  
+		// Only allow the owner to edit the listing
+		if (listing.user_id !== req.user.id) {
+		  return res.status(403).json({ error: "You are not authorized to edit this listing." });
+		}
+	  
+		// Update the listing data with the new data
+		listing.price = price;
+		listing.billingInterval = billingInterval;
+		listing.maxBillingIntervals = maxBillingIntervals;
+		await listing.save();
+	  
+		res.redirect(`/user/me/listings`);
+	  })));
+
+	  // TODO: listing editing endpoints
+	
+	/*
 	 * Listings
 	 */
 	app.get('/listings/search.json', asyncHandler(async (req, res) => {

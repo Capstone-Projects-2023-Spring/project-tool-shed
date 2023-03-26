@@ -4,6 +4,7 @@
 const Listing = ({
   name,
   description,
+  id,
   owner,
   price,
   billingInterval,
@@ -19,6 +20,14 @@ const Listing = ({
       <p>Tool Description: {tool.description}</p>
       <p>Price & Rate : ${price} {billingInterval}</p>
       <p>Available For: {maxBillingIntervals} units</p>
+
+      <a href={`/user/me/edit/${id}`}> 
+          <button>Edit Listing</button> 
+      </a>
     </div >
   );
 };
+
+/**
+ * Note: button only goes to /me
+ */

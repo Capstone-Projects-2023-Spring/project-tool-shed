@@ -321,7 +321,29 @@ const genModels = sequelize => {
 		as: 'tool'
 	});
 
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing};
+	/**
+	 * @class UserMessage
+         * @classdesc Represents a conversation between two users.
+	 * @augments sequelize.Model
+         * @property {string} content Message content
+         */
+	const UserMessage = sequelize.define('UserMessage', {
+		content: {
+			type: DataTypes.STRING, 
+			allowNull: false
+		},
+		sender_id: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		recipient_id: {
+			type: DataTypes.STRING,
+			allowNull: false
+		}
+	}, {tableName: 'user_message', paranoid: true});
+	
+
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage};
 };
 
 module.exports = genModels;

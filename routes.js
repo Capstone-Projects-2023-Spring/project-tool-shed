@@ -26,7 +26,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -337,4 +337,59 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
+	/*
+	* User Messaging
+	*/
+	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!sender) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
+	})));
+	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
+		const { sender_id } = req.user.id;
+		const { recipient_id } = req.params.user_id;
+		const { content } = req.body;
+
+		const message = await models.UserMessage.create({
+			content, sender_id, recipient_id
+		});
+
+	})));
+	app.get('/new/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('user_messaging.html', { user: req.user });
+	})));
+	app.post('/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
+		const { sender } = req.user.id;
+		const { recipient } = req.params.user_id;
+		const { content } = req.body;
+
+		const message = await models.UserMessage.findByPk({ where: { sender_id: sender.id, recipient_id: recipient.id }});
+
+		if (!message) {
+			return res.status(404).json({ error: "Message not found." });
+		}
+
+		message.content = content;
+		await message.save();
+
+	})));
+	app.get('/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { sender } = req.user.id;
+		const { recipient } = req.params.user_id;
+
+		const message = await models.UserMessage.findOne({ where: { sender_id: sender.id,  recipient_id: recipient.id }});
+
+		if (!message) {
+			return res.status(404).json({ error: "Message not found." });
+		}
+		res.render('user_messaging.html', { user: req.user });
+	})));
 };
+
+	

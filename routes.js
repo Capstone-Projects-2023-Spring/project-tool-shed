@@ -369,7 +369,7 @@ module.exports = (app, models) => {
 		const messages = {}; // Other user id => [UserMessage], [oldest, ...., newest]
 		for (const m of allMessages) {
 			const otherId = m.recipient_id === req.user.id ? m.sender_id : m.recipient_id;
-			if (!messages[otherId]) = messages[otherId] = [];
+			if (!messages[otherId]) messages[otherId] = [];
 			messages[otherId].push(m);
 		}
 
@@ -393,14 +393,14 @@ module.exports = (app, models) => {
 		const messages = await models.UserMessage.findAll({
 			where: {
 				[Op.and]: [
-					[Op.or]: [
+					{[Op.or]: [
 						{recipient_id: req.user.id},
 						{sender_id: req.user.id}
-					],
-					[Op.or]: [
+					]},
+					{[Op.or]: [
 						{recipient_id: user_id},
 						{sender_id: user_id}
-					]
+					]}
 				]
 			},
 			order: [

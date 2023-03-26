@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import ReactDOM from 'react-dom/client';
+import { useParams } from "react-router-dom";
 import { ChakraProvider, Button, Flex, Input, Textarea, VStack } from "@chakra-ui/react";
 
 function UserMessaging() {
   
     const [message, setMessage] = useState("");
     const [sentMessage, setSentMessage] = useState("");
+    const { userId } = useParams();
 
     const handleMessageChange = (event) => {
       setMessage(event.target.value);
@@ -13,7 +15,8 @@ function UserMessaging() {
 
     const handleSendMessage = async () => {
         //Set up sending to socket
-        setSentMessage(message);
+        //setSentMessage(message);
+        
         try {
           const response = await fetch(`/new/message/${userId}/send`, {
             method: "POST",
@@ -48,7 +51,7 @@ function UserMessaging() {
     </Flex>
   );
 }
-}
+
 
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(

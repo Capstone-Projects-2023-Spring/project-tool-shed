@@ -352,12 +352,10 @@ module.exports = (app, models) => {
 		const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
 	})));
 	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender_id } = req.user.id;
-		const { recipient_id } = req.params.user_id;
 		const { content } = req.body;
 
 		const message = await models.UserMessage.create({
-			content, sender_id, recipient_id
+			content, sender_id: req.user.id, recipient_id: req.params.user_id
 		});
 
 	})));

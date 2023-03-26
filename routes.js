@@ -251,34 +251,27 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-		Add Listings to User DOES NOT WORK
+		Create a listing for a tool
 	*/
-	app.get('/user/:user_id/newListing', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		const toolNames = await Tool.findAll();
-		//const toolCategories = ToolCategory.findAll();
-
-		res.render('_add_listing.html', {toolNames});
-	})));
-
-	app.post('/user/me/newListing', asyncHandler(requiresAuth(async (req, res) => {
-		//const { user_id } = req.params;
-		//const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		const { name }  = req.body;
-		const listing = await models.Listing.create({
-			name
-		});
-
+	app.get('/listings/new', asyncHandler(async (req, res) => {
+		const tools = await models.Tool.findAll();
+	  
+		res.render('_add_listing.html', {tools});
+	  }));
+	  
+	  app.post('/listings/new', asyncHandler(async (req, res) => {
+		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
+		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
+		const tool = await models.Tool.findByPk(toolId);
+	  
+		await listing.setTool(tool);
+	  
 		res.redirect(`/user/me/listing`);
-	})));
-	
+	  }));
 
 	/*
 	 * View a User's Listings 
-	 */
+	*/
 	
 	app.get('/user/:user_id/listing', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
@@ -298,9 +291,9 @@ module.exports = (app, models) => {
 				}
 			}]
 		})
-		res.render('listing_list.html', {listings, user: owner});
+		res.render('listing_list.html', {listings, user: owner, tool: listings.map(l => l.tool)});
 	}));
-
+	
 	/*
 	 * Listings
 	 */

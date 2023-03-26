@@ -44,11 +44,6 @@ const Tool = (function () {
             <a href={`/tool/delete/${id}`}>
                 <button>Delete Tool</button>
             </a>
-            <a href={`/user/me/listing`}> 
-                <button onClick={() => { //href address is hard coded, will need to adjust for different users
-                    //window.alert('The listing was created.'); // edit to check it was created
-                }}>List Tool</button>
-            </a>
         </div>
     };
 })();

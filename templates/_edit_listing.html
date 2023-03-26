@@ -7,7 +7,7 @@
 {% block body %}
 
 <h1>Edit Listing</h1>
-<form action="/user/:user_id/edit/{{ listing_id }}" method="POST">
+<form action="/user/{{ user_id }}/edit/{{ listing_id }}" method="POST">
     <label for="price">Price:</label>
     <input type="text" name="price" id="price" value="{{ listing.price }}" />
 

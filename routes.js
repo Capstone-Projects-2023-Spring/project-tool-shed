@@ -317,7 +317,7 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-		Edit a Tool
+		Edit a Listing
 	*/
 
 	app.get('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -326,17 +326,14 @@ module.exports = (app, models) => {
 		const { listing_id } = req.params;
 	  
 		const listing = await models.Listing.findByPk(listing_id);
+
 	  console.log(listing)
 		if (!listing) {
 		  return res.status(404).json({ error: "Listing not found." });
 		}
+	  	
 	  
-		// Only allow the owner to edit the listing
-		if (listing.user_id !== req.user.id) {
-		  return res.status(403).json({ error: "You are not authorized to edit this listing." });
-		}
-	  
-		res.render('_edit_listing.html', { listing });
+		res.render('_edit_listing.html', { listing, user_id, listing_id });
 	  })));
 
 	  app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -350,11 +347,7 @@ module.exports = (app, models) => {
 		if (!listing) {
 		  return res.status(404).json({ error: "Listing not found." });
 		}
-	  
-		// Only allow the owner to edit the listing
-		if (listing.user_id !== req.user.id) {
-		  return res.status(403).json({ error: "You are not authorized to edit this listing." });
-		}
+
 	  
 		// Update the listing data with the new data
 		listing.price = price;

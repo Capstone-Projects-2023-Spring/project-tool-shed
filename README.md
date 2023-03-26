@@ -24,6 +24,8 @@
     |   webpack/ # frontend code that gets bundled via webpack
     |   public/ # gets served raw under <scheme>://<hostname>:<port>/public/
     |   scripts/ # devops scripts
+    |   data/ # data you can use, not explicity used by app
+    |   validators/ # code for validating input
     +-- templates/
     |   |  base.html # base template file
     |   |  ... more .html files that extend base.html

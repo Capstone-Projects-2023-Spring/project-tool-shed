@@ -43,19 +43,11 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 
 A user wants to list a tool to sell it as they no longer need it anymore so that other users to be able to purchase it. 
 
-1. The user enters the URL. 
+1. The user navigates to sharemytoolshed.com/, and logs in like in use case #1. The user ends up on the home page, logged in. 
 
-2. The user enters their username and password. 
-
-3. The user clicks on the (button: LOGIN). 
-
-4. The user is brought to the homepage. 
-
-5. The user clicks on the (button: LIST_TOOL) and completes the following fields. 
+2. The user clicks on the (button: LIST_TOOL) and completes the following fields. 
 
     - Name of tool 
-
-    - Zip Code: ##### 
 
     - Type of tool (Electric, Battery, Wireless, etc.) 
 
@@ -81,13 +73,11 @@ A user wants to list a tool to sell it as they no longer need it anymore so that
 
 A user would like to rent out tools that they are not currently using to earn some extra money. 
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the (button: LOGIN). 
+1. The user logs in like in use case #2 & #3. 
 
 2. The user clicks on the (button: LIST_TOOL) and completes the following fields. 
 
     - Name of Tool 
-
-    - Zip Code: ##### 
 
     - Type of Tool (Electric, Battery, Wireless, etc.) 
 

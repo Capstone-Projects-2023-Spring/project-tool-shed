@@ -7,6 +7,9 @@ const Inbox = () => {
   const [messages, setMessages] = useState([]);
   const { userId } = useParams();
 
+  // FIXME: Don't wrap calls to effect
+  // FIXME: this link explains calling async code in hooks
+  //        https://devtrium.com/posts/async-functions-useeffect
   // Retrieve messages from a PostgreSQL database
   try{
     useEffect(() => {
@@ -75,6 +78,9 @@ const Inbox = () => {
       </Box>
   );
 };
+
+
+
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(
   <ChakraProvider>

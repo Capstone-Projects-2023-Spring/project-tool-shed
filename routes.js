@@ -341,6 +341,95 @@ module.exports = (app, models) => {
 	/*
 	* User Messaging
 	*/
+
+
+	/*
+		You need a couple URLS:
+		- A list of conversations (/inbox)
+		- A view for each conversation (/inbox/:user_id)
+		- A JSON endpoint for sending a message
+	*/
+	/*
+
+	// EXAMPLE CODE
+
+	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
+		const allMessages = await models.UserMessage.findAll({
+			where: {
+				[Op.or]: [
+					{recipient_id: req.user.id},
+					{sender_id: req.user.id}
+				]
+			},
+			order: [
+				['createdAt', 'ASC']
+			]
+		});
+
+		const messages = {}; // Other user id => [UserMessage], [oldest, ...., newest]
+		for (const m of allMessages) {
+			const otherId = m.recipient_id === req.user.id ? m.sender_id : m.recipient_id;
+			if (!messages[otherId]) = messages[otherId] = [];
+			messages[otherId].push(m);
+		}
+
+		// [{with: <User object>, messages: [UserMessage]}, ...]
+		const conversations = [];
+		for (const [otherId, messages] of Object.entries(messages)) {
+			conversations.push({
+				with: models.User.findByPk(otherId),
+				messages
+			});
+		}
+
+		// templates/inbox.html renders something like what you see when you first open
+		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
+		res.render('inbox.html', {conversations}); // auth'd user is authUser
+	})));
+
+	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
+		const {user_id} = req.params;
+
+		const messages = await models.UserMessage.findAll({
+			where: {
+				[Op.and]: [
+					[Op.or]: [
+						{recipient_id: req.user.id},
+						{sender_id: req.user.id}
+					],
+					[Op.or]: [
+						{recipient_id: user_id},
+						{sender_id: user_id}
+					]
+				]
+			},
+			order: [
+				['createdAt', 'ASC']
+			]
+		});
+
+		// templates/inbox_thread.html renders all the messages in a conversation.
+		res.render('inbox_thread.html', {messages}); // auth'd user is authUser
+	})));
+
+	// Sends a message.
+	app.post('/index/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
+		const { content } = req.body;
+		const { user_id } = req.params;
+
+		try {
+			const message = await models.UserMessage.create({
+				content, sender_id: req.user.id, recipient_id: user_id
+			});
+
+			res.json({status: 'ok', error: null, message});
+		} catch (error) {
+			res.json({status: 'failure', error, message: null});
+		}
+	})));
+
+	*/
+
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
@@ -349,13 +438,19 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "User not found." });
 		}
 
+		// FIXME: you need this query to include messages sent TO and sent BY req.user
 		try {
 			const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
 		} catch (error)  {
 			console.log(error);
 		}
+
+		// TODO: group messages by recipient (you can do that in JS code)
+		// 	 order each group of messages by time 
+
 		res.render('inbox.html', { user: req.user });
 	})));
+
 	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
 		const { content } = req.body;
 
@@ -363,10 +458,13 @@ module.exports = (app, models) => {
 			content, sender_id: req.user.id, recipient_id: req.params.user_id
 		});
 
+		res.json({status: 'ok', message}); // NEW
 	})));
+
 	app.get('/new/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
 		res.render('user_messaging.html', { user: req.user });
 	})));
+
 	app.post('/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
 		const { sender } = req.user.id;
 		const { recipient } = req.params.user_id;
@@ -382,6 +480,7 @@ module.exports = (app, models) => {
 		await message.save();
 
 	})));
+
 	app.get('/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { sender } = req.user.id;
 		const { recipient } = req.params.user_id;

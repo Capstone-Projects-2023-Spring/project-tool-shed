@@ -349,7 +349,12 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "User not found." });
 		}
 
-		const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
+		try {
+			const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
+		} catch (error)  {
+			console.log(error);
+		}
+		res.render('inbox.html', { user: req.user });
 	})));
 	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
 		const { content } = req.body;

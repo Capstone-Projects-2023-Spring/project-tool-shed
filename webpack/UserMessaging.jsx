@@ -13,9 +13,9 @@ function UserMessaging() {
 
     const handleSendMessage = async () => {
         //Set up sending to socket
-        //setSentMessage(message);
+        setSentMessage(message);
         try {
-          const response = await fetch(`/new/message/${userId}`, {
+          const response = await fetch(`/new/message/${userId}/send`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -27,6 +27,7 @@ function UserMessaging() {
     } catch (error) {
       console.error(error);
     }
+  }
 
   return (
     <Flex

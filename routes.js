@@ -44,7 +44,7 @@ module.exports = (app, models) => {
 		}
 	}));
 
-	app.post('/user/new', asyncHandler(async (req, res) => {
+	app.post('/user/new.json', asyncHandler(async (req, res) => {
 		const { first_name, last_name, email, password,
 			line_one, line_two, city, state, zip_code } = req.body;
 
@@ -54,7 +54,7 @@ module.exports = (app, models) => {
 		await user.setPassword(password);
 		await user.save();
 		await res.setUser(user);
-		res.redirect('/user/me');
+		res.json({user});
 	}));
 
 	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {
@@ -212,6 +212,27 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
+	/*
+			  Delete a tool
+	*/
+
+	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { tool_id } = req.params;
+		const tool = await Tool.findByPk(tool_id);
+
+		if (!tool) {
+			return res.status(404).json({ error: "Tool not found." });
+		}
+
+		if (tool.owner_id !== req.user.id) {
+			return res.status(401).json({ error: "Unauthorized." });
+		}
+
+		await tool.destroy();
+
+		res.redirect(`/user/me/tools`);
+	})));
+
 	// TODO: tool editing endpoints
 
 	/*
@@ -223,8 +244,8 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * About Pages
-	 */
+ * About Pages
+ */
 
 	app.get('/about', asyncHandler(async (req, res) => {
 		res.render('about.html', { error: null });

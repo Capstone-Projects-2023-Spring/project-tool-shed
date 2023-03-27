@@ -360,4 +360,25 @@ module.exports = (app, models) => {
             res.status(500);
         }
     })));   
+
+	/* View my reviews */
+	app.get('/user/:user_id/reviews', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const reviewee = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	
+		if (!reviewee) {
+			return res.status(404).json({ error: "User not found." });
+		}
+	
+		const reviews = await UserReview.findAll({ 
+			where: { reviewee_id: reviewee.id },
+			include: { 
+				model: models.User,
+				as: 'reviewer',
+				attributes:['email']
+			},
+	
+		});
+		res.render('review_list.html', { reviews, user: reviewee });
+	}));
 };

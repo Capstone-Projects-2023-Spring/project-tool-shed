@@ -3,6 +3,7 @@
  * @module models
  */
 
+const path = require('path');
 const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
@@ -402,8 +403,11 @@ const genModels = sequelize => {
 		path: {type: DataTypes.STRING, allowNull: false},
 		originalName: {type: DataTypes.STRING, allowNull: true},
 		size: {type: DataTypes.INTEGER, validate: {min: 0}},
-		mimeType: {type: DataTypes.STRING}
+		mimeType: {type: DataTypes.STRING},
+		storedIn: DataTypes.STRING
 	}, {paranoid: true, tableName: 'file_upload'});
+
+	FileUpload.prototype.getURL = function() {return path.join('/uploads/', path.relative(this.storedIn, this.path));};
 
 	Tool.belongsTo(FileUpload, {
 		foreignKey: {

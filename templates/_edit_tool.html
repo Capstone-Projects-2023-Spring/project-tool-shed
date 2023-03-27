@@ -7,7 +7,7 @@
 {% block body %}
 
 <h1>Edit Tool</h1>
-<form action="/tool/edit/{{ tool.id }}" method="POST">
+<form action="/tool/edit/{{ tool.id }}" enctype="multipart/form-data" method="POST">
     <label for="name">Name:</label>
     <input type="text" name="name" id="name" value="{{ tool.name }}" />
 
@@ -35,6 +35,12 @@
             </option>
             <% }); %>
     </select>
+
+    <label for="manual">Manual:</label>
+    <input type="file" name="manual" id="manual" />
+    {% if tool.manual %}
+    <a target="_blank" href="{{ tool.manual.getURL() }}">Current value</a>
+    {% endif %}
 
     <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}" />
     <div>

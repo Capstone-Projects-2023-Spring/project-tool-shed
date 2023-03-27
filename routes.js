@@ -157,6 +157,7 @@ module.exports = (app, models) => {
 	})));
 
 	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+		console.log('FILE', req.file);
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
 		const tool = await models.Tool.create({
@@ -170,11 +171,11 @@ module.exports = (app, models) => {
 				originalName: uploadedFile.originamname,
 				mimeType: uploadedFile.mimetype,
 				size: uploadedFile.size,
-				path: uploadedFile.path
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
 			});
-			fu.setUploader(req.user);
-			await fu.save();
-			tool.setManual(fu);
+			await tool.setManual(fu);
 			await tool.save();
 		}
 
@@ -188,7 +189,7 @@ module.exports = (app, models) => {
 	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id);
+		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -201,7 +202,7 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-
+		
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
@@ -225,6 +226,7 @@ module.exports = (app, models) => {
 		tool.description = description;
 		tool.tool_category_id = tool_category_id;
 		tool.tool_maker_id = tool_maker_id;
+		await tool.save();
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -232,14 +234,12 @@ module.exports = (app, models) => {
 				originalName: uploadedFile.originamname,
 				mimeType: uploadedFile.mimetype,
 				size: uploadedFile.size,
-				path: uploadedFile.path
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
 			});
-			fu.setUploader(req.user);
-			await fu.save();
-			tool.setManual(fu);
+			await tool.setManual(fu);
 		}
-
-		await tool.save();
 
 		res.redirect(`/user/me/tools`);
 	})));

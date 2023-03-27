@@ -205,7 +205,7 @@ async function startServer() {
 
 	require('./routes.js')(app, sequelize.models);
 
-	app.use('/files', express.static(uploadPath)); // serve files
+	app.use('/uploads', express.static(uploadPath)); // serve files
 	app.use('/public', express.static(path.join(__dirname, "public")));
 	app.use('/webpack', express.static(path.join(__dirname, "webpack/dist")));
 	app.use('/node_modules', express.static(path.join(__dirname, "node_modules"))); // dirty hack to allow serving JS from installed packages.

@@ -9,7 +9,7 @@ const authMiddleware = UserModel => asyncHandler(async (req, res, next) => {
 	res.setUser = async function(u) {
 		const pkAttribute = UserModel.primaryKeyAttribute ?? "id";
 		const pk = JSON.stringify(u[pkAttribute]);
-		const v = await jwt.sign(pk, jwtSecret, {expiresIn: twoWeeks});
+		const v = await jwt.sign(pk, jwtSecret);
 		res.cookie(tokenKey, v); 
 		req.user = u;
 	};

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div id="root"></div>
+<script src="/webpack/Inbox.js" type="application/javascript">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+</script>
+{% endblock %}

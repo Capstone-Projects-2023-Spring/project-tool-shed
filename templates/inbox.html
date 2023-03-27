@@ -6,7 +6,8 @@
 
 {% block body %}
 <div id="root"></div>
-<script src="/webpack/Inbox.js" type="application/javascript">
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+<script type="application/javascript">
+    const _conversations = {{ conversations|json }};
 </script>
+<script src="/webpack/Inbox.js" type="application/javascript"></script>
 {% endblock %}

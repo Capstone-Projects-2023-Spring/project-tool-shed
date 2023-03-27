@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 
-const Inbox = () => {
-  const [messages, setMessages] = useState([]);
+const Inbox = ({conversations}) => {
+  const [messages, setMessages] = useState([{}]);
   const { userId } = useParams();
-
+  console.log(conversations)
   // FIXME: Don't wrap calls to effect
   // FIXME: this link explains calling async code in hooks
   //        https://devtrium.com/posts/async-functions-useeffect
@@ -14,7 +14,7 @@ const Inbox = () => {
     useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`/inbox`);
+        const response = await fetch('/inbox');
         const data = await response.json();
         setMessages(data);
       } catch (error) {
@@ -25,7 +25,7 @@ const Inbox = () => {
     };
     fetchMessages();
   }, []);
-  
+  console.log(messages)
   if(messages.length === 0 || messages.every((message) => message.content === "There are no messages.")){
       return (
           <Box
@@ -79,6 +79,7 @@ const Inbox = () => {
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(
   <ChakraProvider>
-      <Inbox />
+      <Inbox
+      _conversations={conversations} />
   </ChakraProvider>
 );

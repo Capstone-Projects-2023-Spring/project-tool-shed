@@ -342,17 +342,6 @@ module.exports = (app, models) => {
 	* User Messaging
 	*/
 
-
-	/*
-		You need a couple URLS:
-		- A list of conversations (/inbox)
-		- A view for each conversation (/inbox/:user_id)
-		- A JSON endpoint for sending a message
-	*/
-	/*
-
-	// EXAMPLE CODE
-
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
 		const allMessages = await models.UserMessage.findAll({
 			where: {
@@ -375,10 +364,10 @@ module.exports = (app, models) => {
 
 		// [{with: <User object>, messages: [UserMessage]}, ...]
 		const conversations = [];
-		for (const [otherId, messages] of Object.entries(messages)) {
+		for (const [otherId, messagesArr] of Object.entries(messages)) {
 			conversations.push({
 				with: models.User.findByPk(otherId),
-				messages
+				messages: messagesArr
 			});
 		}
 
@@ -408,12 +397,12 @@ module.exports = (app, models) => {
 			]
 		});
 
-		// templates/inbox_thread.html renders all the messages in a conversation.
-		res.render('inbox_thread.html', {messages}); // auth'd user is authUser
+		// templates/user_messaging.html renders all the messages in a conversation.
+		res.render('user_messaging.html', {messages}); // auth'd user is authUser
 	})));
 
 	// Sends a message.
-	app.post('/index/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/inbox/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
 		const { content } = req.body;
 		const { user_id } = req.params;
 
@@ -428,8 +417,8 @@ module.exports = (app, models) => {
 		}
 	})));
 
-	*/
-
+	
+	/*
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
@@ -492,6 +481,7 @@ module.exports = (app, models) => {
 		}
 		res.render('user_messaging.html', { user: req.user });
 	})));
+	*/
 };
 
 	

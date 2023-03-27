@@ -6,8 +6,12 @@
 
 {% block body %}
 <div id="root"></div>
-<script src="/webpack/UserMessaging.js" type="application/javascript"></script>
-<script type="text/babel">
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+<script type="application/javascript">window.recipientId = {{ messages|json }};
+console.log(window.recipientId);
 </script>
+<script src="/webpack/UserMessaging.js" type="application/javascript">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    
+</script>
+
 {% endblock %}

@@ -331,16 +331,24 @@ const genModels = sequelize => {
 		content: {
 			type: DataTypes.STRING, 
 			allowNull: false
-		},
-		sender_id: {
-			type: DataTypes.STRING,
-			allowNull: false
-		},
-		recipient_id: {
-			type: DataTypes.STRING,
-			allowNull: false
 		}
 	}, {tableName: 'user_message', paranoid: true});
+	UserMessage.belongsTo(User, {
+        foreignKey: {
+            name: 'recipient_id',
+            allowNull: false
+        },
+        as: 'recipient'
+    });
+
+    UserMessage.belongsTo(User, {
+        foreignKey: {
+            name: 'sender_id',
+            allowNull: false
+        },
+        as: 'sender'
+    });
+
 	
 
 	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage};

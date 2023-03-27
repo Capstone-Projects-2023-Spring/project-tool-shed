@@ -5,12 +5,11 @@ import { ChakraProvider, Button, Flex, Input, Textarea, VStack } from "@chakra-u
 
 function UserMessaging() {
   
-    const [message, setMessage] = useState("");
-    const [sentMessage, setSentMessage] = useState("");
-    const { userId } = useParams();
-
+    const [content, setContent] = useState("");
+    const [sentContent, setSentContent] = useState("");
+    
     const handleMessageChange = (event) => {
-      setMessage(event.target.value);
+      setContent(event.target.value);
     }
 
     const handleSendMessage = async () => {
@@ -18,15 +17,15 @@ function UserMessaging() {
         //setSentMessage(message);
         
         try {
-          const response = await fetch(`/new/message/${userId}/send`, {
+          const response = await fetch(`/inbox/${window.recipientId}/send.json`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message }),
+            body: JSON.stringify({ content }),
           });
           const data = await response.json();
-          setMessage("");
+          setContent("");
     } catch (error) {
       console.error(error);
     }
@@ -42,9 +41,9 @@ function UserMessaging() {
       bg="blue.100"
     >
       <VStack spacing={4} w={["100%", "80%", "70%"]} mx="auto" alignItems="flex-start">
-      <Textarea backgroundColor="white" color="black" value={sentMessage} w="100%" h="75vh" />
+      <Textarea backgroundColor="white" color="black" value={sentContent} w="100%" h="75vh" />
         <Flex w="100%" alignItems="center">
-          <Input backgroundColor="white" color="black" placeholder="Type your message here" value={message} onChange={handleMessageChange} flex="1" />
+          <Input backgroundColor="white" color="black" placeholder="Type your message here" value={content} onChange={handleMessageChange} flex="1" />
           <Button colorScheme="blue" onClick={handleSendMessage} ml="2">Send</Button>
         </Flex>
       </VStack>

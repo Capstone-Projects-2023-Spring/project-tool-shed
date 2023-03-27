@@ -11,25 +11,20 @@ const Inbox = () => {
   // FIXME: this link explains calling async code in hooks
   //        https://devtrium.com/posts/async-functions-useeffect
   // Retrieve messages from a PostgreSQL database
-  try{
     useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`/inbox/${userId}`);
+        const response = await fetch(`/inbox`);
         const data = await response.json();
         setMessages(data);
       } catch (error) {
         setMessages([{
           content: "There are no messages.",
-          sender_id: ' ',
-          recipient_id: ' '
         }])
       }
     };
     fetchMessages();
-  }, []);} catch(error){
-    console.error(error);
-  }
+  }, []);
   
   if(messages.length === 0 || messages.every((message) => message.content === "There are no messages.")){
       return (

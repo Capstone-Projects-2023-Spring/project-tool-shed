@@ -31,6 +31,7 @@ graph LR
   V[Application Sever\nYouTube API]
   V -->|read| Y[(YouTube Database)]
   end
+
 ```
 <p align="center"><b>Figure 1.</b> High level technical design of the Tool Shed Website.</p> 
 <br></br>

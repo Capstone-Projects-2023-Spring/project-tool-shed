@@ -376,8 +376,7 @@ module.exports = (app, models) => {
 				model: models.User,
 				as: 'reviewer',
 				attributes:['email']
-			},
-	
+			}
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));

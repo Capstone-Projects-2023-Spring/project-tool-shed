@@ -364,10 +364,10 @@ module.exports = (app, models) => {
 
 		// [{with: <User object>, messages: [UserMessage]}, ...]
 		const conversations = [];
-		for (const [otherId, messagesArr] of Object.entries(messages)) {
+		for (const [otherId, messageArr] of Object.entries(messages)) {
 			conversations.push({
 				with: models.User.findByPk(otherId),
-				messages: messagesArr
+				messages: messageArr
 			});
 		}
 
@@ -416,72 +416,6 @@ module.exports = (app, models) => {
 			res.json({status: 'failure', error, message: null});
 		}
 	})));
-
-	
-	/*
-	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		if (!sender) {
-			return res.status(404).json({ error: "User not found." });
-		}
-
-		// FIXME: you need this query to include messages sent TO and sent BY req.user
-		try {
-			const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
-		} catch (error)  {
-			console.log(error);
-		}
-
-		// TODO: group messages by recipient (you can do that in JS code)
-		// 	 order each group of messages by time 
-
-		res.render('inbox.html', { user: req.user });
-	})));
-
-	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { content } = req.body;
-
-		const message = await models.UserMessage.create({
-			content, sender_id: req.user.id, recipient_id: req.params.user_id
-		});
-
-		res.json({status: 'ok', message}); // NEW
-	})));
-
-	app.get('/new/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('user_messaging.html', { user: req.user });
-	})));
-
-	app.post('/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-		const { content } = req.body;
-
-		const message = await models.UserMessage.findByPk({ where: { sender_id: sender.id, recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
-		}
-
-		message.content = content;
-		await message.save();
-
-	})));
-
-	app.get('/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-
-		const message = await models.UserMessage.findOne({ where: { sender_id: sender.id,  recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
-		}
-		res.render('user_messaging.html', { user: req.user });
-	})));
-	*/
 };
 
 	

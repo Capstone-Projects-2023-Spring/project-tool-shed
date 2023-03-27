@@ -8,6 +8,7 @@ function UserMessaging({messages, recipientId}) {
     const [content, setContent] = useState("");
     const [sentContent, setSentContent] = useState("");
     console.log(messages);
+
     const handleMessageChange = (event) => {
       setContent(event.target.value);
     }
@@ -41,7 +42,9 @@ function UserMessaging({messages, recipientId}) {
       bg="blue.100"
     >
       <VStack spacing={4} w={["100%", "80%", "70%"]} mx="auto" alignItems="flex-start">
-      <Textarea backgroundColor="white" color="black" value={messages} w="100%" h="75vh" />
+      <Textarea backgroundColor="white" color="black" value={messages
+        .map(({ content, createdAt, sender_id }) => `${content}\n Sent by: ${sender_id} ${createdAt} `)
+        .join('\n')} w="100%" h="75vh" />
         <Flex w="100%" alignItems="center">
           <Input backgroundColor="white" color="black" placeholder="Type your message here" value={content} onChange={handleMessageChange} flex="1" />
           <Button colorScheme="blue" onClick={handleSendMessage} ml="2">Send</Button>

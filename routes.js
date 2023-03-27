@@ -398,7 +398,7 @@ module.exports = (app, models) => {
 		});
 
 		// templates/user_messaging.html renders all the messages in a conversation.
-		res.render('user_messaging.html', {messages}); // auth'd user is authUser
+		res.render('user_messaging.html', {messages, user_id}); // auth'd user is authUser
 	})));
 
 	// Sends a message.

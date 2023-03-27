@@ -1,85 +1,51 @@
 import { ChakraProvider, Box, Flex, Button, Text } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import ReactDOM from "react-dom";
 
-const Inbox = ({conversations}) => {
-  const [messages, setMessages] = useState([{}]);
-  const { userId } = useParams();
-  console.log(conversations)
-  // FIXME: Don't wrap calls to effect
-  // FIXME: this link explains calling async code in hooks
-  //        https://devtrium.com/posts/async-functions-useeffect
-  // Retrieve messages from a PostgreSQL database
-    useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch('/inbox');
-        const data = await response.json();
-        setMessages(data);
-      } catch (error) {
-        setMessages([{
-          content: "There are no messages.",
-        }])
-      }
-    };
-    fetchMessages();
-  }, []);
-  console.log(messages)
-  if(messages.length === 0 || messages.every((message) => message.content === "There are no messages.")){
-      return (
-          <Box
-            height="100vh"
-            overflowY="scroll"
-            p={4}
-            backgroundColor="blue.200"
-            borderRadius="md"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Text>There are no messages.</Text>
-        </Box>
-      );
-  }
-  //Create onclick that routes to specific usermessage
+const Inbox = ({ conversations }) => {
+  // Create onclick that routes to specific usermessage
+  const handleClick = (message) => {
+    console.log(message);
+  };
 
   return (
-      <Box
-        height="100vh"
-        overflowY="scroll"
-        p={4}
-        backgroundColor="blue.200"
-        borderRadius="md"
-      >
-        {messages.map((message) => (
-          <Flex alignItems="flex-start" flexDirection="column" justifyContent="center">
-              <Button
-              key={message.recipient_id}
-              variant="outline"
-              borderRadius="md"
-              mb={2}
-              w="100%"
-              h="10vh"
-              _hover={{ bg: "gray.200" }}
-              _active={{ bg: "gray.300" }}
-              onClick={() => console.log(message)}
-            >
-                <Text fontWeight="bold">{message.sender_id} chat with {message.recipient_id}</Text>
-                <Text>{message.content}</Text>
-            </Button>
-          </Flex>
-        ))}
-      </Box>
+    <Box
+      height="100vh"
+      overflowY="scroll"
+      p={4}
+      backgroundColor="blue.200"
+      borderRadius="md"
+    >
+      {conversations.map((conversation) => (
+        <Flex
+          alignItems="flex-start"
+          flexDirection="column"
+          justifyContent="center"
+          key={conversation.messages.id}
+        >
+          <Button
+            variant="outline"
+            borderRadius="md"
+            mb={2}
+            w="100%"
+            h="10vh"
+            _hover={{ bg: "gray.200" }}
+            _active={{ bg: "gray.300" }}
+            onClick={() => handleClick(conversation.messages)}
+          >
+            <Text fontWeight="bold">
+              Chat with {conversation.recipient_id}
+            </Text>
+          </Button>
+        </Flex>
+      ))}
+    </Box>
   );
 };
 
-
-
-const root = document.getElementById('root');
+const root = document.getElementById("root");
 ReactDOM.createRoot(root).render(
   <ChakraProvider>
-      <Inbox
-      _conversations={conversations} />
+    <Inbox conversations={_conversations} />
   </ChakraProvider>
-);
+); 

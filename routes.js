@@ -1,7 +1,9 @@
 const asyncHandler = require('express-async-handler');
-const { loginUserSchema, searchListingsSchema } = require('./validators');
+const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
+
 const { Op } = sequelize;
+
 
 /*
 	Routes
@@ -26,7 +28,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview, FileUpload } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -103,8 +105,6 @@ module.exports = (app, models) => {
 		}
 	}));
 
-
-
 	/*
 	 * User/Account viewing
 	 */
@@ -154,13 +154,28 @@ module.exports = (app, models) => {
 		res.render('_add_tool.html', { toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+		console.log('FILE', req.file);
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
 		});
+
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
+			});
+			await tool.setManual(fu);
+			await tool.save();
+		}
 
 		res.redirect(`/user/me/tools`);
 	})));
@@ -172,7 +187,7 @@ module.exports = (app, models) => {
 	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id);
+		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -185,11 +200,11 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-
+		
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/edit/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
@@ -211,11 +226,24 @@ module.exports = (app, models) => {
 		tool.tool_maker_id = tool_maker_id;
 		await tool.save();
 
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
+			});
+			await tool.setManual(fu);
+		}
+
 		res.redirect(`/user/me/tools`);
 	})));
 
 	/*
-			  Delete a tool
+		Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -234,7 +262,6 @@ module.exports = (app, models) => {
 
 		res.redirect(`/user/me/tools`);
 	})));
-
 
 	// TODO: tool editing endpoints
 
@@ -274,6 +301,95 @@ module.exports = (app, models) => {
 		res.render('_recommendFromSearch.html', { error: null });
 	}));
 
+	/*
+		Create a listing for a tool
+	*/
+	app.get('/listing/new', asyncHandler(async (req, res) => {
+		const tools = await models.Tool.findAll();
+	  
+		res.render('_add_listing.html', {tools});
+	  }));
+	  
+	  app.post('/listing/new', asyncHandler(async (req, res) => {
+		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
+		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
+		const tool = await models.Tool.findByPk(toolId);
+	  
+		await listing.setTool(tool);
+	  
+		res.redirect(`/user/me/listings`);
+	  }));
+
+
+	/*
+	 * View a User's Listings 
+	*/
+
+	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await models.Listing.findAll({
+			where: { active: true },
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: {
+					owner_id: owner.id
+				}
+			}]
+		})
+		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
+	}));
+
+	/*
+		Edit a Listing
+	*/
+
+	app.get('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+		const { listing_id } = req.params;
+	  
+		const listing = await models.Listing.findByPk(listing_id);
+
+	  console.log(listing)
+		if (!listing) {
+		  return res.status(404).json({ error: "Listing not found." });
+		}
+	  	
+	  
+		res.render('_edit_listing.html', { listing, user_id, listing_id });
+	  })));
+
+	  app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+		const { listing_id } = req.params;
+		const { price, billingInterval, maxBillingIntervals } = req.body;
+	  
+		const listing = await models.Listing.findByPk(listing_id);
+	  
+		if (!listing) {
+		  return res.status(404).json({ error: "Listing not found." });
+		}
+
+	  
+		// Update the listing data with the new data
+		listing.price = price;
+		listing.billingInterval = billingInterval;
+		listing.maxBillingIntervals = maxBillingIntervals;
+		await listing.save();
+	  
+		res.redirect(`/user/me/listings`);
+	  })));
+
+	  // TODO: listing editing endpoints
+	
 	/*
 	 * Listings
 	 */
@@ -339,8 +455,8 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	* User Messaging
-	*/
+	 * User Messaging
+	 */
 
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
 		const allMessages = await models.UserMessage.findAll({
@@ -364,10 +480,10 @@ module.exports = (app, models) => {
 
 		// [{with: <User object>, messages: [UserMessage]}, ...]
 		const conversations = [];
-		for (const [otherId, messagesArr] of Object.entries(messages)) {
+		for (const [otherId, messageArr] of Object.entries(messages)) {
 			conversations.push({
 				with: models.User.findByPk(otherId),
-				messages: messagesArr
+				messages: messageArr
 			});
 		}
 
@@ -417,71 +533,53 @@ module.exports = (app, models) => {
 		}
 	})));
 
-	
 	/*
-	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	 * User Reviews
+	 */
 
-		if (!sender) {
-			return res.status(404).json({ error: "User not found." });
-		}
+	/* Create a review on another user*/
+	app.get('/review/users', asyncHandler(async (req, res) => {
+		const users = await models.User.findAll();
+		res.render('user_reviews.html', { users });
+	}));
 
-		// FIXME: you need this query to include messages sent TO and sent BY req.user
-		try {
-			const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
-		} catch (error)  {
-			console.log(error);
-		}
-
-		// TODO: group messages by recipient (you can do that in JS code)
-		// 	 order each group of messages by time 
-
-		res.render('inbox.html', { user: req.user });
+	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { reviewee_id } = req.params;
+		res.render('create_user_review.html', { reviewee_id });
 	})));
 
-	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { content } = req.body;
-
-		const message = await models.UserMessage.create({
-			content, sender_id: req.user.id, recipient_id: req.params.user_id
+	app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
+		const { content, ratings, reviewee_id } = await newReviewSchema.validate(req.body);
+		const one_review = await models.UserReview.create({
+			content, ratings, reviewee_id, reviewer_id: req.user.id
 		});
 
-		res.json({status: 'ok', message}); // NEW
-	})));
-
-	app.get('/new/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('user_messaging.html', { user: req.user });
-	})));
-
-	app.post('/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-		const { content } = req.body;
-
-		const message = await models.UserMessage.findByPk({ where: { sender_id: sender.id, recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
+		if (one_review) {
+			res.redirect(`/user/me`);
+		} else {
+			res.status(500);
 		}
+	})));   
 
-		message.content = content;
-		await message.save();
-
-	})));
-
-	app.get('/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-
-		const message = await models.UserMessage.findOne({ where: { sender_id: sender.id,  recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
+	/* View my reviews */
+	app.get('/user/:user_id/reviews', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const reviewee = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	
+		if (!reviewee) {
+			return res.status(404).json({ error: "User not found." });
 		}
-		res.render('user_messaging.html', { user: req.user });
-	})));
-	*/
+	
+		const reviews = await UserReview.findAll({ 
+			where: { reviewee_id: reviewee.id },
+			include: { 
+				model: models.User,
+				as: 'reviewer',
+				attributes:['email']
+			}
+		});
+		res.render('review_list.html', { reviews, user: reviewee });
+	}));
 };
 
 	

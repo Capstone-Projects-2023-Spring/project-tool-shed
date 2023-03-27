@@ -6,7 +6,6 @@ import { ChakraProvider, Box, Button, Flex, Input, Text, Textarea, VStack } from
 function UserMessaging({messages, recipientId}) {
   
     const [content, setContent] = useState("");
-    const [sentContent, setSentContent] = useState("");
     console.log(messages);
 
     const handleMessageChange = (event) => {

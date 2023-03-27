@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { loginUserSchema, searchListingsSchema } = require('./validators');
+const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
 const { Op } = sequelize;
 
@@ -26,7 +26,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -339,8 +339,8 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	* User Messaging
-	*/
+	 * User Messaging
+	 */
 
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
 		const allMessages = await models.UserMessage.findAll({
@@ -417,71 +417,53 @@ module.exports = (app, models) => {
 		}
 	})));
 
-	
 	/*
-	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const sender = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	 * User Reviews
+	 */
 
-		if (!sender) {
-			return res.status(404).json({ error: "User not found." });
-		}
+	/* Create a review on another user*/
+	app.get('/review/users', asyncHandler(async (req, res) => {
+		const users = await models.User.findAll();
+		res.render('user_reviews.html', { users });
+	}));
 
-		// FIXME: you need this query to include messages sent TO and sent BY req.user
-		try {
-			const messages = await UserMessage.findAll({ where: { sender_id: sender.id } });
-		} catch (error)  {
-			console.log(error);
-		}
-
-		// TODO: group messages by recipient (you can do that in JS code)
-		// 	 order each group of messages by time 
-
-		res.render('inbox.html', { user: req.user });
+	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { reviewee_id } = req.params;
+		res.render('create_user_review.html', { reviewee_id });
 	})));
 
-	app.post('/new/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { content } = req.body;
-
-		const message = await models.UserMessage.create({
-			content, sender_id: req.user.id, recipient_id: req.params.user_id
+	app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
+		const { content, ratings, reviewee_id } = await newReviewSchema.validate(req.body);
+		const one_review = await models.UserReview.create({
+			content, ratings, reviewee_id, reviewer_id: req.user.id
 		});
 
-		res.json({status: 'ok', message}); // NEW
-	})));
-
-	app.get('/new/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('user_messaging.html', { user: req.user });
-	})));
-
-	app.post('/message/:user_id/send', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-		const { content } = req.body;
-
-		const message = await models.UserMessage.findByPk({ where: { sender_id: sender.id, recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
+		if (one_review) {
+			res.redirect(`/user/me`);
+		} else {
+			res.status(500);
 		}
+	})));   
 
-		message.content = content;
-		await message.save();
-
-	})));
-
-	app.get('/message/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { sender } = req.user.id;
-		const { recipient } = req.params.user_id;
-
-		const message = await models.UserMessage.findOne({ where: { sender_id: sender.id,  recipient_id: recipient.id }});
-
-		if (!message) {
-			return res.status(404).json({ error: "Message not found." });
+	/* View my reviews */
+	app.get('/user/:user_id/reviews', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const reviewee = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	
+		if (!reviewee) {
+			return res.status(404).json({ error: "User not found." });
 		}
-		res.render('user_messaging.html', { user: req.user });
-	})));
-	*/
+	
+		const reviews = await UserReview.findAll({ 
+			where: { reviewee_id: reviewee.id },
+			include: { 
+				model: models.User,
+				as: 'reviewer',
+				attributes:['email']
+			}
+		});
+		res.render('review_list.html', { reviews, user: reviewee });
+	}));
 };
 
 	

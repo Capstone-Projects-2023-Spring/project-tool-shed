@@ -333,25 +333,67 @@ const genModels = sequelize => {
 			allowNull: false
 		}
 	}, {tableName: 'user_message', paranoid: true});
+
 	UserMessage.belongsTo(User, {
-        foreignKey: {
-            name: 'recipient_id',
-            allowNull: false
-        },
-        as: 'recipient'
-    });
+        	foreignKey: {
+			name: 'recipient_id',
+			allowNull: false
+		},
+		as: 'recipient'
+	});
 
-    UserMessage.belongsTo(User, {
-        foreignKey: {
-            name: 'sender_id',
-            allowNull: false
-        },
-        as: 'sender'
-    });
+	UserMessage.belongsTo(User, {
+		foreignKey: {
+			name: 'sender_id',
+			allowNull: false
+		},
+		as: 'sender'
+	});
 
+	/**
+	 * @class UserReviews
+	 * @classdescription Represents reviews and ratings of other users
+	 * @augments sequelize.Model
+	 * @property {text} content The contents of the review
+	 * @property {integer} ratings The star ratings of another user
+	 */
+	const UserReview = sequelize.define('UserReview', {
+		content: {
+			type: DataTypes.TEXT,
+			allowNull: false
+		},
+		ratings: {
+			type: DataTypes.INTEGER,
+			validate: {
+				min: 0,
+				max: 5
+			}
+		},
+	}, {
+		tableName: "userreview",
+		paranoid: true, 
+	});
+
+	User.hasMany(UserReview, {
+		foreignKey: 'reviewee_id'
+	});
+
+	UserReview.belongsTo(User, {
+		foreignKey: {
+			name: 'reviewer_id',
+			allowNull: false
+		},
+		as: 'reviewer'
+	});
+	UserReview.belongsTo(User, {
+		foreignKey: {
+			name: 'reviewee_id',
+			allowNull: false
+		},
+		as: 'reviewee'
+	});
 	
-
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage};
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage};
 };
 
 module.exports = genModels;

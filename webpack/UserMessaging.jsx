@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom/client';
 import { useParams } from "react-router-dom";
-import { ChakraProvider, Button, Flex, Input, Textarea, VStack } from "@chakra-ui/react";
+import { ChakraProvider, Box, Button, Flex, Input, Text, Textarea, VStack } from "@chakra-ui/react";
 
 function UserMessaging({messages, recipientId}) {
   
@@ -32,6 +32,11 @@ function UserMessaging({messages, recipientId}) {
     }
   }
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return `${date.toLocaleTimeString()}`;
+  }
+
   return (
     <Flex
       justify="flex-end"
@@ -42,9 +47,50 @@ function UserMessaging({messages, recipientId}) {
       bg="blue.100"
     >
       <VStack spacing={4} w={["100%", "80%", "70%"]} mx="auto" alignItems="flex-start">
-      <Textarea backgroundColor="white" color="black" value={messages
-        .map(({ content, createdAt, sender_id }) => `${content}\n Sent by: ${sender_id} ${createdAt} `)
-        .join('\n')} w="100%" h="75vh" />
+      <Box
+          backgroundColor="white"
+          w="100%"
+          h="75vh"
+          overflowY="scroll"
+          px={6}
+          py={4}
+          borderRadius={8}
+          boxShadow="md"
+        >
+          {messages.map(({ content, createdAt, sender_id, recipient_id }, index) => {
+            const recipients = Object.values({ recipient_id });
+            const contents = Object.values({ content });
+            const creations = Object.values({ createdAt });
+            const senders = Object.values({ sender_id });
+            console.log(recipientId)
+
+            return (
+              <Flex
+                key={index}
+                justifyContent={recipients.toString() === recipientId ? "flex-end" : "flex-start"}
+                mb={2}
+                flexWrap="wrap"
+              >
+                <><Flex flexDirection="column">
+                  <Text
+                  key={index}
+                  backgroundColor={recipients.toString() === recipientId ? "blue.200" : "gray.200"}
+                  borderRadius={8}
+                  p={3}
+                  color={recipients.toString() === recipientId ? "white" : "black"}
+                  mb={0}
+                  maxWidth={500}
+                >
+                  {contents}
+                </Text>
+                <Text fontSize="xs" color="gray.400">
+                  {formatDate(creations)}
+                </Text>
+                </Flex></>
+              </Flex>
+            );
+          })}
+        </Box>
         <Flex w="100%" alignItems="center">
           <Input backgroundColor="white" color="black" placeholder="Type your message here" value={content} onChange={handleMessageChange} flex="1" />
           <Button colorScheme="blue" onClick={handleSendMessage} ml="2">Send</Button>

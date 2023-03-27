@@ -6,7 +6,7 @@
 
 {% block body %}
 <!--enctype="multipart/form-data"-->
-<form action="/tool/new" method="POST">
+<form action="/tool/new" enctype="multipart/form-data" method="POST">
   <label for="name">Name:</label>
   <input type="text" name="name" id="name"/>
 
@@ -27,6 +27,9 @@
       <option value="{{ x.id }}">{{ x.name }}</option>
     {% endfor %}
   </select>
+
+    <label for="manual">Manual:</label>
+    <input type="file" name="manual" id="manual" />
 
   <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}"/>
 <div>

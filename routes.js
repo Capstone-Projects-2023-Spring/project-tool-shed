@@ -1,7 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
+
 const { Op } = sequelize;
+
 
 /*
 	Routes
@@ -26,7 +28,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview, FileUpload } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -154,13 +156,27 @@ module.exports = (app, models) => {
 		res.render('_add_tool.html', { toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
 		});
+
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path
+			});
+			fu.setUploader(req.user);
+			await fu.save();
+			tool.setManual(fu);
+			await tool.save();
+		}
 
 		res.redirect(`/user/me/tools`);
 	})));
@@ -189,7 +205,7 @@ module.exports = (app, models) => {
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/edit/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
@@ -209,13 +225,27 @@ module.exports = (app, models) => {
 		tool.description = description;
 		tool.tool_category_id = tool_category_id;
 		tool.tool_maker_id = tool_maker_id;
+
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path
+			});
+			fu.setUploader(req.user);
+			await fu.save();
+			tool.setManual(fu);
+		}
+
 		await tool.save();
 
 		res.redirect(`/user/me/tools`);
 	})));
 
 	/*
-			  Delete a tool
+		Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -234,9 +264,6 @@ module.exports = (app, models) => {
 
 		res.redirect(`/user/me/tools`);
 	})));
-
-
-	// TODO: tool editing endpoints
 
 	/*
 	 * Settings Pages

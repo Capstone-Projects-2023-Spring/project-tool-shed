@@ -392,8 +392,35 @@ const genModels = sequelize => {
 		},
 		as: 'reviewee'
 	});
+
+
+	/**
+	 * @class FileUpload
+ 	 * @classdescription Represents a file that's uploaded.
+	 */
+	const FileUpload = sequelize.define('FileUpload', {
+		path: {type: DataTypes.STRING, allowNull: false},
+		originalName: {type: DataTypes.STRING, allowNull: true},
+		size: {type: DataTypes.INTEGER, validate: {min: 0}},
+		mimeType: {type: DataTypes.STRING}
+	}, {paranoid: true, tableName: 'file_upload'});
+
+	Tool.belongsTo(FileUpload, {
+		foreignKey: {
+			name: 'manual_id',
+			allowNull: true
+		},
+		as: 'manual'
+	});
+	FileUpload.belongsTo(User, {
+		foreignKey: {
+			name: 'uploader_id',
+			allowNull: false
+		},
+		as: 'uploader'
+	});
 	
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage};
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload};
 };
 
 module.exports = genModels;

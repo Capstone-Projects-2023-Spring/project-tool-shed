@@ -3,6 +3,7 @@
  */
 
 const path = require('path');
+const multer = require('multer'); // File upload framework
 const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
 const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migrations
@@ -171,6 +172,20 @@ async function syncDatabase(sequelize) {
 async function startServer() {
 	const app = express();
 
+	const uploadPath = path.join(__dirname, '.uploads');
+	const uploadStorage = multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, uploadPath);
+		},
+		filename: (req, file, cb) => {
+			const as = file.originalname.split('.');
+			let ext = as.pop();
+			ext = ext ? `.${ext}` : '';
+			cb(null, `${as.join('.')}.${Math.round(Math.random() * 1E9)}${ext}`);
+		}
+	});
+	app.upload = multer({storage: uploadStorage});
+
 	const sequelize = await initSequelize();
 
 	// middleware to respond to errors with page
@@ -190,6 +205,7 @@ async function startServer() {
 
 	require('./routes.js')(app, sequelize.models);
 
+	app.use('/files', express.static(uploadPath)); // serve files
 	app.use('/public', express.static(path.join(__dirname, "public")));
 	app.use('/webpack', express.static(path.join(__dirname, "webpack/dist")));
 	app.use('/node_modules', express.static(path.join(__dirname, "node_modules"))); // dirty hack to allow serving JS from installed packages.

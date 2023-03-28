@@ -1,7 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
+
 const { Op } = sequelize;
+
 
 /*
 	Routes
@@ -26,7 +28,7 @@ function requiresAuth(routeFunc) {
 }
 
 module.exports = (app, models) => {
-	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview } = models;
+	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview, FileUpload } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
 		res.render('index.html', {});
@@ -152,13 +154,28 @@ module.exports = (app, models) => {
 		res.render('_add_tool.html', { toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+		console.log('FILE', req.file);
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
 		});
+
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
+			});
+			await tool.setManual(fu);
+			await tool.save();
+		}
 
 		res.redirect(`/user/me/tools`);
 	})));
@@ -170,7 +187,7 @@ module.exports = (app, models) => {
 	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id);
+		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -183,11 +200,11 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-
+		
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
-	app.post('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/tool/edit/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = req.body;
 
@@ -209,11 +226,24 @@ module.exports = (app, models) => {
 		tool.tool_maker_id = tool_maker_id;
 		await tool.save();
 
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originamname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: uploadedFile.path,
+				storedIn: uploadedFile.destination,
+				uploader_id: req.user.id
+			});
+			await tool.setManual(fu);
+		}
+
 		res.redirect(`/user/me/tools`);
 	})));
 
 	/*
-			  Delete a tool
+		Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -424,6 +454,89 @@ module.exports = (app, models) => {
 		res.json({ results });
 	}));
 
+	/*
+	 * User Messaging
+	 */
+
+	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
+		const allMessages = await models.UserMessage.findAll({
+			where: {
+				[Op.or]: [
+					{recipient_id: req.user.id},
+					{sender_id: req.user.id}
+				]
+			},
+			order: [
+				['createdAt', 'ASC']
+			]
+		});
+
+		const messages = {}; // Other user id => [UserMessage], [oldest, ...., newest]
+		for (const m of allMessages) {
+			const otherId = m.recipient_id === req.user.id ? m.sender_id : m.recipient_id;
+			if (!messages[otherId]) messages[otherId] = [];
+			messages[otherId].push(m);
+		}
+
+		// [{with: <User object>, messages: [UserMessage]}, ...]
+		const conversations = [];
+		for (const [otherId, messagesArr] of Object.entries(messages)) {
+			conversations.push({
+				with: models.User.findByPk(otherId),
+				messages: messagesArr
+			});
+		}
+
+		// templates/inbox.html renders something like what you see when you first open
+		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
+		res.render('inbox.html', {conversations}); // auth'd user is authUser
+	})));
+
+	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
+		const {user_id} = req.params;
+
+		const messages = await models.UserMessage.findAll({
+			where: {
+				[Op.and]: [
+					{[Op.or]: [
+						{recipient_id: req.user.id},
+						{sender_id: req.user.id}
+					]},
+					{[Op.or]: [
+						{recipient_id: user_id},
+						{sender_id: user_id}
+					]}
+				]
+			},
+			order: [
+				['createdAt', 'ASC']
+			]
+		});
+
+		// templates/user_messaging.html renders all the messages in a conversation.
+		res.render('user_messaging.html', {messages, user_id}); // auth'd user is authUser
+	})));
+
+	// Sends a message.
+	app.post('/inbox/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
+		const { content } = req.body;
+		const { user_id } = req.params;
+
+		try {
+			const message = await models.UserMessage.create({
+				content, sender_id: req.user.id, recipient_id: user_id
+			});
+
+			res.json({status: 'ok', error: null, message});
+		} catch (error) {
+			res.json({status: 'failure', error, message: null});
+		}
+	})));
+
+	/*
+	 * User Reviews
+	 */
+
 	/* Create a review on another user*/
 	app.get('/review/users', asyncHandler(async (req, res) => {
 		const users = await models.User.findAll();
@@ -432,20 +545,21 @@ module.exports = (app, models) => {
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { reviewee_id } = req.params;
-        res.render('create_user_review.html', { reviewee_id });
-    })));
+		res.render('create_user_review.html', { reviewee_id });
+	})));
 
-    app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
-        const { content, ratings, reviewee_id } = await newReviewSchema.validate(req.body);
-        const one_review = await models.UserReview.create({
-            content, ratings, reviewee_id, reviewer_id: req.user.id
-        });
-        if(one_review){
-            res.redirect(`/user/me`);
-        } else{
-            res.status(500);
-        }
-    })));   
+	app.post('/review/new', asyncHandler(requiresAuth(async (req, res) => {
+		const { content, ratings, reviewee_id } = await newReviewSchema.validate(req.body);
+		const one_review = await models.UserReview.create({
+			content, ratings, reviewee_id, reviewer_id: req.user.id
+		});
+
+		if (one_review) {
+			res.redirect(`/user/me`);
+		} else {
+			res.status(500);
+		}
+	})));   
 
 	/* View my reviews */
 	app.get('/user/:user_id/reviews', asyncHandler(async (req, res) => {
@@ -467,3 +581,5 @@ module.exports = (app, models) => {
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
 };
+
+	

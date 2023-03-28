@@ -3,6 +3,7 @@
  * @module models
  */
 
+const path = require('path');
 const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
@@ -322,13 +323,41 @@ const genModels = sequelize => {
 	});
 
 	/**
-     * @class UserReviews
-     * @classdescription Represents reviews and ratings of other users
-     * @augments sequelize.Model
-     * @property {text} content The contents of the review
-     * @property {integer} ratings The star ratings of another user
-     * 
-     */
+	 * @class UserMessage
+         * @classdesc Represents a conversation between two users.
+	 * @augments sequelize.Model
+         * @property {string} content Message content
+         */
+	const UserMessage = sequelize.define('UserMessage', {
+		content: {
+			type: DataTypes.STRING, 
+			allowNull: false
+		}
+	}, {tableName: 'user_message', paranoid: true});
+
+	UserMessage.belongsTo(User, {
+        	foreignKey: {
+			name: 'recipient_id',
+			allowNull: false
+		},
+		as: 'recipient'
+	});
+
+	UserMessage.belongsTo(User, {
+		foreignKey: {
+			name: 'sender_id',
+			allowNull: false
+		},
+		as: 'sender'
+	});
+
+	/**
+	 * @class UserReviews
+	 * @classdescription Represents reviews and ratings of other users
+	 * @augments sequelize.Model
+	 * @property {text} content The contents of the review
+	 * @property {integer} ratings The star ratings of another user
+	 */
 	const UserReview = sequelize.define('UserReview', {
 		content: {
 			type: DataTypes.TEXT,
@@ -341,32 +370,61 @@ const genModels = sequelize => {
 				max: 5
 			}
 		},
-		}, {
-			tableName: "userreview",
-			paranoid: true, 
-		});
+	}, {
+		tableName: "userreview",
+		paranoid: true, 
+	});
 
-		User.hasMany(UserReview, {
-			foreignKey: 'reviewee_id'
-		});
+	User.hasMany(UserReview, {
+		foreignKey: 'reviewee_id'
+	});
 
-		UserReview.belongsTo(User, {
-			foreignKey: {
-				name: 'reviewer_id',
-				allowNull: false
-			},
-			as: 'reviewer'
-		});
-		UserReview.belongsTo(User, {
-			foreignKey: {
-				name: 'reviewee_id',
-				allowNull: false
-			},
-			as: 'reviewee'
-		});
+	UserReview.belongsTo(User, {
+		foreignKey: {
+			name: 'reviewer_id',
+			allowNull: false
+		},
+		as: 'reviewer'
+	});
+	UserReview.belongsTo(User, {
+		foreignKey: {
+			name: 'reviewee_id',
+			allowNull: false
+		},
+		as: 'reviewee'
+	});
+
+
+	/**
+	 * @class FileUpload
+ 	 * @classdescription Represents a file that's uploaded.
+	 */
+	const FileUpload = sequelize.define('FileUpload', {
+		path: {type: DataTypes.STRING, allowNull: false},
+		originalName: {type: DataTypes.STRING, allowNull: true},
+		size: {type: DataTypes.INTEGER, validate: {min: 0}},
+		mimeType: {type: DataTypes.STRING},
+		storedIn: DataTypes.STRING
+	}, {paranoid: true, tableName: 'file_upload'});
+
+	FileUpload.prototype.getURL = function() {return path.join('/uploads/', path.relative(this.storedIn, this.path));};
+
+	Tool.belongsTo(FileUpload, {
+		foreignKey: {
+			name: 'manual_id',
+			allowNull: true
+		},
+		as: 'manual'
+	});
+	FileUpload.belongsTo(User, {
+		foreignKey: {
+			name: 'uploader_id',
+			allowNull: false
+		},
+		as: 'uploader'
+	});
 	
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview};
-
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload};
 };
 
 module.exports = genModels;

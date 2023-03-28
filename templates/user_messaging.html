@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div id="root"></div>
+<script type="application/javascript">window._recipientId = {{ user_id|json }};
+window._messages = {{ messages|json}};
+console.log(window.recipientId);
+</script>
+<script src="/webpack/UserMessaging.js" type="application/javascript"></script>
+
+{% endblock %}

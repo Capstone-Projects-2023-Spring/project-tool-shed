@@ -1,9 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
-
+const net = require('net');
 const { Op } = sequelize;
-
 
 /*
 	Routes
@@ -243,7 +242,7 @@ module.exports = (app, models) => {
 	})));
 
 	/*
-		Delete a tool
+			  Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -461,10 +460,11 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * User Messaging
-	 */
+	* User Messaging
+	*/
 
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
+		const senderId = req.user.id;
 		const allMessages = await models.UserMessage.findAll({
 			where: {
 				[Op.or]: [
@@ -495,7 +495,7 @@ module.exports = (app, models) => {
 
 		// templates/inbox.html renders something like what you see when you first open
 		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
-		res.render('inbox.html', { conversations }); // auth'd user is authUser
+		res.render('inbox.html', {conversations, senderId}); // auth'd user is authUser
 	})));
 
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -542,6 +542,29 @@ module.exports = (app, models) => {
 			res.json({ status: 'failure', error, message: null });
 		}
 	})));
+
+	let unixListeners = [];
+	net.createServer(function(tcpSocket) {
+    		tcpSocket.on('data', function(data) {
+			for (const f of unixListeners) {
+				f(data);
+			}
+    		});
+	}).listen(10337, '0.0.0.0');
+	
+
+	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
+		const handleData = data => {
+				const userMessage = JSON.parse(data.toString());
+				if (userMessage.recipient_id === req.user.id) {
+					ws.send(JSON.stringify(userMessage));
+				}
+		};
+		unixListeners.push(handleData);
+		ws.on('close', () => {
+			unixListeners = unixListeners.filter(x => x !== handleData);
+		});
+	}));
 
 	/*
 	 * User Reviews

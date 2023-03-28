@@ -8,6 +8,7 @@
 <div id="root"></div>
 <script type="application/javascript">
     const _conversations = {{ conversations|json }};
+    const _senderId = {{ senderId|json }};
 </script>
 <script src="/webpack/Inbox.js" type="application/javascript"></script>
 {% endblock %}

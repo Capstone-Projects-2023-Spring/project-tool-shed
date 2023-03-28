@@ -321,7 +321,52 @@ const genModels = sequelize => {
 		as: 'tool'
 	});
 
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing};
+	/**
+     * @class UserReviews
+     * @classdescription Represents reviews and ratings of other users
+     * @augments sequelize.Model
+     * @property {text} content The contents of the review
+     * @property {integer} ratings The star ratings of another user
+     * 
+     */
+	const UserReview = sequelize.define('UserReview', {
+		content: {
+			type: DataTypes.TEXT,
+			allowNull: false
+		},
+		ratings: {
+			type: DataTypes.INTEGER,
+			validate: {
+				min: 0,
+				max: 5
+			}
+		},
+		}, {
+			tableName: "userreview",
+			paranoid: true, 
+		});
+
+		User.hasMany(UserReview, {
+			foreignKey: 'reviewee_id'
+		});
+
+		UserReview.belongsTo(User, {
+			foreignKey: {
+				name: 'reviewer_id',
+				allowNull: false
+			},
+			as: 'reviewer'
+		});
+		UserReview.belongsTo(User, {
+			foreignKey: {
+				name: 'reviewee_id',
+				allowNull: false
+			},
+			as: 'reviewee'
+		});
+	
+	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview};
+
 };
 
 module.exports = genModels;

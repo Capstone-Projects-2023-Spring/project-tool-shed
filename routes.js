@@ -1,9 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
-
 const { Op } = sequelize;
-
 
 /*
 	Routes
@@ -200,7 +198,7 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-		
+
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
@@ -243,7 +241,7 @@ module.exports = (app, models) => {
 	})));
 
 	/*
-		Delete a tool
+			  Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -455,10 +453,11 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * User Messaging
-	 */
+	* User Messaging
+	*/
 
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
+		const senderId = req.user.id;
 		const allMessages = await models.UserMessage.findAll({
 			where: {
 				[Op.or]: [
@@ -489,7 +488,7 @@ module.exports = (app, models) => {
 
 		// templates/inbox.html renders something like what you see when you first open
 		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
-		res.render('inbox.html', {conversations}); // auth'd user is authUser
+		res.render('inbox.html', {conversations, senderId}); // auth'd user is authUser
 	})));
 
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {

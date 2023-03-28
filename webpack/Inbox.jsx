@@ -3,8 +3,9 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 const Inbox = ({ conversations, senderId }) => {
-  const handleClick = (recipientId) => {
-    window.location.href = `/inbox/${recipientId}`;
+  const handleClick = (recipientId, currUser) => {
+    const chatId = currUser === senderId ? recipientId : senderId
+    window.location.href = `/inbox/${chatId}`;
   };
   console.log(senderId);
   return (
@@ -34,7 +35,7 @@ const Inbox = ({ conversations, senderId }) => {
                 h="10vh"
                 _hover={{ bg: "gray.200" }}
                 _active={{ bg: "gray.300" }}
-                onClick={() => handleClick(lastMessage.recipient_id)}
+                onClick={() => handleClick(lastMessage.recipient_id, lastMessage.sender_id)}
               >
                 <Text fontWeight="bold">
                   Chat with {lastMessage.sender_id === senderId ? lastMessage.recipient_id : lastMessage.sender_id}

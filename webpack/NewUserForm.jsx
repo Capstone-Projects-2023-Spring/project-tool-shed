@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { ChakraProvider, Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import validationSchema from '../validators/createUser';
+import validationSchema from '../validators/userWithAddressSchema';
 
 const initialValues = {
   first_name: '',

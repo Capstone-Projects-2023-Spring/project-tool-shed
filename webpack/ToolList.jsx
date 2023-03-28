@@ -35,7 +35,7 @@ const Tool = ({
 	const s = name + " " + description;
 
         return <div style={style}>
-            <h2>{name} {owner}</h2>
+            <h2>{name} <a href={`/user/${owner.id}`}>{owner}</a></h2>
             <p>Description: {description}</p>
             <p>Category ID: {tool_category_id}</p>
             <p>Maker ID: {tool_maker_id}</p>

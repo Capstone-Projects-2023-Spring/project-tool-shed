@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
-const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
+const { loginUserSchema, searchListingsSchema, newReviewSchema,
+	userWithAddressSchema, toolSchema, messageSchema } = require('./validators');
 const sequelize = require('sequelize');
-const net = require('net');
 const { Op } = sequelize;
 
 /*
@@ -47,7 +47,7 @@ module.exports = (app, models) => {
 
 	app.post('/user/new.json', asyncHandler(async (req, res) => {
 		const { first_name, last_name, email, password,
-			line_one, line_two, city, state, zip_code } = req.body;
+			line_one, line_two, city, state, zip_code } = await userWithAddressSchema.validate(req.body);
 
 		const address = await Address.create({ line_one, line_two, city, state, zip_code });
 
@@ -60,7 +60,7 @@ module.exports = (app, models) => {
 
 	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const { first_name, last_name, email, password, active,
-			line_one, line_two, city, state, zip_code } = req.body;
+			line_one, line_two, city, state, zip_code } = await userWithAddressSchema.validate(req.body);
 
 		const user = req.user;
 		user.first_name = first_name;
@@ -104,6 +104,12 @@ module.exports = (app, models) => {
 		}
 	}));
 
+	app.post('/user/logout', asyncHandler(requiresAuth(async (req, res) => {
+		req.setUser(null);
+		res.redirect('/');
+	})));
+
+
 	/*
 	 * User/Account viewing
 	 */
@@ -113,23 +119,19 @@ module.exports = (app, models) => {
 		res.render('users_list.html', { users });
 	}));
 
-	app.get('/user/me', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('user_singular.html', { user: req.user });
-	})));
-
 	app.get('/user/:user_id', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
-		const user = await User.findByPk(user_id);
+		const user = user_id === 'me' ? req.user : await User.findByPk(user_id);
 		if (!user) {
 			return res.status(404).json({ error: 'User not found' });
 		}
 		res.render('user_singular.html', { user });
 	}));
 
+
 	/*
 	 * View a User's Tools
 	 */
-
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
@@ -143,19 +145,19 @@ module.exports = (app, models) => {
 		res.render('tool_list.html', { tools, user: owner });
 	}));
 
-	/*
-		Add Tools to User
-	*/
-	app.get('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
-		const toolCategories = ToolCategory.findAll();
-		const toolMakers = ToolMaker.findAll();
 
-		res.render('_add_tool.html', { toolCategories, toolMakers });
+	/*
+	 * Add Tools to User
+	 */
+	app.get('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('_add_tool.html', {
+			toolCategories: await ToolCategory.findAll(),
+			toolMakers: await ToolMaker.findAll()
+		});
 	})));
 
 	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
-		console.log('FILE', req.file);
-		const { name, description, tool_category_id, tool_maker_id } = req.body;
+		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
@@ -182,30 +184,29 @@ module.exports = (app, models) => {
 	/*
 		Edit a Tool
 	*/
-
 	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
+		const tool = await Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
 		}
-
-		const toolCategories = await ToolCategory.findAll();
-		const toolMakers = await ToolMaker.findAll();
 
 		// Only allow the owner to edit the tool
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
 
+		const toolCategories = await ToolCategory.findAll();
+		const toolMakers = await ToolMaker.findAll();
+
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
 	app.post('/tool/edit/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
-		const { name, description, tool_category_id, tool_maker_id } = req.body;
+		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.findByPk(tool_id);
 
@@ -241,10 +242,10 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
-	/*
-			  Delete a tool
-	*/
 
+	/*
+	 * Delete a tool
+	 */
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const tool = await Tool.findByPk(tool_id);
@@ -262,7 +263,6 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
-	// TODO: tool editing endpoints
 
 	/*
 	 * Settings Pages
@@ -272,59 +272,85 @@ module.exports = (app, models) => {
 		res.render('account.html', { error: null });
 	}));
 
+
 	/*
- * About Pages
- */
+	 * About Pages
+	 */
 
 	app.get('/about', asyncHandler(async (req, res) => {
 		res.render('about.html', { error: null });
 	}));
 
-	app.get('/about/terms_of_use', asyncHandler(async (req, res) => {
-		res.render('terms_of_use.html', { error: null });
-	}));
-
-	app.get('/about/faqs', asyncHandler(async (req, res) => {
-		res.render('faqs.html', { error: null });
-	}));
-
-	app.get('/about/avoid_scams', asyncHandler(async (req, res) => {
-		res.render('avoid_scams.html', { error: null });
-	}));
 
 	/*
 	 * API Pages
 	 */
 
+	// TODO: delete me?
 	app.get('/search', asyncHandler(async (req, res) => {
 		res.render('_recommendFromSearch.html', { error: null });
 	}));
 
 	/*
-		Create a listing for a tool
-	*/
-	app.get('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	 * Create a listing for a tool
+	 */
+	app.get('/listing/new', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('_add_listing.html', {
+			tools: await Tool.findAll({ where: { owner_id: owner.id } })
+		});
+	})));
 
-		if (!owner) {
-			return res.status(404).json({ error: "User not found." });
-		}
-
-		const tools = await Tool.findAll({ where: { owner_id: owner.id } });
-		res.render('_add_listing.html', { tools });
-	}));
-
-	app.post('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
+	app.post('/listing/new', asyncHandler(async (req, res) => {
 		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
-		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
-		const tool = await models.Tool.findByPk(toolId);
-
-		await listing.setTool(tool);
+		await models.Listing.create({
+			price,
+			billingInterval,
+			maxBillingIntervals,
+			tool_id: toolId
+		});
 
 		res.redirect(`/user/me/listings`);
 	}));
 
+
+	/*
+	 * Edit a Listing
+	 */
+
+	app.get('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		res.render('_edit_listing.html', { listing });
+	})));
+
+	app.post('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+		const { price, billingInterval, maxBillingIntervals } = req.body;
+
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		if (listing.owner_id !== req.user.id) {
+			return res.status(403).json({ error: "not your listing!" });
+		}
+
+		// Update the listing data with the new data
+		listing.price = price;
+		listing.billingInterval = billingInterval;
+		listing.maxBillingIntervals = maxBillingIntervals;
+		await listing.save();
+
+		res.redirect(`/user/me/listings`);
+	})));
 
 	/*
 	 * View a User's Listings 
@@ -350,50 +376,6 @@ module.exports = (app, models) => {
 		})
 		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
 	}));
-
-	/*
-		Edit a Listing
-	*/
-
-	app.get('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-		const { listing_id } = req.params;
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		console.log(listing)
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-
-		res.render('_edit_listing.html', { listing, user_id, listing_id });
-	})));
-
-	app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-		const { listing_id } = req.params;
-		const { price, billingInterval, maxBillingIntervals } = req.body;
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-
-		// Update the listing data with the new data
-		listing.price = price;
-		listing.billingInterval = billingInterval;
-		listing.maxBillingIntervals = maxBillingIntervals;
-		await listing.save();
-
-		res.redirect(`/user/me/listings`);
-	})));
-
-	// TODO: listing editing endpoints
 
 	/*
 	 * Listings
@@ -529,7 +511,7 @@ module.exports = (app, models) => {
 
 	// Sends a message.
 	app.post('/inbox/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
-		const { content } = req.body;
+		const { content } = await messageSchema.validate(req.body);
 		const { user_id } = req.params;
 
 		try {
@@ -558,7 +540,10 @@ module.exports = (app, models) => {
 		};
 		unixListeners.push(handleData);
 		ws.on('close', () => {
-			unixListeners = unixListeners.filter(x => x !== handleData);
+			let idx = unixListeners.indexOf(handleData);
+			if (idx !== -1) {
+				unixListeners.splice(idx, 1);
+			}
 		});
 	}));
 
@@ -568,8 +553,9 @@ module.exports = (app, models) => {
 
 	/* Create a review on another user*/
 	app.get('/review/users', asyncHandler(async (req, res) => {
-		const users = await models.User.findAll();
-		res.render('user_reviews.html', { users });
+		res.render('user_reviews.html', {
+			users: await models.User.findAll()
+		});
 	}));
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {

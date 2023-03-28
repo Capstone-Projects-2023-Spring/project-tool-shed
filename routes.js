@@ -480,10 +480,10 @@ module.exports = (app, models) => {
 
 		// [{with: <User object>, messages: [UserMessage]}, ...]
 		const conversations = [];
-		for (const [otherId, messagesArr] of Object.entries(messages)) {
+		for (const [otherId, messageArr] of Object.entries(messages)) {
 			conversations.push({
 				with: models.User.findByPk(otherId),
-				messages: messagesArr
+				messages: messageArr
 			});
 		}
 

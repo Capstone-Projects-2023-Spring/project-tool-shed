@@ -11,7 +11,7 @@ const userWithAddressSchema = yup.object({
 	line_one: _nullStr.required(),
 	line_two: _nullStr,
 	city: _nullStr.required(),
-	active: yup.boolean().transform(x => x === 'on').
+	active: yup.boolean().transform(x => x === 'on'),
 	state: yup.string().matches(/^[A-Za-z]{2}$/, 'Must be a valid state (e.g. NJ)').required(),
 	zip_code: yup.string().matches(/^[0-9]{5}$/, 'Must be exactly 5 digits').required()
 });

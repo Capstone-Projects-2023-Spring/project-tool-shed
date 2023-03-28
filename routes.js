@@ -106,6 +106,7 @@ module.exports = (app, models) => {
 
 	app.post('/user/logout', asyncHandler(requiresAuth(async (req, res) => {
 		req.setUser(null);
+		res.redirect('/');
 	})));
 
 
@@ -146,7 +147,7 @@ module.exports = (app, models) => {
 
 
 	/*
-	 *Add Tools to User
+	 * Add Tools to User
 	 */
 	app.get('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
 		res.render('_add_tool.html', {
@@ -241,6 +242,7 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
+
 	/*
 	 * Delete a tool
 	 */
@@ -261,6 +263,7 @@ module.exports = (app, models) => {
 		res.redirect(`/user/me/tools`);
 	})));
 
+
 	/*
 	 * Settings Pages
 	 */
@@ -268,6 +271,7 @@ module.exports = (app, models) => {
 	app.get('/account', asyncHandler(async (req, res) => {
 		res.render('account.html', { error: null });
 	}));
+
 
 	/*
 	 * About Pages
@@ -277,17 +281,6 @@ module.exports = (app, models) => {
 		res.render('about.html', { error: null });
 	}));
 
-	app.get('/about/terms_of_use', asyncHandler(async (req, res) => {
-		res.render('terms_of_use.html', { error: null });
-	}));
-
-	app.get('/about/faqs', asyncHandler(async (req, res) => {
-		res.render('faqs.html', { error: null });
-	}));
-
-	app.get('/about/avoid_scams', asyncHandler(async (req, res) => {
-		res.render('avoid_scams.html', { error: null });
-	}));
 
 	/*
 	 * API Pages

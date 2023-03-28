@@ -1,9 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
-
+const net = require('net');
 const { Op } = sequelize;
-
 
 /*
 	Routes
@@ -56,7 +55,7 @@ module.exports = (app, models) => {
 		await user.setPassword(password);
 		await user.save();
 		await res.setUser(user);
-		res.json({user});
+		res.json({ user });
 	}));
 
 	app.post('/user/edit', asyncHandler(requiresAuth(async (req, res) => {
@@ -187,7 +186,7 @@ module.exports = (app, models) => {
 	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
+		const tool = await models.Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -200,7 +199,7 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-		
+
 		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
 	})));
 
@@ -243,7 +242,7 @@ module.exports = (app, models) => {
 	})));
 
 	/*
-		Delete a tool
+			  Delete a tool
 	*/
 
 	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
@@ -304,21 +303,27 @@ module.exports = (app, models) => {
 	/*
 		Create a listing for a tool
 	*/
-	app.get('/listing/new', asyncHandler(async (req, res) => {
-		const tools = await models.Tool.findAll();
-	  
-		res.render('_add_listing.html', {tools});
-	  }));
-	  
-	  app.post('/listing/new', asyncHandler(async (req, res) => {
+	app.get('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const tools = await Tool.findAll({ where: { owner_id: owner.id } });
+		res.render('_add_listing.html', { tools });
+	}));
+
+	app.post('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
 		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
 		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
 		const tool = await models.Tool.findByPk(toolId);
-	  
+
 		await listing.setTool(tool);
-	  
+
 		res.redirect(`/user/me/listings`);
-	  }));
+	}));
 
 
 	/*
@@ -354,42 +359,42 @@ module.exports = (app, models) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 		const { listing_id } = req.params;
-	  
+
 		const listing = await models.Listing.findByPk(listing_id);
 
-	  console.log(listing)
+		console.log(listing)
 		if (!listing) {
-		  return res.status(404).json({ error: "Listing not found." });
+			return res.status(404).json({ error: "Listing not found." });
 		}
-	  	
-	  
-		res.render('_edit_listing.html', { listing, user_id, listing_id });
-	  })));
 
-	  app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+
+		res.render('_edit_listing.html', { listing, user_id, listing_id });
+	})));
+
+	app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 		const { listing_id } = req.params;
 		const { price, billingInterval, maxBillingIntervals } = req.body;
-	  
+
 		const listing = await models.Listing.findByPk(listing_id);
-	  
+
 		if (!listing) {
-		  return res.status(404).json({ error: "Listing not found." });
+			return res.status(404).json({ error: "Listing not found." });
 		}
 
-	  
+
 		// Update the listing data with the new data
 		listing.price = price;
 		listing.billingInterval = billingInterval;
 		listing.maxBillingIntervals = maxBillingIntervals;
 		await listing.save();
-	  
-		res.redirect(`/user/me/listings`);
-	  })));
 
-	  // TODO: listing editing endpoints
-	
+		res.redirect(`/user/me/listings`);
+	})));
+
+	// TODO: listing editing endpoints
+
 	/*
 	 * Listings
 	 */
@@ -455,15 +460,16 @@ module.exports = (app, models) => {
 	}));
 
 	/*
-	 * User Messaging
-	 */
+	* User Messaging
+	*/
 
 	app.get('/inbox', asyncHandler(requiresAuth(async (req, res) => {
+		const senderId = req.user.id;
 		const allMessages = await models.UserMessage.findAll({
 			where: {
 				[Op.or]: [
-					{recipient_id: req.user.id},
-					{sender_id: req.user.id}
+					{ recipient_id: req.user.id },
+					{ sender_id: req.user.id }
 				]
 			},
 			order: [
@@ -489,23 +495,27 @@ module.exports = (app, models) => {
 
 		// templates/inbox.html renders something like what you see when you first open
 		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
-		res.render('inbox.html', {conversations}); // auth'd user is authUser
+		res.render('inbox.html', {conversations, senderId}); // auth'd user is authUser
 	})));
 
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
-		const {user_id} = req.params;
+		const { user_id } = req.params;
 
 		const messages = await models.UserMessage.findAll({
 			where: {
 				[Op.and]: [
-					{[Op.or]: [
-						{recipient_id: req.user.id},
-						{sender_id: req.user.id}
-					]},
-					{[Op.or]: [
-						{recipient_id: user_id},
-						{sender_id: user_id}
-					]}
+					{
+						[Op.or]: [
+							{ recipient_id: req.user.id },
+							{ sender_id: req.user.id }
+						]
+					},
+					{
+						[Op.or]: [
+							{ recipient_id: user_id },
+							{ sender_id: user_id }
+						]
+					}
 				]
 			},
 			order: [
@@ -514,7 +524,7 @@ module.exports = (app, models) => {
 		});
 
 		// templates/user_messaging.html renders all the messages in a conversation.
-		res.render('user_messaging.html', {messages, user_id}); // auth'd user is authUser
+		res.render('user_messaging.html', { messages, user_id }); // auth'd user is authUser
 	})));
 
 	// Sends a message.
@@ -527,11 +537,30 @@ module.exports = (app, models) => {
 				content, sender_id: req.user.id, recipient_id: user_id
 			});
 
-			res.json({status: 'ok', error: null, message});
+			res.json({ status: 'ok', error: null, message });
 		} catch (error) {
-			res.json({status: 'failure', error, message: null});
+			res.json({ status: 'failure', error, message: null });
 		}
 	})));
+
+	let unixListeners = [];
+	UserMessage.messageCreated = msg => {
+		for (const f of unixListeners) {
+			f(msg);
+		}
+	};
+
+	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
+		const handleData = userMessage => {
+			if (userMessage.recipient_id === req.user.id) {
+				ws.send(JSON.stringify(userMessage));
+			}
+		};
+		unixListeners.push(handleData);
+		ws.on('close', () => {
+			unixListeners = unixListeners.filter(x => x !== handleData);
+		});
+	}));
 
 	/*
 	 * User Reviews
@@ -559,27 +588,27 @@ module.exports = (app, models) => {
 		} else {
 			res.status(500);
 		}
-	})));   
+	})));
 
 	/* View my reviews */
 	app.get('/user/:user_id/reviews', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const reviewee = user_id === 'me' ? req.user : await User.findByPk(user_id);
-	
+
 		if (!reviewee) {
 			return res.status(404).json({ error: "User not found." });
 		}
-	
-		const reviews = await UserReview.findAll({ 
+
+		const reviews = await UserReview.findAll({
 			where: { reviewee_id: reviewee.id },
-			include: { 
+			include: {
 				model: models.User,
 				as: 'reviewer',
-				attributes:['email']
+				attributes: ['email']
 			}
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
 };
 
-	
+

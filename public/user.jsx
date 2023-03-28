@@ -35,6 +35,7 @@ const User = (function() {
 		return <div style={style}>
 			<h2>{firstName} {lastName} {id} {active}</h2>
 			<p>Email: {email}</p>
+			<a href={`/inbox/${id}`}>Send Message</a>
 			{isEditable && 
 			<form action="/users/edit" method="post" style={{display: 'flex', flexFlow: 'column nowrap'}}>
 				<FormInput name='first_name' label="First Name:" value={firstName} setter={setFirstName} />

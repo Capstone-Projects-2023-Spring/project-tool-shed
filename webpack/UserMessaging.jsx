@@ -3,28 +3,34 @@ import ReactDOM from 'react-dom/client';
 import { useParams } from "react-router-dom";
 import { ChakraProvider, Box, Button, Flex, Input, Text, Textarea, VStack } from "@chakra-ui/react";
 
-function UserMessaging({messages, recipientId}) {
-  
+function UserMessaging({messages: _messages, recipientId}) {
+    const [messages, setMessages] = useState(_messages);  
+	
+    useEffect(() => {
+	const url = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + `/websocket/inbox/${recipientId}`;
+        let s = new WebSocket(url);
+	s.addEventListener('message', ({data}) => {
+		const msg = JSON.parse(data);
+		setMessages(ms => [...ms, msg]);
+	});
+    }, []);
+
     const [content, setContent] = useState("");
-    console.log(messages);
 
     const handleMessageChange = (event) => {
       setContent(event.target.value);
     }
 
     const handleSendMessage = async () => {
-        //Set up sending to socket
-        //setSentMessage(message);
-        
         try {
-          const response = await fetch(`/inbox/${recipientId}/send.json`, {
+          const {message} = await fetch(`/inbox/${recipientId}/send.json`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ content }),
-          });
-          const data = await response.json();
+          }).then(x => x.json());
+	  setMessages(ms => [...ms, message]);
           setContent("");
     } catch (error) {
       console.error(error);
@@ -61,7 +67,6 @@ function UserMessaging({messages, recipientId}) {
             const contents = Object.values({ content });
             const creations = Object.values({ createdAt });
             const senders = Object.values({ sender_id });
-            console.log(recipientId)
 
             return (
               <Flex

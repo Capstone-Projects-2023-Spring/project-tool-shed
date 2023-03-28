@@ -171,6 +171,7 @@ async function syncDatabase(sequelize) {
  */
 async function startServer() {
 	const app = express();
+	app.wsInstance = require('express-ws')(app, undefined, {wsOptions: {clientTracking: true}});
 
 	const uploadPath = path.join(__dirname, '.uploads');
 	const uploadStorage = multer.diskStorage({

@@ -2,61 +2,61 @@
 <html>
 
 <head>
-	{% block header %}
+    {% block header %}
 
-	{% endblock %}
+    {% endblock %}
 </head>
 
 <body>
-	<!--Navigation bar-->
-	<div id="nav"></div>
+    <!--Navigation bar-->
+    <div id="nav"></div>
 
-	{% block body %}
+    {% block body %}
 
-	{% endblock %}
-	<script src="/node_modules/react/umd/react.development.js"></script>
-	<script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
-	<script src="/node_modules/babel-standalone/babel.min.js"></script>
-	
-	<script type="text/babel">
-		const user = {{ authUser|json }};
-		const NavBar = ({user}) => {
-			let navItems = {};
+    {% endblock %}
+    <script src="/node_modules/react/umd/react.development.js"></script>
+    <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script src="/node_modules/babel-standalone/babel.min.js"></script>
 
-			if (user) {
-				navItems['/account'] = 'Account';
-				navItems["/user/me/tools"] = "Tools";
-				navItems["/tool/new"] = "Add Tool";
-				navItems["/inbox"] = "Messages";
-				navItems["/user/me/listings"] = "Listings"
+    <script type="text/babel">
+        const user = {{ authUser| json }};
+        const NavBar = ({ user }) => {
+            let navItems = {};
 
-        navItems["/user/me/listing/new"] = "Create Listing"
-        navItems["/user/me/reviews"] = "My Review";
-        navItems["/review/users"] = "Review";
+            if (user) {
+                navItems['/account'] = 'Account';
+                navItems["/user/me/tools"] = "Tools";
+                navItems["/tool/new"] = "Add Tool";
+                navItems["/inbox"] = "Messages";
+                navItems["/user/me/listings"] = "Listings"
 
-				navItems["/about"] = "About";
-			} else {
-				navItems['/user/login'] = 'Log In';
-				navItems['/user/new'] = 'Sign Up';
-				navItems["/about"] = "About";
-			}
+                navItems["/listing/new"] = "Create Listing"
+                navItems["/user/me/reviews"] = "My Review";
+                navItems["/review/users"] = "Review";
 
-			return <div>
-				<nav>
-					<label className="logo"><a href="/">ToolShed</a></label>
-					<ul>
-						{Object.entries(navItems).map(([url, label]) =>
-							<li key={url}><a href={url}>{label}</a></li>)}
-					</ul>
-				</nav>
-			</div>;
-		};
-		ReactDOM.createRoot(document.getElementById('nav')).render(<NavBar user={user}/>);
-	</script>
+                navItems["/about"] = "About";
+            } else {
+                navItems['/user/login'] = 'Log In';
+                navItems['/user/new'] = 'Sign Up';
+                navItems["/about"] = "About";
+            }
+
+            return <div>
+                <nav>
+                    <label className="logo"><a href="/">ToolShed</a></label>
+                    <ul>
+                        {Object.entries(navItems).map(([url, label]) =>
+                            <li key={url}><a href={url}>{label}</a></li>)}
+                    </ul>
+                </nav>
+            </div>;
+        };
+        ReactDOM.createRoot(document.getElementById('nav')).render(<NavBar user={user} />);
+    </script>
 </body>
 
 <style>
-	/* Styling for nav */
+    /* Styling for nav */
     * {
         padding: 0;
         margin: 0;
@@ -119,7 +119,6 @@
         padding: 14px 16px;
         text-decoration: none;
     }
-
 </style>
 
 </html>

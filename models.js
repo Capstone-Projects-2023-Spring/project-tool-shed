@@ -3,6 +3,7 @@
  * @module models
  */
 
+const net = require('net');
 const path = require('path');
 const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
@@ -350,6 +351,12 @@ const genModels = sequelize => {
 		},
 		as: 'sender'
 	});
+
+	UserMessage.addHook('afterCreate', 'call_socket', async (msg, opts) => {
+		UserMessage.messageCreated(msg); // UserMessage.messageCreated gets set in routes.js
+	});
+
+
 
 	/**
 	 * @class UserReviews

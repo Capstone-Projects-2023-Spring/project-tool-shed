@@ -544,21 +544,17 @@ module.exports = (app, models) => {
 	})));
 
 	let unixListeners = [];
-	net.createServer(function(tcpSocket) {
-    		tcpSocket.on('data', function(data) {
-			for (const f of unixListeners) {
-				f(data);
-			}
-    		});
-	}).listen(10337, '0.0.0.0');
-	
+	UserMessage.messageCreated = msg => {
+		for (const f of unixListeners) {
+			f(msg);
+		}
+	};
 
 	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
-		const handleData = data => {
-				const userMessage = JSON.parse(data.toString());
-				if (userMessage.recipient_id === req.user.id) {
-					ws.send(JSON.stringify(userMessage));
-				}
+		const handleData = userMessage => {
+			if (userMessage.recipient_id === req.user.id) {
+				ws.send(JSON.stringify(userMessage));
+			}
 		};
 		unixListeners.push(handleData);
 		ws.on('close', () => {

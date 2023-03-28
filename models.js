@@ -353,11 +353,7 @@ const genModels = sequelize => {
 	});
 
 	UserMessage.addHook('afterCreate', 'call_socket', async (msg, opts) => {
-		const client = new net.Socket();
-		client.connect(10337, '0.0.0.0', () => {
-			client.write(JSON.stringify(msg));
-			client.destroy();
-		});
+		UserMessage.messageCreated(msg); // UserMessage.messageCreated gets set in routes.js
 	});
 
 

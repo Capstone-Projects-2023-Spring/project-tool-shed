@@ -11,7 +11,7 @@ function UserMessaging({messages: _messages, recipientId}) {
         let s = new WebSocket(url);
 	s.addEventListener('message', ({data}) => {
 		const msg = JSON.parse(data);
-		setMessages([...messages, msg]);
+		setMessages(ms => [...ms, msg]);
 	});
     }, []);
 
@@ -30,7 +30,7 @@ function UserMessaging({messages: _messages, recipientId}) {
             },
             body: JSON.stringify({ content }),
           }).then(x => x.json());
-	  setMessages([...messages, message]);
+	  setMessages(ms => [...ms, message]);
           setContent("");
     } catch (error) {
       console.error(error);

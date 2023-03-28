@@ -3,8 +3,14 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 const Inbox = ({ conversations, senderId }) => {
-  const handleClick = (recipientId) => {
-    window.location.href = `/inbox/${recipientId}`;
+
+  //Initial Receiver - person that receives first message
+  //Initial Sender - person that sent the first message
+  //SenderId - current screens user ID
+  const handleClick = (initialReceiver, initialSender) => {
+    const chatId = senderId === initialSender ? initialReceiver : initialSender;
+    console.log(chatId)
+    window.location.href = `/inbox/${chatId}`;
   };
   console.log(senderId);
   return (
@@ -16,6 +22,8 @@ const Inbox = ({ conversations, senderId }) => {
       ) : (
         conversations.map((conversation) => {
           const { user, messages } = conversation;
+          const intialSender = messages[0].sender_id;
+          const initialReciever = messages[0].recipient_id;
           const lastMessage = messages[messages.length - 1];
           console.log(user); 
 
@@ -34,7 +42,7 @@ const Inbox = ({ conversations, senderId }) => {
                 h="10vh"
                 _hover={{ bg: "gray.200" }}
                 _active={{ bg: "gray.300" }}
-                onClick={() => handleClick(lastMessage.recipient_id)}
+                onClick={() => handleClick(initialReciever, intialSender)}
               >
                 <Text fontWeight="bold">
                   Chat with {lastMessage.sender_id === senderId ? lastMessage.recipient_id : lastMessage.sender_id}

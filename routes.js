@@ -286,35 +286,71 @@ module.exports = (app, models) => {
 	 * API Pages
 	 */
 
+	// TODO: delete me?
 	app.get('/search', asyncHandler(async (req, res) => {
 		res.render('_recommendFromSearch.html', { error: null });
 	}));
 
 	/*
-		Create a listing for a tool
-	*/
-	app.get('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+	 * Create a listing for a tool
+	 */
+	app.get('/listing/new', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('_add_listing.html', {
+			tools: await Tool.findAll({ where: { owner_id: owner.id } })
+		});
+	})));
 
-		if (!owner) {
-			return res.status(404).json({ error: "User not found." });
-		}
-
-		const tools = await Tool.findAll({ where: { owner_id: owner.id } });
-		res.render('_add_listing.html', { tools });
-	}));
-
-	app.post('/user/:user_id/listing/new', asyncHandler(async (req, res) => {
+	app.post('/listing/new', asyncHandler(async (req, res) => {
 		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
-		const listing = await models.Listing.create({ price, billingInterval, maxBillingIntervals, tool_id: toolId });
-		const tool = await models.Tool.findByPk(toolId);
-
-		await listing.setTool(tool);
+		await models.Listing.create({
+			price,
+			billingInterval,
+			maxBillingIntervals,
+			tool_id: toolId
+		});
 
 		res.redirect(`/user/me/listings`);
 	}));
 
+
+	/*
+	 * Edit a Listing
+	 */
+
+	app.get('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		res.render('_edit_listing.html', { listing });
+	})));
+
+	app.post('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+		const { price, billingInterval, maxBillingIntervals } = req.body;
+
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		if (listing.owner_id !== req.user.id) {
+			return res.status(403).json({ error: "not your listing!" });
+		}
+
+		// Update the listing data with the new data
+		listing.price = price;
+		listing.billingInterval = billingInterval;
+		listing.maxBillingIntervals = maxBillingIntervals;
+		await listing.save();
+
+		res.redirect(`/user/me/listings`);
+	})));
 
 	/*
 	 * View a User's Listings 
@@ -340,43 +376,6 @@ module.exports = (app, models) => {
 		})
 		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
 	}));
-
-	/*
-		Edit a Listing
-	*/
-
-	app.get('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id, listing_id } = req.params;
-		//const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-		res.render('_edit_listing.html', { listing, user_id, listing_id });
-	})));
-
-	app.post('/user/:user_id/edit/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { user_id, listing_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-		const { price, billingInterval, maxBillingIntervals } = req.body;
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-		// Update the listing data with the new data
-		listing.price = price;
-		listing.billingInterval = billingInterval;
-		listing.maxBillingIntervals = maxBillingIntervals;
-		await listing.save();
-
-		res.redirect(`/user/me/listings`);
-	})));
 
 	/*
 	 * Listings

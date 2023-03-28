@@ -11,7 +11,6 @@ const Listing = ({
   maxBillingIntervals,
   tool,
 }) => {
-  console.log('tools:', tool)
   return (
     <div>
       <h2>
@@ -21,7 +20,7 @@ const Listing = ({
       <p>Price & Rate : ${price} {billingInterval}</p>
       <p>Available For: {maxBillingIntervals} units</p>
 
-      <a href={`/user/me/edit/${id}`}> 
+      <a href={`/listing/${id}/edit`}> 
           <button>Edit Listing</button> 
       </a>
     </div >

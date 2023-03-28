@@ -7,7 +7,7 @@
 {% block body %}
 
 <h1>Edit Listing</h1>
-<form action="/user/{{ user_id }}/edit/{{ listing_id }}" method="POST">
+<form method="POST">
     <label for="price">Price:</label>
     <input type="text" name="price" id="price" value="{{ listing.price }}" />
 
@@ -22,7 +22,6 @@
     <label for="maxbillingIntervals">Max Billing Interval:</label>
     <input type="text" name="maxbillingIntervals" id="maxbillingIntervals" value="{{ listing.maxBillingIntervals }}" />
 
-    <input type="hidden" name="owner_id" id="owner_id" value="{{ authUser.id }}" />
     <div>
         <button type="submit">Save Changes</button>
     </div>

@@ -15,7 +15,6 @@
 
 	const user = {{ user|json }};
 	const isEditable = {{ user.id === authUser.id }};
-	console.log(user);
 	root.render(<User {...user} isEditable={isEditable} />);
 </script>
 

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema } = require('./validators');
 const sequelize = require('sequelize');
+const net = require('net');
 const { Op } = sequelize;
 
 /*
@@ -541,6 +542,29 @@ module.exports = (app, models) => {
 			res.json({ status: 'failure', error, message: null });
 		}
 	})));
+
+	let unixListeners = [];
+	net.createServer(function(tcpSocket) {
+    		tcpSocket.on('data', function(data) {
+			for (const f of unixListeners) {
+				f(data);
+			}
+    		});
+	}).listen(10337, '0.0.0.0');
+	
+
+	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
+		const handleData = data => {
+				const userMessage = JSON.parse(data.toString());
+				if (userMessage.recipient_id === req.user.id) {
+					ws.send(JSON.stringify(userMessage));
+				}
+		};
+		unixListeners.push(handleData);
+		ws.on('close', () => {
+			unixListeners = unixListeners.filter(x => x !== handleData);
+		});
+	}));
 
 	/*
 	 * User Reviews

@@ -1,16 +1,18 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { ChakraProvider, Select, Box, Heading, Divider, Container,
-	 FormControl, FormLabel, FormErrorMessage, FormHelperText,
-	 Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb } from '@chakra-ui/react';
+import {
+	ChakraProvider, Select, Box, Heading, Divider, Container,
+	FormControl, FormLabel, FormErrorMessage, FormHelperText,
+	Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb
+} from '@chakra-ui/react';
 
 import getBrowserCoords from './util/getBrowserCoords';
 
 const defaultApiKey = GOOGLE_MAPS_API_KEY; // see webpack.config.js, module.exports.plugins
-const defaultCoordinates = {lat: 39.98020784788337, lon: -75.15746555080395 }; // temple university
+const defaultCoordinates = { lat: 39.98020784788337, lon: -75.15746555080395 }; // temple university
 const defaultSearchRadius = 10;
 
-const SearchTools = ({ apiKey = defaultApiKey, categories=[], makers=[] }) => {
+const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) => {
 	const [results, setResults] = useState([]);
 	const [coords, setCoords] = useState();
 	const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +51,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories=[], makers=[] }) => {
 	useLayoutEffect(() => {
 		if (!mapRef.current) return;
 
-		const loader = new Loader({apiKey,version: 'weekly'});
+		const loader = new Loader({ apiKey, version: 'weekly' });
 		loader.load().then(() => {
 			const _map = new google.maps.Map(mapRef.current, {
 				zoom: 8,
@@ -75,15 +77,15 @@ const SearchTools = ({ apiKey = defaultApiKey, categories=[], makers=[] }) => {
 
 	useLayoutEffect(() => {
 		if (!coords || !map) return;
-	
+
 		const pt = map.getCenter();
 		if (!pt || pt.lng() !== coords.lon || pt.lat() !== coords.lat) {
 			console.log(coords, map);
-			map.setCenter({lng: coords.lon, lat: coords.lat});
+			map.setCenter({ lng: coords.lon, lat: coords.lat });
 		}
 
 		let radiusVisualization = new google.maps.Circle({
-			center: {lng: coords.lon, lat: coords.lat},
+			center: { lng: coords.lon, lat: coords.lat },
 			radius: searchRadius * 1000, // in meters
 			strokeColor: "#FFF",
 			strokeOpacity: 0.0,
@@ -99,148 +101,117 @@ const SearchTools = ({ apiKey = defaultApiKey, categories=[], makers=[] }) => {
 
 	}, [searchRadius, coords, map]);
 
-		// useLayoutEffect(() => {
-		// 	if (!map) return;
+	useLayoutEffect(() => { // TEST WITH TOOL NAMES
+		if (!map) return;
 
-		// 	let markers = [];
-		// 	for (const res of results) {
-		// 	  const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
-		// 	  const title = 'Tool';
-		// 	  const position = { lat: geocoded_lat, lng: geocoded_lon };
-
-		// 	  // create a custom marker icon
-		// 	  const icon = {
-		// 		url: '../public/handman_icon.png',
-		// 		scaledSize: new google.maps.Size(50, 50),
-		// 		origin: new google.maps.Point(0, 0),
-		// 		anchor: new google.maps.Point(25, 25),
-		// 	  };
-
-		// 	  // set the custom marker icon as the icon of the marker
-		// 	  const marker = new google.maps.Marker({
-		// 		position,
-		// 		map,
-		// 		title,
-		// 		icon, // <-- set the custom icon here
-		// 	  });
-
-		// 	  markers.push(marker);
-		// 	}
-
-		// 	return () => {
-		// 	  for (const m of markers) {
-		// 		m.setMap(null);
-		// 	  }
-		// 	};
-		//   }, [map, results]);
-
-		useLayoutEffect(() => { // TEST WITH TOOL NAMES
-			if (!map) return;
-
-			let markers = [];
+		let markers = [];
 			for (const res of results) {
 				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 				const name = res.tool.name;
 				const description = res.tool.description;
+				const owner_id = res.tool.owner_id;
+				const first_name = res.tool.owner.first_name;
+				const last_name = res.tool.owner.last_name;
 				const position = { lat: geocoded_lat, lng: geocoded_lon };
 
-				// create a custom marker icon
-				const icon = {
-					url: '../public/handman_icon.png',
-					scaledSize: new google.maps.Size(50, 50),
-					origin: new google.maps.Point(0, 0),
-					anchor: new google.maps.Point(25, 25),
-				};
-
-				// set the custom marker icon as the icon of the marker and add title
-				const marker = new google.maps.Marker({
-					position,
-					map,
-					title: name, // <-- set the tool name as the marker title
-					// icon, // <-- set the custom icon here
-				});
-
-				const infoWindow = new google.maps.InfoWindow({
-					content: `<div><h3>${name}</h3><p>${description}</p></div>`,
-				});
-
-				// add an event listener for the "mouseover" event
-				marker.addListener("mouseover", () => {
-					infoWindow.open(map, marker);
-				});
-
-				// add an event listener for the "mouseout" event
-				marker.addListener("mouseout", () => {
-					infoWindow.close();
-				});
-
-				markers.push(marker);
-			}
-
-			return () => {
-				for (const m of markers) {
-					m.setMap(null);
-				}
+			// create a custom marker icon
+			const icon = {
+				url: '../public/handman_icon.png',
+				scaledSize: new google.maps.Size(50, 50),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(25, 25),
 			};
-		}, [map, results]);
 
-	
-	const labelStyles = {mt: '2', ml: '-2.5', fontSize: 'sm'};
-	const sliderValueStyle = {textAlign: 'center', bg: 'blue.500', color: 'white', mt: '-10', ml: '-5', w: '12'};
+			// set the custom marker icon as the icon of the marker and add title
+			const marker = new google.maps.Marker({
+				position,
+				map,
+				title: name, // <-- set the tool name as the marker title
+			});
+
+			const infoWindow = new google.maps.InfoWindow({
+				content: `<div style="font-size: 14px; line-height: 1.5; width: 250px;">
+							<h3 style="margin: 0 0 10px;">${name}</h3>
+							<p style="margin: 0 0 5px;">${description}</p>
+							<div style="display: block; margin-top: 5px;">&#128295; Click to contact ${first_name} ${last_name}! &#128295;</div>
+						  </div>`
+			});
+
+
+			// add an event listener for the "mouseover" event
+			marker.addListener("mouseover", () => {
+				infoWindow.open(map, marker);
+			});
+
+			// add an event listener for the "mouseout" event
+			marker.addListener("mouseout", () => {
+				infoWindow.close();
+			});
+
+			// add an event listener for the "click" event
+			marker.addListener("click", () => {
+				// Placeholder.  This will be modified to the tools details page when it is available
+				// For now, routing to messaging page to contact owner_id
+				window.open(`http://127.0.0.1:5000/inbox/${owner_id}`, '_blank');
+			});
+
+			markers.push(marker);
+		}
+
+		return () => {
+			for (const m of markers) {
+				m.setMap(null);
+			}
+		};
+	}, [map, results]);
+
+
+	const labelStyles = { mt: '2', ml: '-2.5', fontSize: 'sm' };
+	const sliderValueStyle = { textAlign: 'center', bg: 'blue.500', color: 'white', mt: '-10', ml: '-5', w: '12' };
 	const maxDist = 200;
 	return (
-<ChakraProvider>
-	<Box className="SearchTools" w="100%">
-		<Container className="SearchTools__Filters" w='100%'>
-			<FormControl>
-				<FormLabel>Search Query</FormLabel>
-				<Input placeholder='Enter search query here...'
-					value={searchQuery}
-					onChange={x => setSearchQuery(x.target.value)} />
-				<FormHelperText>This is full text search.</FormHelperText>
-			</FormControl>
+		<ChakraProvider>
+			<Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
+				<Container className="SearchTools__Filters" w='100%'>
+					<FormControl mb={4}>
+						<FormLabel>Search Query</FormLabel>
+						<Input placeholder='Enter search query here...'
+							value={searchQuery}
+							onChange={x => setSearchQuery(x.target.value)} />
+					</FormControl>
 
-			<FormControl>
-				<FormLabel>Search Radius</FormLabel>
-				<Box>
-				<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
-					<SliderMark value={50} {...labelStyles}>50km</SliderMark>
-					<SliderMark value={100} {...labelStyles}>100km</SliderMark>
-					<SliderMark value={150} {...labelStyles}>150km</SliderMark>
-					<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
-					<SliderTrack>
-						<SliderFilledTrack />
-					</SliderTrack>
-					<SliderThumb />
-				</Slider>
-				</Box>
-				<FormHelperText>How far away to search for tools.</FormHelperText>
-			</FormControl>
-			<FormControl>
-				<FormLabel>Tool Category</FormLabel>
-				<Select placeholder="Select category" onChange={x => setSelectedCategory(x)}>
-				{categories.map(c => (
-					<option key={c.value} value={c.value}>
-						{c.label}
-					</option>
-				))}
-				</Select>
-			</FormControl>
-			<FormControl>
-				<FormLabel>Tool Maker</FormLabel>
-				<Select placeholder="Select maker" onChange={x => setSelectedCategory(x)}>
-				{makers.map(x => (
-					<option key={x.value} value={x.value}>
-						{x.label}
-					</option>
-				))}
-				</Select>
-			</FormControl>	
-		</Container>
-		<Divider />
-		<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} />
-	</Box>
-</ChakraProvider>
+					<FormControl mb={4}>
+						<FormLabel>Search Radius</FormLabel>
+						<Box>
+							<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
+								<SliderTrack>
+									<SliderFilledTrack bg="blue.500" />
+								</SliderTrack>
+								<SliderThumb bg="blue.500" />
+								<SliderMark value={50} {...labelStyles}>50km</SliderMark>
+								<SliderMark value={100} {...labelStyles}>100km</SliderMark>
+								<SliderMark value={150} {...labelStyles}>150km</SliderMark>
+								<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
+							</Slider>
+						</Box>
+					</FormControl>
+
+					<FormControl mb={4}>
+						<FormLabel>Tool Category</FormLabel>
+						<Select placeholder="Select category" onChange={x => setSelectedCategory(x)}>
+							{categories.map(c => (
+								<option key={c.value} value={c.value}>
+									{c.label}
+								</option>
+							))}
+						</Select>
+					</FormControl>
+				</Container>
+				<Divider my={4} />
+				<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
+
+			</Box>
+		</ChakraProvider>
 	);
 };
 

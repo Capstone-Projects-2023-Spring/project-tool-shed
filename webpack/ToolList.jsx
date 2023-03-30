@@ -40,11 +40,11 @@ const Tool = ({
             <p>Category ID: {tool_category_id}</p>
             <p>Maker ID: {tool_maker_id}</p>
         
-            <a href={`/tool/edit/${id}`}>
+            <a href={`/tools/${id}/edit`}>
                 <button>Edit Tool</button>
             </a>
 
-            <a href={`/tool/delete/${id}`}>
+            <a href={`/tools/${id}/delete`}>
                 <button>Delete Tool</button>
             </a>
 	    <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`}><button>View on Youtube</button></a>

@@ -1,8 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema,
-	userWithAddressSchema, toolSchema, messageSchema } = require('./validators');
+	userWithAddressSchema, toolSchema, messageSchema, listingSchema } = require('./validators');
 const sequelize = require('sequelize');
 const { Op } = sequelize;
+const path = require('path');
 
 /*
 	Routes
@@ -96,7 +97,7 @@ module.exports = (app, models) => {
 		let u = await models.User.findAll({ where: { email: email } });
 		u = u.length > 0 ? u[0] : null;
 
-		if (u && u.passwordMatches(password)) {
+		if (u && await u.passwordMatches(password)) {
 			await res.setUser(u);
 			res.redirect(redirectURI ?? '/');
 		} else {
@@ -130,8 +131,10 @@ module.exports = (app, models) => {
 
 
 	/*
-	 * View a User's Tools
+	 * Tools
 	 */
+
+	/* PAGE: View a User's Tools */
 	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
@@ -145,49 +148,19 @@ module.exports = (app, models) => {
 		res.render('tool_list.html', { tools, user: owner });
 	}));
 
-
-	/*
-	 * Add Tools to User
-	 */
-	app.get('/tool/new', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('_add_tool.html', {
+	/* PAGE: Create a tool */
+	app.get('/tools/new', asyncHandler(requiresAuth(async (req, res) => {
+		res.render('tool_form.html', {
 			toolCategories: await ToolCategory.findAll(),
 			toolMakers: await ToolMaker.findAll()
 		});
 	})));
 
-	app.post('/tool/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+	/* PAGE: Edit a tool */
+	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const {tool_id} = req.params;
 
-		const tool = await models.Tool.create({
-			name, description, owner_id: req.user.id,
-			tool_maker_id, tool_category_id
-		});
-
-		const uploadedFile = req.file;
-		if (uploadedFile) {
-			const fu = await FileUpload.create({
-				originalName: uploadedFile.originamname,
-				mimeType: uploadedFile.mimetype,
-				size: uploadedFile.size,
-				path: uploadedFile.path,
-				storedIn: uploadedFile.destination,
-				uploader_id: req.user.id
-			});
-			await tool.setManual(fu);
-			await tool.save();
-		}
-
-		res.redirect(`/user/me/tools`);
-	})));
-
-	/*
-		Edit a Tool
-	*/
-	app.get('/tool/edit/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
-		const { tool_id } = req.params;
-
-		const tool = await Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
+		const tool = await models.Tool.findByPk(tool_id);
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -197,14 +170,42 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
-
-		const toolCategories = await ToolCategory.findAll();
-		const toolMakers = await ToolMaker.findAll();
-
-		res.render('_edit_tool.html', { tool, toolCategories, toolMakers });
+		
+		res.render('tool_form.html', {
+			toolCategories: await ToolCategory.findAll(),
+			toolMakers: await ToolMaker.findAll(),
+			tool
+		});
 	})));
 
-	app.post('/tool/edit/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+	/* API: Create tools */
+	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+
+		const tool = await models.Tool.create({
+			name, description, owner_id: req.user.id,
+			tool_maker_id, tool_category_id
+		});
+
+		const uploadedFile = req.file;
+		if (uploadedFile) {
+			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
+			const fu = await FileUpload.create({
+				originalName: uploadedFile.originalname,
+				mimeType: uploadedFile.mimetype,
+				size: uploadedFile.size,
+				path: relPath,
+				uploader_id: req.user.id
+			});
+
+			await tool.setManual(fu);
+		}
+
+		res.json({tool});
+	})));
+
+	/* API: Edit tool */
+	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
@@ -228,27 +229,27 @@ module.exports = (app, models) => {
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
+			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
 			const fu = await FileUpload.create({
-				originalName: uploadedFile.originamname,
+				originalName: uploadedFile.originalname,
 				mimeType: uploadedFile.mimetype,
 				size: uploadedFile.size,
-				path: uploadedFile.path,
-				storedIn: uploadedFile.destination,
+				path: relPath,
 				uploader_id: req.user.id
 			});
+
 			await tool.setManual(fu);
 		}
 
-		res.redirect(`/user/me/tools`);
+		res.json({tool});
 	})));
 
-
-	/*
-	 * Delete a tool
-	 */
-	app.get('/tool/delete/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
+	/* API: Delete a tool */
+	app.delete('/api/tools/:tool_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const tool = await Tool.findByPk(tool_id);
+
+		// TODO: prevent deleting tools with active listings.
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -259,79 +260,30 @@ module.exports = (app, models) => {
 		}
 
 		await tool.destroy();
-
-		res.redirect(`/user/me/tools`);
+	
+		res.json({});
 	})));
 
-
-	/*
-	 * Settings Pages
-	 */
-
-	app.get('/account', asyncHandler(async (req, res) => {
-		res.render('account.html', { error: null });
-	}));
-
-
-	/*
-	 * About Pages
-	 */
-
-	app.get('/about', asyncHandler(async (req, res) => {
-		res.render('about.html', { error: null });
-	}));
-
-
-	/*
-	 * API Pages
-	 */
-
-	// TODO: delete me?
-	app.get('/search', asyncHandler(async (req, res) => {
-		res.render('_recommendFromSearch.html', { error: null });
-	}));
-
-	/*
-	 * Create a listing for a tool
-	 */
-	app.get('/listing/new', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('_add_listing.html', {
-			tools: await Tool.findAll({ where: { owner_id: owner.id } })
-		});
-	})));
-
-	app.post('/listing/new', asyncHandler(async (req, res) => {
-		const { toolId, price, billingInterval, maxBillingIntervals } = req.body;
-		await models.Listing.create({
+	/* API: Create a listing */
+	// refer to templates/_add_listing.html
+	app.post('/api/listings/new', asyncHandler(async (req, res) => {
+		const { toolId, price,
+			billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
+		const l = await models.Listing.create({
 			price,
 			billingInterval,
 			maxBillingIntervals,
 			tool_id: toolId
 		});
-
-		res.redirect(`/user/me/listings`);
+	
+		res.json({listing: l});
 	}));
 
-
-	/*
-	 * Edit a Listing
-	 */
-
-	app.get('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+	/* API: Edit a listing */
+	// refer to templates/_edit_listing.html
+	app.post('/api/listing/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-		res.render('_edit_listing.html', { listing });
-	})));
-
-	app.post('/listing/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
-		const { listing_id } = req.params;
-		const { price, billingInterval, maxBillingIntervals } = req.body;
+		const { price, billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
 
 		const listing = await models.Listing.findByPk(listing_id);
 
@@ -349,8 +301,48 @@ module.exports = (app, models) => {
 		listing.maxBillingIntervals = maxBillingIntervals;
 		await listing.save();
 
-		res.redirect(`/user/me/listings`);
+		res.json({listing});
 	})));
+
+	/* API: Delete a listing */
+	app.delete('/api/listing/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+		
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		if (listing.owner_id !== req.user.id) {
+			return res.status(403).json({ error: "not your listing!" });
+		}
+
+		// TODO: check if the listing is active
+		
+		await listing.destroy();
+
+		res.json({status: 'ok'});
+	})));
+
+
+	/*
+	 * Edit a Listing
+	 */
+
+	/*app.get('/listings/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
+		const { listing_id } = req.params;
+
+		const listing = await models.Listing.findByPk(listing_id);
+
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		res.render('_edit_listing.html', { listing });
+	})));*/
+
+
 
 	/*
 	 * View a User's Listings 
@@ -373,7 +365,8 @@ module.exports = (app, models) => {
 					owner_id: owner.id
 				}
 			}]
-		})
+		});
+
 		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
 	}));
 
@@ -440,6 +433,35 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
+	/*
+	 * Settings Pages
+	 */
+
+	app.get('/account', asyncHandler(async (req, res) => {
+		res.render('account.html', { error: null });
+	}));
+
+
+	/*
+	 * About Pages
+	 */
+
+	app.get('/about', asyncHandler(async (req, res) => {
+		res.render('about.html', { error: null });
+	}));
+
+
+	/*
+	 * API Pages
+	 */
+
+	// TODO: delete me?
+	app.get('/search', asyncHandler(async (req, res) => {
+		res.render('_recommendFromSearch.html', { error: null });
+	}));
+
+
 
 	/*
 	* User Messaging

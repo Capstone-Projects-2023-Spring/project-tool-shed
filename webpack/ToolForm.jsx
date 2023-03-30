@@ -1,24 +1,24 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
-import { ChakraProvider, Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from '@chakra-ui/react';
+import { ChakraProvider, Box, Button, FormControl, FormHelperText, FormErrorMessage, FormLabel, Input, Stack, Select } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import validationSchema from '../validators/tool'; // TODO: update this
-import path from 'path';
+import toolSchema from '../validators/tool';
 
 const ToolForm = ({tool, toolCategories, toolMakers}) => {
 	const isEdit = !!tool;
-	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {\
+	const [manualFile, setManualFile] = useState();
+	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
 		let formData = new FormData();
-		for (const [k, v] of Object.entries(values) {
+		for (const [k, v] of Object.entries(values)) {
 			formData.append(k, v);
+		}
+		if (manualFile) {
+			formData.append('manual', manualFile);
 		}
 		try {
 			const {tool} = await fetch(isEdit ? `/api/tools/${tool.id}` : '/api/tools/new', {
 				method: isEdit ? "PATCH" : 'POST',
-				headers: {
-					'Content-Type': 'multipart/form-data'
-				},
 				body: formData,
 				credentials: "same-origin"
 			}).then(x => x.json());
@@ -30,14 +30,12 @@ const ToolForm = ({tool, toolCategories, toolMakers}) => {
 		}
 	};
 
-	const initialValues = tool ?? {};
-
-	const manualURL = tool.manual ? path.join(`/uploads/`, tool.manual.path) : null;
-	const manualName = tool.manual ? tool.manual.originalName : null;
+	const manualURL = tool && tool.manual ? `/uploads/${tool.manual.path}` : null;
+	const manualName = tool && tool.manual ? tool.manual.originalName : null;
 
 	return (
 	<Box maxW={{ sm: '90%', md: '80%', lg: '50%' }} mx="auto" my='8'>
-		<Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+		<Formik initialValues={tool ?? {}} validationSchema={toolSchema} onSubmit={handleSubmit}>
         	{({ values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting }) => (
 		<Form>
 			<Stack spacing={3}>
@@ -68,8 +66,8 @@ const ToolForm = ({tool, toolCategories, toolMakers}) => {
 					</Select>
 				</FormControl>
 				<FormControl>
-					<Input type="file" name="manual" value={} onChange={e => setFieldValue('manual', e.currentTarget.files[0])} />
-					{manualURL && <a target="_blank" href={manualURL}>{values.manual ? values.manual.name : manualName}</a>}
+					<Input type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
+					{manualURL && <FormHelperText>Currently uploaded: <a target="_blank" href={manualURL}>{manualName}</a></FormHelperText>}
 				</FormControl>
 				<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">Submit</Button>
 			</Stack>

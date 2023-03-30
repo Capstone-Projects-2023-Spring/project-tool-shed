@@ -160,7 +160,7 @@ module.exports = (app, models) => {
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const {tool_id} = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id);
+		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -199,9 +199,10 @@ module.exports = (app, models) => {
 			});
 
 			await tool.setManual(fu);
+			res.json({tool: {...tool, manual: fu}});
+		} else {
+			res.json({tool});
 		}
-
-		res.json({tool});
 	})));
 
 	/* API: Edit tool */

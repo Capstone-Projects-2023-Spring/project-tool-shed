@@ -152,7 +152,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the tools details page when it is available
 				// For now, routing to messaging page to contact owner_id
-				window.open(`http://127.0.0.1:5000/inbox/${owner_id}`, '_blank');
+				window.open(`http://sharemytoolshed.com:5000/inbox/${owner_id}`, '_blank');
 			});
 
 			markers.push(marker);

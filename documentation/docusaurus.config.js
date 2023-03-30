@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
  * The URL or reference to your projects logo!
  * @type {string}
  */
-const logo = 'https://upload.wikimedia.org/wikipedia/commons/1/17/Temple_T_logo.svg';
+const logo = '/static/img/logo.png';
 
 const main_template_jira_scripts = () => {
     return [
@@ -116,12 +116,12 @@ const config = {
             position: 'left',
             label: 'Documentation',
           },{
-            to: '/tutorial/Intro',
+            to: '/tutorial/intro',
             label: 'Docusaurus Tutorial',
             position: 'left',
             activeBaseRegex: `/tutorial/`,
           },{
-            to: '/resources/Intro',
+            to: '/resources/intro',
             label: 'Resources',
             position: 'left',
             activeBaseRegex: `/resources/`,
@@ -146,8 +146,14 @@ const config = {
                 label: 'Documentation',
                 to: '/docs/intro',
               },
+              {
+                label: 'Resources',
+                to: '/resources/intro',
+              },
             ],
+            
           },
+          
           // {
           //   title: 'Community',
           //   items: [

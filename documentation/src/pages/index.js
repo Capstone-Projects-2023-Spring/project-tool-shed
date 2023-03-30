@@ -18,8 +18,8 @@ function HomepageHeader() {
             {/* TODO: Change me to your project's tutorial*/ }
           <Link
             className="button button--secondary button--lg"
-            to="http://sharemytoolshed.com:5000/">
-            Toolshed 🔧🏠
+            to="/tutorial/intro">
+            Docusaurus Tutorial - 5min ⏱️
           </Link>
         </div>
       </div>
@@ -32,8 +32,8 @@ export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-        title={`Tool Shed's Docusaurus`}
-        description="Docusarususususssssuuusss, it's really tough to spell on the first try">
+        title={`Hello from ${siteConfig.title}`}
+        description="Description will go into a meta tag in <head />">
         <HomepageHeader/>
         <main>
             <MDXContent>

@@ -143,7 +143,11 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "User not found." });
 		}
 
-		const tools = await Tool.findAll({ where: { owner_id: owner.id } });
+		const tools = await Tool.findAll({ where: { owner_id: owner.id }, include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: "tool_category"},
+			{model: ToolMaker, as: "tool_maker"}
+		]});
 
 		res.render('tool_list.html', { tools, user: owner });
 	}));
@@ -170,11 +174,14 @@ module.exports = (app, models) => {
 		if (tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
+
+		const listings = await Listing.findAll({where: {tool_id}});
 		
 		res.render('tool_form.html', {
 			toolCategories: await ToolCategory.findAll(),
 			toolMakers: await ToolMaker.findAll(),
-			tool
+			tool,
+			listings
 		});
 	})));
 
@@ -185,7 +192,10 @@ module.exports = (app, models) => {
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
-		});
+		}, {include: [
+			{model: ToolCategory, as: "category"},
+			{model: ToolMaker, as: "maker"}
+		]});
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -210,7 +220,11 @@ module.exports = (app, models) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
-		const tool = await models.Tool.findByPk(tool_id);
+		const tool = await models.Tool.findByPk(tool_id, {include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: "tool_category"},
+			{model: ToolMaker, as: "tool_maker"}
+		]});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -262,14 +276,15 @@ module.exports = (app, models) => {
 
 		await tool.destroy();
 	
-		res.json({});
+		res.json({status: 'ok'});
 	})));
 
 	/* API: Create a listing */
 	// refer to templates/_add_listing.html
-	app.post('/api/listings/new', asyncHandler(async (req, res) => {
+	app.post('/api/listings/new', asyncHandler(requiresAuth(async (req, res) => {
 		const { toolId, price,
 			billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
+		console.log(req.body, {toolId, price, billingInterval, maxBillingIntervals});
 		const l = await models.Listing.create({
 			price,
 			billingInterval,
@@ -278,11 +293,11 @@ module.exports = (app, models) => {
 		});
 	
 		res.json({listing: l});
-	}));
+	})));
 
 	/* API: Edit a listing */
 	// refer to templates/_edit_listing.html
-	app.post('/api/listing/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+	app.put('/api/listings/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
 		const { price, billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
 
@@ -306,7 +321,7 @@ module.exports = (app, models) => {
 	})));
 
 	/* API: Delete a listing */
-	app.delete('/api/listing/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
+	app.delete('/api/listings/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
 		
 		const listing = await models.Listing.findByPk(listing_id);

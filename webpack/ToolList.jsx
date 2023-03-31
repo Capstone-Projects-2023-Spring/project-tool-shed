@@ -21,30 +21,32 @@ const Tool = ({
         name, 
         description, 
         id, 
-        detailed = false, 
-        owner,
-        searchVector,
-        owner_id,
-        tool_category_id,
-        tool_maker_id
+        tool_category,
+        tool_maker
     }) => {
-        if (detailed) {
-            return "TODO";
-        }
-
 	const s = name + " " + description;
 
+	const onDelete = () => {
+		if (confirm(`Are you sure you want to delete ${name}?`)) { // TODO: something else
+			fetch(`/api/tools/${id}`, {
+				method: "DELETE"
+			}).then(() => {
+				window.location.reload();
+			});
+		} 
+	}
+
         return <div style={style}>
-            <h2>{name} <a href={`/user/${owner.id}`}>{owner}</a></h2>
-            <p>Description: {description}</p>
-            <p>Category ID: {tool_category_id}</p>
-            <p>Maker ID: {tool_maker_id}</p>
+            <h2>{name}</h2>
+	    <h3>Maker: {tool_maker.name}</h3>
+	    <h3>Category: {tool_category.name}</h3>
+            <p>{description}</p>
         
             <a href={`/tools/${id}/edit`}>
                 <button>Edit Tool</button>
             </a>
 
-            <a href={`/tools/${id}/delete`}>
+            <a onClick={onDelete}>
                 <button>Delete Tool</button>
             </a>
 	    <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`}><button>View on Youtube</button></a>

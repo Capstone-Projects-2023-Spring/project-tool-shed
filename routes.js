@@ -203,7 +203,8 @@ module.exports = (app, models) => {
 					owner_id: owner.id
 				},
 				include: [{
-					{model: User, as: "owner"}
+					model: models.User, // <-- corrected line
+					as: "owner"
 				}]
 			}]
 		});

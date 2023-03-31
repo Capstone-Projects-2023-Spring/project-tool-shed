@@ -18,8 +18,8 @@ function HomepageHeader() {
             {/* TODO: Change me to your project's tutorial*/ }
           <Link
             className="button button--secondary button--lg"
-            to="/tutorial/intro">
-            Docusaurus Tutorial - 5min ⏱️
+            to="http://sharemytoolshed.com:5000/">
+            Visit Toolshed 🔧🏠
           </Link>
         </div>
       </div>

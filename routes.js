@@ -135,7 +135,7 @@ module.exports = (app, models) => {
 	 */
 
 	/* PAGE: View a User's Tools */
-	app.get('/user/:user_id/tools', asyncHandler(async (req, res) => {
+	app.get('/user/:user_id/tools', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
 		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
 
@@ -145,12 +145,12 @@ module.exports = (app, models) => {
 
 		const tools = await Tool.findAll({ where: { owner_id: owner.id }, include: [
 			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: "tool_category"},
-			{model: ToolMaker, as: "tool_maker"}
+			{model: ToolCategory, as: "category"},
+			{model: ToolMaker, as: "maker"}
 		]});
 
 		res.render('tool_list.html', { tools, user: owner });
-	}));
+	})));
 
 	/* PAGE: Create a tool */
 	app.get('/tools/new', asyncHandler(requiresAuth(async (req, res) => {
@@ -184,6 +184,32 @@ module.exports = (app, models) => {
 			listings
 		});
 	})));
+
+	/* PAGE: View a User's Listings  */
+	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
+		const { user_id } = req.params;
+		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
+
+		if (!owner) {
+			return res.status(404).json({ error: "User not found." });
+		}
+
+		const listings = await models.Listing.findAll({
+			where: { active: true },
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				where: {
+					owner_id: owner.id
+				},
+				include: [{
+					{model: User, as: "owner"}
+				}]
+			}]
+		});
+
+		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
+	}));
 
 	/* API: Create tools */
 	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
@@ -222,8 +248,8 @@ module.exports = (app, models) => {
 
 		const tool = await models.Tool.findByPk(tool_id, {include: [
 			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: "tool_category"},
-			{model: ToolMaker, as: "tool_maker"}
+			{model: ToolCategory, as: "category"},
+			{model: ToolMaker, as: "maker"}
 		]});
 
 		if (!tool) {
@@ -241,6 +267,8 @@ module.exports = (app, models) => {
 		tool.tool_category_id = tool_category_id;
 		tool.tool_maker_id = tool_maker_id;
 		await tool.save();
+
+		// TODO: load the new categories and makers
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -341,55 +369,8 @@ module.exports = (app, models) => {
 		res.json({status: 'ok'});
 	})));
 
-
-	/*
-	 * Edit a Listing
-	 */
-
-	/*app.get('/listings/:listing_id/edit', asyncHandler(requiresAuth(async (req, res) => {
-		const { listing_id } = req.params;
-
-		const listing = await models.Listing.findByPk(listing_id);
-
-		if (!listing) {
-			return res.status(404).json({ error: "Listing not found." });
-		}
-
-		res.render('_edit_listing.html', { listing });
-	})));*/
-
-
-
-	/*
-	 * View a User's Listings 
-	*/
-
-	app.get('/user/:user_id/listings', asyncHandler(async (req, res) => {
-		const { user_id } = req.params;
-		const owner = user_id === 'me' ? req.user : await User.findByPk(user_id);
-
-		if (!owner) {
-			return res.status(404).json({ error: "User not found." });
-		}
-
-		const listings = await models.Listing.findAll({
-			where: { active: true },
-			include: [{
-				model: models.Tool,
-				as: 'tool',
-				where: {
-					owner_id: owner.id
-				}
-			}]
-		});
-
-		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
-	}));
-
-	/*
-	 * Listings
-	 */
-	app.get('/listings/search.json', asyncHandler(async (req, res) => {
+	/* API: search listings */
+	app.get('/api/listings/search.json', asyncHandler(async (req, res) => {
 		const {
 			searchQuery, // string
 			searchRadius, // kilometers

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom';
 import { ChakraProvider, Box, Button, FormControl, FormHelperText,
 	 FormErrorMessage, FormLabel, Input, Stack, Select, Card, CardHeader,
 	 CardBody, Heading, Summary, Text, StackDivider, Divider } from '@chakra-ui/react';
@@ -15,7 +15,6 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 	const [listing, setListing] = useState(_listing);
 	const isEdit = !!listing.id;
 	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
-		console.log("SUBMITTING", values);
 		setSubmitting(true);
 		try {
 			const {listing: l} = await fetch(isEdit ? `/api/listings/${listing.id}` : '/api/listings/new', {
@@ -26,8 +25,6 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 				body: JSON.stringify({...values, toolId}),
 				credentials: "same-origin"
 			}).then(x => x.json());
-
-			console.log(l);
 
 			setManualFile(null);
 			setListing(l);
@@ -45,7 +42,7 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 
 	return (
       		<Card p="5">
-	<Formik initialValues={listing ?? {}} onSubmit={handleSubmit}>
+	<Formik enableReinitialize initialValues={listing ?? {}} onSubmit={handleSubmit}>
         {({ values, errors, touched, setFieldValue, handleChange, handleBlur, handleSubmit: hs, isSubmitting }) => (
 		<Form>
 			<FormControl isInvalid={errors.active}>
@@ -80,6 +77,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 	const isEdit = !!tool;
 	const [manualFile, setManualFile] = useState();
 	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
+		setSubmitting(true);
 		let formData = new FormData();
 		for (const [k, v] of Object.entries(values)) {
 			formData.append(k, v);
@@ -93,15 +91,15 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				body: formData,
 				credentials: "same-origin"
 			}).then(x => x.json());
-
-			console.log(t);
-
-			setManualFile(null);
-			setTool(t);
-			resetForm(t);
 			if (!isEdit) {
 				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
 			}
+
+			setTool(t);
+			setManualFile(null);
+
+			setSubmitting(false);
+			resetForm(t);
 		} catch (error) {
 			setSubmitting(false);
 			setErrors({ submit: error.message });
@@ -128,9 +126,9 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			<CardHeader>
 			<Heading size="md">Tool Information</Heading>
 			<br />
-		<Formik initialValues={tool ?? {}} validationSchema={toolSchema} onSubmit={handleSubmit}>
+		<Formik enableReinitialize initialValues={tool ?? {}} validationSchema={toolSchema} onSubmit={handleSubmit}>
         	{({ values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting }) => (
-
+			<Form>
 			<Stack spacing={3}>
 				<FormControl isInvalid={errors.name}>
 					<FormLabel>Name</FormLabel>
@@ -167,6 +165,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				</FormControl>
 				<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 			</Stack>
+			</Form>
 		)}
 		</Formik>
 			</CardHeader>
@@ -184,7 +183,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 )};
 
 const root = document.getElementById('root');
-ReactDOM.createRoot(root).render(
+createRoot(root).render(
   <ChakraProvider>
       <ToolForm {...window._toolFormProps} />
   </ChakraProvider>

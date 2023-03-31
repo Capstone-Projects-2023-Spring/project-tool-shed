@@ -21,8 +21,8 @@ const Tool = ({
         name, 
         description, 
         id, 
-        tool_category,
-        tool_maker
+        category,
+        maker
     }) => {
 	const s = name + " " + description;
 
@@ -38,8 +38,8 @@ const Tool = ({
 
         return <div style={style}>
             <h2>{name}</h2>
-	    <h3>Maker: {tool_maker.name}</h3>
-	    <h3>Category: {tool_category.name}</h3>
+	    {maker && <h3>Maker: {maker.name}</h3>}
+	    {category && <h3>Category: {category.name}</h3>}
             <p>{description}</p>
         
             <a href={`/tools/${id}/edit`}>

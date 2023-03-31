@@ -109,6 +109,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
 				const name = res.tool.name;
 				const description = res.tool.description;
+				const listing_id = res.listing.id;
 				const owner_id = res.tool.owner_id;
 				const first_name = res.tool.owner.first_name;
 				const last_name = res.tool.owner.last_name;
@@ -152,7 +153,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the tools details page when it is available
 				// For now, routing to messaging page to contact owner_id
-				window.open(`http://sharemytoolshed.com:5000/inbox/${owner_id}`, '_blank');
+				window.open(`http://sharemytoolshed.com:5000/listings/${listing_id}/details`);
 			});
 
 			markers.push(marker);

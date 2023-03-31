@@ -438,20 +438,16 @@ module.exports = (app, models) => {
 	app.get('/listings/:listing_id/details', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
 
-		const listing = await models.Listing.findByPk(listing_id);
-		// const listings = await models.Listing.findAll({
-		// 	where: { active: true },
-		// 	include: [{
-		// 		model: models.Tool,
-		// 		as: 'tool',
-		// 		where: {
-		// 			listing_id: listing.id
-		// 		},
-		// 	}]
-		// });
-		// if (!listing) {
-		// 	return res.status(404).json({ error: "Listing not found." });
-		// }
+		const listing = await models.Listing.findByPk(listing_id, {
+			where: { active: true },
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+			}]
+		});
+		if (!listing) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
 
 		// const props = {
 		// 	//owner: listing.owner,

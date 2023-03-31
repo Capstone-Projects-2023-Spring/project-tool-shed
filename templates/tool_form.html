@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Tool</title>
+{% endblock %}
+{% block body %}
+
+<div id="root"></div>
+
+<script type="application/javascript">
+	window._toolFormProps = {
+		tool: {% if tool %}{{tool|json}}{% else %}undefined{% endif %},
+		toolCategories: {{toolCategories|json}},
+		toolMakers: {{toolMakers|json}},
+		listings: {{listings|json}}
+	};
+</script>
+
+<script type="application/javascript" src="/webpack/ToolForm.js"></script>
+
+{% endblock %}

@@ -7,6 +7,7 @@ const net = require('net');
 const path = require('path');
 const {DataTypes, QueryTypes} = require('sequelize');
 const bcrypt = require('bcrypt');
+const {billingIntervals} = require('./constants');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const genModels = sequelize => {
@@ -303,7 +304,7 @@ const genModels = sequelize => {
 			allowNull: false
 		},
 		billingInterval: {
-			type: DataTypes.ENUM('hourly', 'daily', 'weekly', 'forever'),
+			type: DataTypes.ENUM(...billingIntervals),
 			defaultValue: 'daily'
 		},
 		maxBillingIntervals: {
@@ -405,13 +406,17 @@ const genModels = sequelize => {
 	/**
 	 * @class FileUpload
  	 * @classdescription Represents a file that's uploaded.
+	 * @property {string} path Path of file, relative to uploads directory
+	 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
+	 * @property {integer} size Size of the file in bytes
+	 * @property {string} mimeType The mimetype of the file
+	 * @property {integer} uploader_id The ID of the uploader
 	 */
 	const FileUpload = sequelize.define('FileUpload', {
 		path: {type: DataTypes.STRING, allowNull: false},
 		originalName: {type: DataTypes.STRING, allowNull: true},
 		size: {type: DataTypes.INTEGER, validate: {min: 0}},
 		mimeType: {type: DataTypes.STRING},
-		storedIn: DataTypes.STRING
 	}, {paranoid: true, tableName: 'file_upload'});
 
 	FileUpload.prototype.getURL = function() {return path.join('/uploads/', path.relative(this.storedIn, this.path));};

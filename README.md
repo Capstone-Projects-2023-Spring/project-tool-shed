@@ -1,7 +1,7 @@
 [![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-f4981d0f882b2a3f0472912d15f9806d57e124e0fc890972558857b51b24a6f9.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=9939989)
 <div align="center">
 
-# Toolshed 🔧🏠
+# Toolshed
 [![Report Issue on Jira](https://img.shields.io/badge/Report%20Issues-Jira-0052CC?style=flat&logo=jira-software)](https://temple-cis-projects-in-cs.atlassian.net/jira/software/c/projects/DT/issues)
 [![Deploy Docs](https://github.com/Capstone-Projects-2023-Spring/project-tool-shed/actions/workflows/deploy.yml/badge.svg)](https://github.com/Capstone-Projects-2023-Spring/project-tool-shed/actions/workflows/deploy.yml)
 [![Documentation Website Link](https://img.shields.io/badge/-Documentation%20Website-brightgreen)](https://capstone-projects-2023-spring.github.io/project-tool-shed/)
@@ -16,14 +16,7 @@ Simply visit this link:<a href="http://sharemytoolshed.com:5000/"> Toolshed Webs
 ## Running Locally
 
 	npm install
-	npm run local 
-    
-    OR 
-
-    npm install
-    npm run db
-    npm run webpack
-    npm run web
+	npm run local
 
 ## Code Tree
 

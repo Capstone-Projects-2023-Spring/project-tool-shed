@@ -43,7 +43,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 		// Remove any leading or trailing '&' symbols
 		newSearchQuery = newSearchQuery.replace(/^&+|&+$/g, '');
 
-		fetch(`/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
+		fetch(`/api/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
 			.then(x => x.json())
 			.then(x => setResults(x.results));
 	}, [coords, searchQuery, searchRadius, selectedCategory]);

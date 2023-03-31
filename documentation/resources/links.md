@@ -1,10 +1,4 @@
----
-sidebar_position: 1
----
-
 # Links & Resources
-
-Below are a list of websites that provide additional documentation and references
 
 ## Jira Board & Important Sites
 - <a href="https://temple-cis-projects-in-cs.atlassian.net/jira/software/c/projects/TS/boards/31/roadmap">Jira Board </a>

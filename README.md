@@ -6,7 +6,7 @@
 [![Deploy Docs](https://github.com/Capstone-Projects-2023-Spring/project-tool-shed/actions/workflows/deploy.yml/badge.svg)](https://github.com/Capstone-Projects-2023-Spring/project-tool-shed/actions/workflows/deploy.yml)
 [![Documentation Website Link](https://img.shields.io/badge/-Documentation%20Website-brightgreen)](https://capstone-projects-2023-spring.github.io/project-tool-shed/)
 
-<span style="font-size: 30px;"><a href="http://sharemytoolshed.com:5000/">Toolshed Website  </a></span>
+<a href="http://sharemytoolshed.com:5000/">Toolshed Website  </a>
 
 </div>
 

@@ -17,7 +17,7 @@ const main_template_jira_scripts = () => {
 }
 
 // You can change the title here. The default is the name of the repository.
-const title = 'Tool Shed';
+const title = 'Tool Shed'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -114,13 +114,14 @@ const config = {
             position: 'left',
             label: 'Documentation',
           },{
-            to: '/tutorial/intro',
+            to: '/tutorial/Intro',
             label: 'Docusaurus Tutorial',
             position: 'left',
             activeBaseRegex: `/tutorial/`,
-          },{
+          },
+          {
             to: '/resources/Links',
-            label: 'Resources',
+            label: 'Links & Resources',
             position: 'left',
             activeBaseRegex: `/resources/`,
           },
@@ -145,11 +146,10 @@ const config = {
                 to: '/docs/intro',
               },
               {
-                label: 'Resources',
-                to: '/resources/links',
+                label: 'Links & Resources',
+                to: '/resources/Links',
               },
             ],
-            
           },
           
           // {
@@ -201,29 +201,29 @@ const config = {
       },
 
     }),
-    plugins: [
-      [
-        '@docusaurus/plugin-content-docs',
-        {
-          id: 'resources',
-          path: 'resources',
-          routeBasePath: 'resources',
-          sidebarPath: require.resolve('./sidebars.js'),
-          // ... other options
-        },
-      ],
-      [
-        '@docusaurus/plugin-content-docs',
-        {
-          id: 'tutorial',
-          path: 'tutorial',
-          routeBasePath: 'tutorial',
-          sidebarPath: require.resolve('./sidebars.js'),
-          // ... other options
-        },
-  
-      ],
-      [
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'tutorial',
+        path: 'tutorial',
+        routeBasePath: 'tutorial',
+        sidebarPath: require.resolve('./sidebars.js'),
+        // ... other options
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'resources',
+        path: 'resources',
+        routeBasePath: 'resources',
+        sidebarPath: require.resolve('./sidebars.js'),
+        // ... other options
+      },
+
+    ],
+    [
       "docusaurus2-dotenv-2",
       {
         systemvars: true,

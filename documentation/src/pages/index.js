@@ -19,7 +19,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="http://sharemytoolshed.com:5000/">
-            Toolshed 🔧🏠
+            Visit Toolshed 🔧🏠
           </Link>
         </div>
       </div>

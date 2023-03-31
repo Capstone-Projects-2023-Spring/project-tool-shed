@@ -13,8 +13,6 @@
 
 - <a href="https://tuprd-my.sharepoint.com/:w:/g/personal/tup29794_temple_edu/EbYVaONL_QdJipU69jrjI2wBt850YCfEt7FOQse9aRxuAw?e=5UfAhG">User Stories </a>
 
-- <a href=" https://tuprd-my.sharepoint.com/:w:/g/personal/tup29794_temple_edu/EdUYRX1xzVZEoT3cZnhO6FUBSnYUGtcBj5ryeN88rGAdLQ?e=gJK9cF">System Block Diagram </a>
-
 - <a href="https://tuprd-my.sharepoint.com/:p:/g/personal/tup29794_temple_edu/ETAOc21Tyn9LndqQF6TPln8BaH2xWTNwnQzfLTfKpBECRQ?e=sxLhbC">Group Presentation </a>
 
 - <a href="https://tuprd-my.sharepoint.com/:w:/g/personal/tup29794_temple_edu/ESfmjSSF1wtEq7sCNzCEOK8BNqZcxzADkj3DbIkvQSHXMQ?e=3nb09V">Software Development Plan </a>

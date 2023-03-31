@@ -23,7 +23,7 @@ const title = 'Tool Shed'
 const config = {
   /*TODO: Change to your project's title and tagline*/
   title: title,
-  tagline: 'Owls are cool',
+  tagline: 'A one stop shop to find tools available to rent near you',
   /*Unless you move this website to a seperate repo don't change url and baseurl.*/
   url: 'https://'+process.env.ORG_NAME+'.github.io/',
   baseUrl: '/'+process.env.PROJECT_NAME+'/',
@@ -118,9 +118,10 @@ const config = {
             label: 'Docusaurus Tutorial',
             position: 'left',
             activeBaseRegex: `/tutorial/`,
-          },{
-            to: '/resources/intro',
-            label: 'Resources',
+          },
+          {
+            to: '/resources/Links',
+            label: 'Links & Resources',
             position: 'left',
             activeBaseRegex: `/resources/`,
           },
@@ -145,11 +146,12 @@ const config = {
                 to: '/docs/intro',
               },
               {
-                label: 'Resources',
-                to: '/resources/intro',
+                label: 'Links & Resources',
+                to: '/resources/Links',
               },
             ],
           },
+          
           // {
           //   title: 'Community',
           //   items: [

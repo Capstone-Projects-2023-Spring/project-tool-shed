@@ -14,7 +14,8 @@ module.exports = {
 		NewUserForm: path.resolve(__dirname, 'webpack/NewUserForm.jsx'),
 		UserMessaging: path.resolve(__dirname, 'webpack/UserMessaging.jsx'),
 		Inbox: path.resolve(__dirname, 'webpack/Inbox.jsx'),
-		ToolList: path.resolve(__dirname, 'webpack/ToolList.jsx')
+		ToolList: path.resolve(__dirname, 'webpack/ToolList.jsx'),
+		ToolForm: path.resolve(__dirname, 'webpack/ToolForm.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

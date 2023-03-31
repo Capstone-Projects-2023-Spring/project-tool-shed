@@ -5,5 +5,6 @@ module.exports = {
 	userWithAddressSchema: require('./userWithAddressSchema'),
 	toolSchema: require('./tool'),
 	messageSchema: require('./message'),
-	meOrID: require('./meOrID')
+	meOrID: require('./meOrID'),
+	listingSchema: require('./listing')
 }

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+
 
 const style = {
   backgroundColor: "#F1F1F1",
@@ -15,31 +16,28 @@ const Listing = ({
   maxBillingIntervals,
   tool,
 }) => {
-  return <div style={style}>
-            <h2>
+  return (
+    <div style={style}>
+      <h2>
         <p>{tool.name} {owner}</p>
       </h2>
       <p>Tool Description: {tool.description}</p>
       <p>Price & Rate : ${price} {billingInterval}</p>
       <p>Available For: {maxBillingIntervals} units</p>
 
-      <a href={`/inbox/${tool.owner_id}`}> 
-          <button>Contact Owner</button> 
+      <a href={`/inbox/${tool.owner_id}`}>
+        <button>Contact Owner</button>
       </a>
-        </div>
+    </div>
+  );
 };
 
-const ListingList = ({ listings }) => {
+const ListingDetails = ({ listings }) => {
   return <div>
     {listings.map(l => <Listing key={l.id} {...l} />)}
   </div>;
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-	<ListingList listings={window._listings} />
-);
-
-// ReactDOM.render(
-//   <ListingDisplay listing={listing} />,
-//   document.getElementById('root')
-// );
+// use ReactDOM.createRoot to render the component
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<ListingDetails listings = {window._listings}/>);

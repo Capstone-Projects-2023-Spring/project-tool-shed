@@ -435,8 +435,11 @@ module.exports = (app, models) => {
 	/*
 		Listing Details Page
 	*/
-	app.get('/listings/:listing_id/details', asyncHandler(requiresAuth(async (req, res) => {
+	app.get('/listing/:listing_id/details', asyncHandler(requiresAuth(async (req, res) => {
+		console.log("hello");
+		
 		const { listing_id } = req.params;
+		console.log("hello");
 
 		const listing = await models.Listing.findByPk(listing_id, {
 			where: { active: true },
@@ -445,24 +448,21 @@ module.exports = (app, models) => {
 				as: 'tool',
 			}]
 		});
+		console.log("hello");
+
 		if (!listing) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
 
-		// const props = {
-		// 	//owner: listing.owner,
-		// 	price: listing.price,
-		// 	billingInterval: listing.billingInterval,
-		// 	maxBillingIntervals: listing.maxBillingIntervals,
-		// 	tool: {
-		// 	  name: listing.toolName,
-		// 	  description: listing.toolDescription,
-		// 	  owner_id: listing.owner_id
-		// 	}
-		//   };
+		console.log("hello");
+		
 
+		// res.json({listing});
 		// res.json(`listing`, {props});
-		res.json({listing});
+		// res.json({listing_id, listing});
+		console.log("hello");
+		res.render('listing_detail.html');
+		console.log("hello");
 	})));
 
 	/*

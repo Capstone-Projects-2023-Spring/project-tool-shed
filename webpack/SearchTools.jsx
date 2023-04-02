@@ -105,14 +105,15 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 		if (!map) return;
 
 		let markers = [];
-		for (const res of results) {
-			const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
-			const name = res.tool.name;
-			const description = res.tool.description;
-			const listing_id = res.id;
-			const first_name = res.tool.owner.first_name;
-			const last_name = res.tool.owner.last_name;
-			const position = { lat: geocoded_lat, lng: geocoded_lon };
+			for (const res of results) {
+				const { geocoded_lat, geocoded_lon } = res.tool.owner.address;
+				const name = res.tool.name;
+				const description = res.tool.description;
+				const listing_id = res.id;
+				const position = { lat: geocoded_lat, lng: geocoded_lon };
+				const owner_id = res.tool.owner_id;
+				const first_name = res.tool.owner.first_name;
+				const last_name = res.tool.owner.last_name;
 
 			// create a custom marker icon
 			const icon = {
@@ -133,7 +134,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				content: `<div style="font-size: 14px; line-height: 1.5; width: 250px;">
 							<h3 style="margin: 0 0 10px;">${name}</h3>
 							<p style="margin: 0 0 5px;">${description}</p>
-							<div style="display: block; margin-top: 5px;">&#128295; Click to get Details ${first_name} ${last_name}! &#128295;</div>
+							<div style="display: block; margin-top: 5px;">&#128295; Click to see details &#128295;</div>
 						  </div>`
 			});
 
@@ -152,8 +153,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the tools details page when it is available
 				// For now, routing to messaging page to contact owner_id
-				window.open(`http://sharemytoolshed.com:5000/listing/${listing_id}/details`);
-				console.log(5);
+				window.open(`http://localhost:5000/listing/${listing_id}/details`);
 			});
 
 			markers.push(marker);
@@ -217,5 +217,4 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 };
 
 export default SearchTools;
-
 

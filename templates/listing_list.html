@@ -11,7 +11,7 @@
 <script src="/public/listing.jsx" type="text/babel"></script>
 
 <script type="text/babel">
-	const ListingsList = ({ listings, tool }) => {
+	const ListingsList = ({ listings }) => {
 		return <div>
 			{listings.map(l => <Listing key={l.id} {...l} />)}
 		</div>;

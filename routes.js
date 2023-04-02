@@ -205,7 +205,7 @@ module.exports = (app, models) => {
 					owner_id: owner.id
 				},
 				include: [{
-					model: User,
+					model: models.User, // <-- corrected line
 					as: "owner"
 				}]
 			}]

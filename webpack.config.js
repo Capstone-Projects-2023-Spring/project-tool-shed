@@ -16,6 +16,7 @@ module.exports = {
 		Inbox: path.resolve(__dirname, 'webpack/Inbox.jsx'),
 		ToolList: path.resolve(__dirname, 'webpack/ToolList.jsx'),
 		ToolForm: path.resolve(__dirname, 'webpack/ToolForm.jsx'),
+		NavBar: path.resolve(__dirname, 'webpack/NavBar.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

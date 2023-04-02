@@ -41,6 +41,7 @@
     "pg-hstore": "^2.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0",
     "react-router-dom": "^6.9.0",
     "sequelize": "^6.29.3",
     "yup": "^1.0.0"

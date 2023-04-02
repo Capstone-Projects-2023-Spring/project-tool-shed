@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block header %}
-//<title>Listing Details</title>
+<title>Listing Details</title>
 {% endblock %}
 
 {% block body %}
@@ -10,9 +10,6 @@
 
 <script type="application/javascript">
     window._listings = {{ listings | json}};
-        //listing: { listings| json},
-        //recommendation: { recommendation | json }
-    //};
 </script>
 
 <script type="application/javascript" src="/webpack/ListingDetails.js"></script>

@@ -211,7 +211,7 @@ module.exports = (app, models) => {
 			}]
 		});
 
-		res.render('listing_list.html', { listings, user: owner});
+		res.render('listing_list.html', { listings, user: owner });
 	}));
 
 	/* API: Create tools */
@@ -383,8 +383,7 @@ module.exports = (app, models) => {
 			searchRadius, // kilometers
 			userLat, userLon, // degrees
 			useUserAddress, // boolean
-			selectedCategory, // string from dropdown menu // find out why this is undefined
-			minRating //
+			selectedCategory // string from dropdown menu // find out why this is undefined
 		} = await searchListingsSchema.validate(req.query);
 
 		let lat = userLat;
@@ -432,10 +431,6 @@ module.exports = (app, models) => {
 						},
 						order: sequelize.col('distance'),
 						where: sequelize.literal(`${distanceKm} < ${searchRadius}`)
-							// [Op.and]: [
-							// 	sequelize.literal(`${distanceKm} < ${searchRadius}`),
-							// 	minRating ? sequelize.literal(`EXISTS (SELECT 1 FROM reviews WHERE reviews.user_id = user.id GROUP BY reviews.tool_id HAVING AVG(rating) >= ${minRating})`) : {}
-							// ]
 					}]
 				}]
 			}]
@@ -467,28 +462,7 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "Listing not found." });
 		}
 
-		// const recommendation = await models.Listing.findAll({
-		// 	where: {
-		// 		active: true
-		// 	},
-		// 	include:[{
-		// 		model: models.Tool,
-		// 		as:'tool',
-		// 		include:[{
-		// 			model: models.ToolCategory,
-		// 			as: 'category',
-		// 			where: {
-		// 				tool_category_id: listing.tool.category.id
-		// 			},
-		// 		}]
-		// 	}]
-		// });
-
-		res.render('listing_details.html', {listings});
-		console.log("sent the listing");
-		//res.json({listing});
-		//res.json({listing, recommendation});
-		// res.render('listing_detail.html', {listing, recommendation});
+		res.render('listing_details.html', { listings });
 	}));
 
 	/*

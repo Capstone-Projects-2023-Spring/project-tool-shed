@@ -10,18 +10,18 @@
 <body>
     <!--Navigation bar-->
     <div id="nav"></div>
-
-    {% block body %}
-
-    {% endblock %}
     <script src="/node_modules/react/umd/react.development.js"></script>
     <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
     <script src="/node_modules/babel-standalone/babel.min.js"></script>
-
+    {% block body %}
     <script type="application/javascript">
         const _user = {{ authUser|json }};
     </script>
     <script src="/webpack/NavBar.js" type="application/javascript"></script>
+    {% endblock %}
+    
+
+    
 </body>
 
 

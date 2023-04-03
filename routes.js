@@ -143,11 +143,13 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "User not found." });
 		}
 
-		const tools = await Tool.findAll({ where: { owner_id: owner.id }, include: [
-			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: "category"},
-			{model: ToolMaker, as: "maker"}
-		]});
+		const tools = await Tool.findAll({
+			where: { owner_id: owner.id }, include: [
+				{ model: FileUpload, as: 'manual' },
+				{ model: ToolCategory, as: "category" },
+				{ model: ToolMaker, as: "maker" }
+			]
+		});
 
 		res.render('tool_list.html', { tools, user: owner });
 	})));
@@ -162,9 +164,9 @@ module.exports = (app, models) => {
 
 	/* PAGE: Edit a tool */
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
-		const {tool_id} = req.params;
+		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, {include: [{model: FileUpload, as: 'manual'}]});
+		const tool = await models.Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -175,8 +177,8 @@ module.exports = (app, models) => {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
 
-		const listings = await Listing.findAll({where: {tool_id}});
-		
+		const listings = await Listing.findAll({ where: { tool_id } });
+
 		res.render('tool_form.html', {
 			toolCategories: await ToolCategory.findAll(),
 			toolMakers: await ToolMaker.findAll(),
@@ -209,7 +211,7 @@ module.exports = (app, models) => {
 			}]
 		});
 
-		res.render('listing_list.html', { listings, user: owner, tool: listings.map(l => l.tool) });
+		res.render('listing_list.html', { listings, user: owner });
 	}));
 
 	/* API: Create tools */
@@ -219,10 +221,12 @@ module.exports = (app, models) => {
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
-		}, {include: [
-			{model: ToolCategory, as: "category"},
-			{model: ToolMaker, as: "maker"}
-		]});
+		}, {
+			include: [
+				{ model: ToolCategory, as: "category" },
+				{ model: ToolMaker, as: "maker" }
+			]
+		});
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -236,9 +240,9 @@ module.exports = (app, models) => {
 			});
 
 			await tool.setManual(fu);
-			res.json({tool: {...tool, manual: fu}});
+			res.json({ tool: { ...tool, manual: fu } });
 		} else {
-			res.json({tool});
+			res.json({ tool });
 		}
 	})));
 
@@ -247,11 +251,13 @@ module.exports = (app, models) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
-		const tool = await models.Tool.findByPk(tool_id, {include: [
-			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: "category"},
-			{model: ToolMaker, as: "maker"}
-		]});
+		const tool = await models.Tool.findByPk(tool_id, {
+			include: [
+				{ model: FileUpload, as: 'manual' },
+				{ model: ToolCategory, as: "category" },
+				{ model: ToolMaker, as: "maker" }
+			]
+		});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -285,7 +291,7 @@ module.exports = (app, models) => {
 			await tool.setManual(fu);
 		}
 
-		res.json({tool});
+		res.json({ tool });
 	})));
 
 	/* API: Delete a tool */
@@ -304,8 +310,8 @@ module.exports = (app, models) => {
 		}
 
 		await tool.destroy();
-	
-		res.json({status: 'ok'});
+
+		res.json({ status: 'ok' });
 	})));
 
 	/* API: Create a listing */
@@ -313,15 +319,15 @@ module.exports = (app, models) => {
 	app.post('/api/listings/new', asyncHandler(requiresAuth(async (req, res) => {
 		const { toolId, price,
 			billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
-		console.log(req.body, {toolId, price, billingInterval, maxBillingIntervals});
+		console.log(req.body, { toolId, price, billingInterval, maxBillingIntervals });
 		const l = await models.Listing.create({
 			price,
 			billingInterval,
 			maxBillingIntervals,
 			tool_id: toolId
 		});
-	
-		res.json({listing: l});
+
+		res.json({ listing: l });
 	})));
 
 	/* API: Edit a listing */
@@ -346,13 +352,13 @@ module.exports = (app, models) => {
 		listing.maxBillingIntervals = maxBillingIntervals;
 		await listing.save();
 
-		res.json({listing});
+		res.json({ listing });
 	})));
 
 	/* API: Delete a listing */
 	app.delete('/api/listings/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
-		
+
 		const listing = await models.Listing.findByPk(listing_id);
 
 		if (!listing) {
@@ -364,10 +370,10 @@ module.exports = (app, models) => {
 		}
 
 		// TODO: check if the listing is active
-		
+
 		await listing.destroy();
 
-		res.json({status: 'ok'});
+		res.json({ status: 'ok' });
 	})));
 
 	/* API: search listings */
@@ -431,14 +437,41 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+	/*
+		Listing Details Page
+	*/
+	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
+		console.log("getting");
+		const { listing_id } = req.params;
+
+		const listings = await models.Listing.findOne({
+			where: {
+				id: listing_id,
+				active: true
+			},
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				include: [{
+					model: models.ToolCategory,
+					as: 'category'
+				}]
+			}]
+		});
+		if (!listings) {
+			return res.status(404).json({ error: "Listing not found." });
+		}
+
+		res.render('listing_details.html', { listings });
+	}));
 
 	/*
 	 * Settings Pages
 	 */
 
-	app.get('/account', asyncHandler(async (req, res) => {
-		res.render('account.html', { error: null });
-	}));
+	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
+        res.render('account.html', {});
+    })));
 
 
 	/*
@@ -497,7 +530,7 @@ module.exports = (app, models) => {
 
 		// templates/inbox.html renders something like what you see when you first open
 		// your texting/SMS app - a list of conversations. This is represented by the `conversations` variable
-		res.render('inbox.html', {conversations, senderId}); // auth'd user is authUser
+		res.render('inbox.html', { conversations, senderId }); // auth'd user is authUser
 	})));
 
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {

@@ -13,10 +13,12 @@ module.exports = {
 		about: path.resolve(__dirname, 'webpack/about.jsx'),
 		NewUserForm: path.resolve(__dirname, 'webpack/NewUserForm.jsx'),
 		UserMessaging: path.resolve(__dirname, 'webpack/UserMessaging.jsx'),
+		account: path.resolve(__dirname, 'webpack/account.jsx'),
 		Inbox: path.resolve(__dirname, 'webpack/Inbox.jsx'),
 		ToolList: path.resolve(__dirname, 'webpack/ToolList.jsx'),
 		ToolForm: path.resolve(__dirname, 'webpack/ToolForm.jsx'),
 		NavBar: path.resolve(__dirname, 'webpack/NavBar.jsx'),
+		ListingDetails: path.resolve(__dirname, 'webpack/ListingDetails.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

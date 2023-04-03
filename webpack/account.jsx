@@ -22,6 +22,9 @@ function Account() {
             <strong>First Name:</strong> {authUser.first_name}<br />
             <strong>Last Name:</strong> {authUser.last_name}<br />
             <strong>Email:</strong> {authUser.email}<br />
+            <strong>ID:</strong> {authUser.id}<br />
+            <strong>Address ID:</strong> {authUser.address_id}<br />
+
             <br />
             To update your account information, you can click here to go directly to your account page and make any necessary changes:<br />
             <a href="http://127.0.0.1:5000/user/me" style={{ color: 'blue', fontWeight: 'bold' }}>Edit Account Information</a>.
@@ -29,13 +32,14 @@ function Account() {
         </>
       );
       break;
-
-
     case 'View your Toolshed':
       content = (
         <>
           <Text>
             Welcome to your Toolshed!<br />
+            <br />
+            To view your Toolshed, you can click here to go directly to your ToolShed page and make any necessary changes:<br />
+            <a href="http://127.0.0.1:5000/user/me/tools" style={{ color: 'blue', fontWeight: 'bold' }}>View your ToolShed!</a>.
           </Text>
         </>
       );

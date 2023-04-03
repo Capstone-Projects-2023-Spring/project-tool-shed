@@ -2,9 +2,6 @@
 
 {% block body %}
 
-<div>
-  <h1>Welcome, {{ authUser.first_name }} {{ authUser.last_name }}!</h1>
-</div>
 <script type="application/javascript">
   window._user = {{ authUser|json }};
 </script>

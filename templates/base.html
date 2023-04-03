@@ -2,27 +2,65 @@
 <html>
 
 <head>
-    {% block header %}
 	<title>ToolShed | Share your tools!</title>
-    {% endblock %}
+	<style>
+		/* Flexbox styling for header, body, and footer */
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			margin: 0;
+		}
+
+		header {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 2em;
+			background-color: #f2f2f2;
+            z-index: 9999;
+		}
+
+		main {
+			flex: 1;
+			padding: 1em;
+		}
+
+		footer {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 1em;
+			background-color: #f2f2f2;
+		}
+	</style>
+	{% block header %}
+	<!--Header content-->
+	{% endblock %}
 </head>
 
 <body>
-    <!--Navigation bar-->
-    <div id="nav"></div>
-    <script src="/node_modules/react/umd/react.development.js"></script>
-    <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
-    <script src="/node_modules/babel-standalone/babel.min.js"></script>
-    {% block body %}
-    <script type="application/javascript">
-        const _user = {{ authUser|json }};
-    </script>
-    <script src="/webpack/NavBar.js" type="application/javascript"></script>
-    {% endblock %}
-    
-
-    
+	<!--Navigation bar-->
+	<header>
+		<div id="nav"></div>
+		<script type="application/javascript">
+			const _user = {{ authUser|json }};
+		</script>
+		<script src="/webpack/NavBar.js" type="application/javascript"></script>
+		<script src="/node_modules/react/umd/react.development.js"></script>
+		<script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+		<script src="/node_modules/babel-standalone/babel.min.js"></script>
+	</header>
+	<main>
+		{% block body %}
+		<!--Body content-->
+		{% endblock %}
+	</main>
+	<footer>
+		<!--Footer content-->
+	</footer>
 </body>
-
 
 </html>

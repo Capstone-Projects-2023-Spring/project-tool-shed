@@ -22,14 +22,14 @@ const NavBar = ({ authUser }) => {
   } else {
     navItemsRight["/user/login"] = "Log In";
     navItemsRight["/user/new"] = "Sign Up";
-    navItemsLeft["/about"] = "About";
+    
   }
 
   return (
     <Flex>
       <Box bg="blue.500" position="fixed" top="0" left="0" w="100%" p="4">
         <Flex alignItems="center" justify="space-between">
-          <Flex alignItems="center" justify="space-between" w="30%">
+          <Flex alignItems="center" justify="space-between" w={authUser ? "30%" : "10%"}>
             <a href="/" style={{ color: "white", fontSize: "24px" }}>
               <strong>{navItemsLeft["/"]}</strong>
             </a>
@@ -57,7 +57,7 @@ const NavBar = ({ authUser }) => {
               )
             ))}
           </Flex>
-          <Flex alignItems="center">
+          <Flex alignItems="center" justify="space-around" w={authUser ? "5%" : "10%"}>
             {Object.entries(navItemsRight).map(([url, label]) => (
               <a
                 key={url}

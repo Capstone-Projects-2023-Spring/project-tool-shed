@@ -469,9 +469,13 @@ module.exports = (app, models) => {
 	 * Settings Pages
 	 */
 
-	app.get('/account', asyncHandler(async (req, res) => {
-		res.render('account.html', { error: null });
-	}));
+	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
+		const user = req.user;
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+		res.render('account.html', { user });
+	})));
 
 
 	/*

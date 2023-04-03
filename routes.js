@@ -469,9 +469,9 @@ module.exports = (app, models) => {
 	 * Settings Pages
 	 */
 
-	app.get('/account', asyncHandler(async (req, res) => {
-		res.render('account.html', { error: null });
-	}));
+	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
+        res.render('account.html', {});
+    })));
 
 
 	/*

@@ -1,84 +1,11 @@
 {% extends "base.html" %}
 
-{% block head %}
-
-{% endblock %}
-
 {% block body %}
 
-<body>
-
-    <!--Drop down menu-->
-    <div id="dropdownmenu"></div>
-    <script type="text/babel">
-        const Menu = props => (
-            <div>
-                <h2>Account Settings</h2>
-                <div class="dropdown">
-                    <button class="dropbtn">Settings</button>
-                    <div class="dropdown-content">
-                        <a href="#edit">Edit Account</a>
-                        <a href="#deactivate">Deactivate Account</a>
-                    </div>
-                </div>
-            </div>
-        );
-        ReactDOM.render(<Menu />, document.getElementById('dropdownmenu'));
-    </script>
-</body>
-
-<style>
- 
-
-    /* style of dropdown button */
-    .dropbtn {
-        background: #0082e6;
-        color: white;
-        padding: 16px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-    }
-
-    /* container <div> to position dropdown content */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-        padding: 16px;
-    }
-
-    /* Dropdown content, hidden */
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-    }
-
-    /* Dropdown links */
-    .dropdown-content a {
-        color: black;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-    }
-
-    /* change color of dropdown on hover */
-    .dropdown-content a:hover {
-        background-color: #f1f1f1
-    }
-
-    /* show dropdown menu on hover */
-    .dropdown:hover .dropdown-content {
-        display: block
-    }
-
-    /* background color dropdown button changes when dropdown content shown */
-    .dropdown:hover .dropbtn {
-        background-color: #017edd;
-    }
-</style>
+<script type="application/javascript">
+  window._user = {{ authUser|json }};
+</script>
+<div id="root"></div>
+<script src="/webpack/account.js" type="application/javascript"></script>
 
 {% endblock %}

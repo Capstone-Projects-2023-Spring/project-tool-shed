@@ -8,6 +8,8 @@ function Account() {
     setCurrentTab(tabName);
   };
 
+  const authUser = window._user; // Access the authUser variable from the global _user variable
+
   let content = '';
   switch (currentTab) {
     case 'Account Details and Settings':
@@ -15,6 +17,11 @@ function Account() {
         <>
           <Text>
             Welcome to Account Settings!<br />
+            <br />
+            Your account information:<br />
+            <strong>First Name:</strong> {authUser.first_name}<br />
+            <strong>Last Name:</strong> {authUser.last_name}<br />
+            <strong>Email:</strong> {authUser.email}<br />
             <br />
             To update your account information, you can click here to go directly to your account page and make any necessary changes:<br />
             <a href="http://127.0.0.1:5000/user/me" style={{ color: 'blue', fontWeight: 'bold' }}>Edit Account Information</a>.
@@ -37,7 +44,11 @@ function Account() {
       content = (
         <>
           <Text>
-            Thank you! Goodbye!<br />
+            Thank you for using our website! We hope you had a great experience.<br />
+            <br />
+            Have a nice day, and see you again soon!<br />
+            <br />
+            <Button onClick={handleLogout}>Click here to logout</Button>
           </Text>
         </>
       );
@@ -61,7 +72,6 @@ function Account() {
                 </ListItem>
                 <ListItem>
                     <Button onClick={() => handleTabChange('Log Out')}>Log Out</Button>
-                    {/* <Button onClick={handleLogout}>Log Out</Button> */}
                 </ListItem>
             </UnorderedList>
             <Heading as="h1" mb="4">{currentTab}</Heading>

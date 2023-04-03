@@ -470,12 +470,8 @@ module.exports = (app, models) => {
 	 */
 
 	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
-		const user = req.user;
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
-		res.render('account.html', { user });
-	})));
+        res.render('account.html', {});
+    })));
 
 
 	/*

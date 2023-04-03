@@ -1,15 +1,43 @@
 import React, {useState} from 'react';
-import {createRoot} from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import { ChakraProvider, Box, Button, FormControl, FormHelperText,
 	 FormErrorMessage, FormLabel, Input, Stack, Select, Card, CardHeader,
 	 CardBody, Heading, Summary, Text, StackDivider, Divider } from '@chakra-ui/react';
 import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
+
+import { AsyncSelect, AsyncCreatableSelect } from "chakra-react-select";
+
 import toolSchema from '../validators/tool';
 import listingSchema from '../validators/listing';
 import {billingIntervals} from '../constants';
 
 const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+const searchCollection = col => s => fetch(`/api/search/${col}?q=${encodeURIComponent(s)}`, {
+	method: "GET",
+	credentials: "same-origin"
+}).then(x => x.json()).then(x => x.results);
+
+const SearchDropdown = ({name, collection}) => {
+		const {values, setFieldValue, handleBlur} = useFormikContext();
+
+		return (
+			<AsyncSelect
+				defaultOptions
+				value={values[name]}
+				onChange={o => {
+					setFieldValue(name, o);
+				}}
+				onBlur={handleBlur}
+				name={name}
+				getOptionLabel={e => e.name}
+				getOptionValue={e => e.id}
+				loadOptions={searchCollection(collection)} />
+		);
+	}
+
+
 
 const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 	const [listing, setListing] = useState(_listing);
@@ -50,15 +78,15 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 			</FormControl>
 			<FormControl isInvalid={errors.price}>
 				<FormLabel>Price</FormLabel>
-				<Input name="price" type="number" value={values.price} onChange={handleChange} onBlur={handleBlur} />
+				<Input name="price" type="number" onChange={handleChange} onBlur={handleBlur} />
 			</FormControl>
 			<FormControl isInvalid={errors.maxBillingIntervals}>
 				<FormLabel>Max # of billing intervals</FormLabel>
-				<Input name="maxBillingIntervals" type="number" step="1" value={values.maxBillingIntervals} onChange={handleChange} onBlur={handleBlur} />
+				<Input name="maxBillingIntervals" type="number" step="1" onChange={handleChange} onBlur={handleBlur} />
 			</FormControl>
 			<FormControl>
 				<FormLabel>Billing Interval</FormLabel>
-				<Select placeholder="Select billing interval" name="billingInterval" value={values.billingInterval}>
+				<Select placeholder="Select billing interval" name="billingInterval">
 					{billingIntervals.map(x => <option key={x} value={x}>{capitalize(x)}</option>)}
 				</Select>
 			</FormControl>
@@ -76,12 +104,20 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 	const [listings, setListings] = useState(_listings);
 	const isEdit = !!tool;
 	const [manualFile, setManualFile] = useState();
-	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
+
+	const handleSubmit = async (_values, { setSubmitting, resetForm, setErrors }, history) => {
 		setSubmitting(true);
 		let formData = new FormData();
+
+		const {maker, category, ...values} = _values;
+
 		for (const [k, v] of Object.entries(values)) {
 			formData.append(k, v);
 		}
+
+		formData.append('tool_maker_id', maker ? maker.id : '');
+		formData.append('tool_category_id', category ? category.id : '');
+
 		if (manualFile) {
 			formData.append('manual', manualFile);
 		}
@@ -91,15 +127,15 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				body: formData,
 				credentials: "same-origin"
 			}).then(x => x.json());
+
 			if (!isEdit) {
 				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
 			}
 
-			setTool(t);
 			setManualFile(null);
-
 			setSubmitting(false);
-			resetForm(t);
+			setTool(t);
+			resetForm({values: t});
 		} catch (error) {
 			setSubmitting(false);
 			setErrors({ submit: error.message });
@@ -126,7 +162,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			<CardHeader>
 			<Heading size="md">Tool Information</Heading>
 			<br />
-		<Formik enableReinitialize initialValues={tool ?? {}} validationSchema={toolSchema} onSubmit={handleSubmit}>
+		<Formik enableReinitialize initialValues={tool ?? {}} onSubmit={handleSubmit}>
         	{({ values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting }) => (
 			<Form>
 			<Stack spacing={3}>
@@ -140,23 +176,11 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				</FormControl>
 				<FormControl>
 					<FormLabel>Category</FormLabel>
-					<Select placeholder="Select category" name="tool_category_id" value={values.tool_category_id}>
-						{toolCategories.map(c => (
-							<option key={c.id} value={c.id}>
-								{c.name}
-							</option>
-						))}
-					</Select>
+					<SearchDropdown collection="category" name="category" />
 				</FormControl>
 				<FormControl>
 					<FormLabel>Maker</FormLabel>
-					<Select placeholder="Select maker" name="tool_maker_id" value={values.tool_maker_id}>
-						{toolMakers.map(c => (
-							<option key={c.id} value={c.id}>
-								{c.name}
-							</option>
-						))}
-					</Select>
+					<SearchDropdown collection="maker" name="maker" />
 				</FormControl>
 				<FormControl>
 					<FormLabel>Manual</FormLabel>

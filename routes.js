@@ -156,17 +156,18 @@ module.exports = (app, models) => {
 
 	/* PAGE: Create a tool */
 	app.get('/tools/new', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('tool_form.html', {
-			toolCategories: await ToolCategory.findAll(),
-			toolMakers: await ToolMaker.findAll()
-		});
+		res.render('tool_form.html', {});
 	})));
 
 	/* PAGE: Edit a tool */
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
+		const tool = await models.Tool.findByPk(tool_id, { include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		] });
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -180,8 +181,6 @@ module.exports = (app, models) => {
 		const listings = await Listing.findAll({ where: { tool_id } });
 
 		res.render('tool_form.html', {
-			toolCategories: await ToolCategory.findAll(),
-			toolMakers: await ToolMaker.findAll(),
 			tool,
 			listings
 		});
@@ -251,13 +250,7 @@ module.exports = (app, models) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
 
-		const tool = await models.Tool.findByPk(tool_id, {
-			include: [
-				{ model: FileUpload, as: 'manual' },
-				{ model: ToolCategory, as: "category" },
-				{ model: ToolMaker, as: "maker" }
-			]
-		});
+		const tool = await models.Tool.findByPk(tool_id, {});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -271,11 +264,10 @@ module.exports = (app, models) => {
 		// Update the tool with the new data
 		tool.name = name;
 		tool.description = description;
-		tool.tool_category_id = tool_category_id;
-		tool.tool_maker_id = tool_maker_id;
 		await tool.save();
 
-		// TODO: load the new categories and makers
+		await tool.setCategory(tool_category_id);
+		await tool.setMaker(tool_maker_id);
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -290,6 +282,12 @@ module.exports = (app, models) => {
 
 			await tool.setManual(fu);
 		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
 
 		res.json({ tool });
 	})));
@@ -437,6 +435,34 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
+	app.get('/api/search/:kind', asyncHandler(async (req, res) => {
+		const { kind } = req.params;
+		const { q } = req.query;
+
+		let model = null;
+		if (kind === 'maker') {
+			model = ToolMaker;
+		} else if (kind === 'category') {
+			model = ToolCategory;
+		}
+		
+		if (!model) return res.status(404).json({error: "Not found", results: null});
+
+		const sq = (q ?? '').split(' ').filter(x => x.length > 2).map(x => `${x}:*`).join(' <-> ');
+
+		let where = {};
+
+		if (sq.length > 0) {
+			where.searchVector = {[Op.match]: sequelize.fn('to_tsquery', sq)};
+		}
+
+		let results = await model.findAll({
+			where
+		});
+		res.json({results, error: null});
+	}));
+
 	/*
 		Listing Details Page
 	*/

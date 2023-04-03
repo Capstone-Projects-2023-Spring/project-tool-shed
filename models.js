@@ -207,9 +207,13 @@ const genModels = sequelize => {
          * @property {string} name The name of the manufacturer
          */
 	const ToolMaker = sequelize.define('ToolMaker', {
-		name: {type: DataTypes.STRING, allowNull: false}
+		name: {type: DataTypes.STRING, allowNull: false},
+		searchVector: { type: DataTypes.TSVECTOR}
 	}, {tableName: 'tool_maker', paranoid: true});
 
+	ToolMaker.addHook('beforeSave', 'populate_maker_vector', async (x, opts) => {
+		x.searchVector = sequelize.fn('to_tsvector', x.name);
+	});
 
 
 	/**
@@ -219,9 +223,13 @@ const genModels = sequelize => {
          * @property {string} name The name of the category
          */
 	const ToolCategory = sequelize.define("ToolCategory", {
-		name: {type: DataTypes.STRING, allowNull: false}
+		name: {type: DataTypes.STRING, allowNull: false},
+		searchVector: { type: DataTypes.TSVECTOR}
 	}, {tableName: "tool_category", paranoid: true});
 
+	ToolCategory.addHook('beforeSave', 'populate_category_vector', async (x, opts) => {
+		x.searchVector = sequelize.fn('to_tsvector', x.name);
+	});
 
 
 	// TODO: write indeces for TSVector field (depends on implementing it in moldymeat)
@@ -262,12 +270,12 @@ const genModels = sequelize => {
 
 	Tool.hasOne(ToolCategory, {
 		as: "category",
-		foreignKey: {name: 'tool_category_id'}
+		foreignKey: {name: 'tool_category_id', allowNull: true}
 	});
 
 	Tool.hasOne(ToolMaker, {
 		as: 'maker',
-		foreignKey: {name: 'tool_maker_id'}
+		foreignKey: {name: 'tool_maker_id', allowNull: true}
 	});
 
 	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {

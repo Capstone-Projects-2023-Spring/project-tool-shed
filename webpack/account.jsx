@@ -24,7 +24,6 @@ function Account() {
             <strong>Email:</strong> {authUser.email}<br />
             <strong>ID:</strong> {authUser.id}<br />
             <strong>Address ID:</strong> {authUser.address_id}<br />
-
             <br />
             To update your account information, you can click here to go directly to your account page and make any necessary changes:<br />
             <br />

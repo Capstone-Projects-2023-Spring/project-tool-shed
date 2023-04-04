@@ -2,7 +2,9 @@ import React, {useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import { ChakraProvider, Box, Button, FormControl, FormHelperText,
 	 FormErrorMessage, FormLabel, Input, Stack, Select, Card, CardHeader,
-	 CardBody, Heading, Summary, Text, StackDivider, Divider } from '@chakra-ui/react';
+	 CardBody, Heading, Summary, Text, StackDivider, Divider,
+	 Link } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 
@@ -120,7 +122,7 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 	);
 };
 
-const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}) => {
+const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMakers}) => {
 	const [tool, setTool] = useState(_tool);
 	const [listings, setListings] = useState(_listings);
 	const isEdit = !!tool;
@@ -233,7 +235,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				<FormControl>
 					<FormLabel>Manual</FormLabel>
 					<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
-					{manualURL && <FormHelperText>Currently uploaded: <a target="_blank" href={manualURL}>{manualName}</a></FormHelperText>}
+					{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 				</FormControl>
 				<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 			</Stack>
@@ -243,10 +245,9 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			</CardHeader>
 			{isEdit && <Divider />}
 			{isEdit && <CardBody>
-				<Stack divider={<StackDivider />} spacing='4'>
+				<Stack divider={<StackDivider />} spacing={3}>
 					<Heading size='md'>Listings</Heading>
 					{listings.map(l => <ListingForm toolId={tool.id} key={l.id} listing={l} onDelete={onListingDelete} />)}
-
 					<Button mt={4} colorScheme="blue" onClick={onNewListing}>+ New Listing</Button>
 				</Stack>
 			</CardBody>}

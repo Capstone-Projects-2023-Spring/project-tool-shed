@@ -5,23 +5,23 @@
 
 const net = require('net');
 const path = require('path');
-const {DataTypes, QueryTypes} = require('sequelize');
+const { DataTypes, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
-const {billingIntervals} = require('./constants');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const { billingIntervals } = require('./constants');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const genModels = sequelize => {
 	/**
 	 * @class User
-         * @classdesc Represents a user.
+		 * @classdesc Represents a user.
 	 * @augments sequelize.Model
-         * @property {string} first_name The user's first name
+		 * @property {string} first_name The user's first name
 	 * @property {string} last_name The user's last name
-         * @property {string} email The user's email, used for logging in
-         * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
+		 * @property {string} email The user's email, used for logging in
+		 * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
 	 * @property {int} address_id The ID of an Address record for the user.
 	 * @property {int} billing_address_id The ID of an Address record for the user.
-         */
+		 */
 	const User = sequelize.define('User', {
 		first_name: {
 			type: DataTypes.STRING,
@@ -47,17 +47,17 @@ const genModels = sequelize => {
 		tableName: "user",
 		paranoid: true, // soft delete enabled
 	});
-	
+
 
 	// TODO: rewrite setPassword into a setter on password_hash
 	// https://sequelize.org/docs/v6/core-concepts/getters-setters-virtuals/#setters
 
 	/**
-         * Sets a user's password. 
+		 * Sets a user's password. 
 	 * @param {string} v The user's new password.
 	 * @method module:models~User#setPassword
-         */
-	User.prototype.setPassword = async function(v) {
+		 */
+	User.prototype.setPassword = async function (v) {
 		const s = await bcrypt.genSalt(10);
 		this.password_hash = await bcrypt.hash(v, s);
 	};
@@ -68,22 +68,22 @@ const genModels = sequelize => {
 	 * @return {boolean} Whether or not the password matched.
 	 * @method module:models~User#passwordMatches
 	 */
-	User.prototype.passwordMatches = async function(v) {
+	User.prototype.passwordMatches = async function (v) {
 		return await bcrypt.compare(v, this.password_hash);
 	};
 
 	/**
 	 * @class Address
-         * @classdesc Represents an address.
+		 * @classdesc Represents an address.
 	 * @augments sequelize.Model
-         * @property {string} line_two
+		 * @property {string} line_two
 	 * @property {string} city
 	 * @property {string} state - The state of the address, should be a 2-digit uppercase value like "NJ" or "PA"
 	 * @property {string} zip_code
 	 * @property {bool} geocoded - Whether or not the address has been geocoded yet
 	 * @property {double} geocoded_lat - the latitude value from geocoding - not user set
 	 * @property {double} geocoded_lon - the longitude value from geocoding - not user set
-         */
+		 */
 	const Address = sequelize.define('Address', {
 		line_one: {
 			type: DataTypes.STRING,
@@ -117,10 +117,10 @@ const genModels = sequelize => {
 			type: DataTypes.DOUBLE,
 			allowNull: true
 		}
-	}, {tableName: 'address', paranoid: true});
+	}, { tableName: 'address', paranoid: true });
 
-	User.belongsTo(Address, {foreignKey: 'address_id', as: 'address'});
-	User.belongsTo(Address, {foreignKey: 'billing_address_id', as: 'billing_address'});
+	User.belongsTo(Address, { foreignKey: 'address_id', as: 'address' });
+	User.belongsTo(Address, { foreignKey: 'billing_address_id', as: 'billing_address' });
 
 	/**
 	 * Gets coordinates for a string address.
@@ -129,11 +129,11 @@ const genModels = sequelize => {
 	 * @method module:models~Address.geocode
 	 * @async
 	 */
-	Address.geocode = async function(addressString) {
+	Address.geocode = async function (addressString) {
 		let coord = null;
 		let err = null;
 		try {
-			const {coordinate, error} = await fetch(`http://0.0.0.0:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
+			const { coordinate, error } = await fetch(`http://0.0.0.0:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());
 			coord = coordinate;
 			err = error;
 		} catch (e) {
@@ -141,9 +141,9 @@ const genModels = sequelize => {
 		}
 
 		if (coord) {
-			const {lat, lon, accuracyPercent} = coord;
+			const { lat, lon, accuracyPercent } = coord;
 			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${accuracyPercent}%)`);
-			return {lat, lon};
+			return { lat, lon };
 		}
 
 		console.log(`Failed to geocode "${addressString}: ${err ? err : "unknown error"}".`);
@@ -156,7 +156,7 @@ const genModels = sequelize => {
 	 * @returns {boolean} Whether or not the address was successfully geocoded.
 	 * @async
 	 */
-	Address.prototype.ensureGeocoded = async function(shouldSave=true) {
+	Address.prototype.ensureGeocoded = async function (shouldSave = true) {
 		if (this.geocoded) return true;
 
 		const coords = await this.getCoordinates();
@@ -177,7 +177,7 @@ const genModels = sequelize => {
 	 * @method module:models~Address#stringValue
 	 * @returns {string} A string representing the address, suitable for display or geocoding.
 	 */
-	Address.prototype.stringValue = function() {
+	Address.prototype.stringValue = function () {
 		let r = `${this.line_one}`;
 		if (this.line_two) r += `\n${this.line_two}`;
 		r += `\n${this.city}, ${this.state} ${this.zip_code}`;
@@ -190,7 +190,7 @@ const genModels = sequelize => {
 	 * @method module:models~Address#getCoordinates
 	 * @async
 	 */
-	Address.prototype.getCoordinates = async function() {
+	Address.prototype.getCoordinates = async function () {
 		return await Address.geocode(this.stringValue());
 	};
 
@@ -202,25 +202,25 @@ const genModels = sequelize => {
 
 	/**
 	 * @class ToolMaker
-         * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
+		 * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
 	 * @augments sequelize.Model
-         * @property {string} name The name of the manufacturer
-         */
+		 * @property {string} name The name of the manufacturer
+		 */
 	const ToolMaker = sequelize.define('ToolMaker', {
-		name: {type: DataTypes.STRING, allowNull: false}
-	}, {tableName: 'tool_maker', paranoid: true});
+		name: { type: DataTypes.STRING, allowNull: false }
+	}, { tableName: 'tool_maker', paranoid: true });
 
 
 
 	/**
 	 * @class ToolCategory
-         * @classdesc Represents a kind of tool - like hammer, saw, or drill.
+		 * @classdesc Represents a kind of tool - like hammer, saw, or drill.
 	 * @augments sequelize.Model
-         * @property {string} name The name of the category
-         */
+		 * @property {string} name The name of the category
+		 */
 	const ToolCategory = sequelize.define("ToolCategory", {
-		name: {type: DataTypes.STRING, allowNull: false}
-	}, {tableName: "tool_category", paranoid: true});
+		name: { type: DataTypes.STRING, allowNull: false }
+	}, { tableName: "tool_category", paranoid: true });
 
 
 
@@ -228,18 +228,18 @@ const genModels = sequelize => {
 
 	/**
 	 * @class Tool
-         * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
+		 * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
-         * @property {string} name Name of the tool.
-         * @property {string} description An arbitrary description of the tool and its condition.
+		 * @property {string} name Name of the tool.
+		 * @property {string} description An arbitrary description of the tool and its condition.
 
-         * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
-         * @property {integer} owner_id The id of the User record that owns this tool
-         * @property {integer} tool_category_id The id the category related to this tool
+		 * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+		 * @property {integer} owner_id The id of the User record that owns this tool
+		 * @property {integer} tool_category_id The id the category related to this tool
 	 * @property {integer} tool_maker_id The id of the maker of this tool.
-         */
+		 */
 	const Tool = sequelize.define('Tool', {
-        	name: {
+		name: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
@@ -250,8 +250,8 @@ const genModels = sequelize => {
 		searchVector: {
 			type: DataTypes.TSVECTOR
 		}
-	}, {tableName: 'tool', paranoid: true});
-    
+	}, { tableName: 'tool', paranoid: true });
+
 	Tool.belongsTo(User, {
 		foreignKey: {
 			name: 'owner_id',
@@ -260,14 +260,17 @@ const genModels = sequelize => {
 		as: 'owner'
 	});
 
-	Tool.hasOne(ToolCategory, {
-		as: "category",
-		foreignKey: {name: 'tool_category_id'}
+	Tool.belongsTo(ToolCategory, {
+		foreignKey: {
+			name: 'tool_category_id', 
+			allowNull: true
+		},
+		as: 'category'
 	});
 
 	Tool.hasOne(ToolMaker, {
 		as: 'maker',
-		foreignKey: {name: 'tool_maker_id'}
+		foreignKey: { name: 'tool_maker_id' }
 	});
 
 	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
@@ -285,19 +288,19 @@ const genModels = sequelize => {
 		if (toolCategory) {
 			content += toolCategory.name ?? '';
 		}
-	
+
 		tool.searchVector = sequelize.fn('to_tsvector', content);
 	});
 
 
 	/**
 	 * @class Listing
-         * @classdesc Represents a tool's being listed for sale.
+		 * @classdesc Represents a tool's being listed for sale.
 	 * @augments sequelize.Model
-         * @property {number} price The amount the listing costs per `billingInterval`
+		 * @property {number} price The amount the listing costs per `billingInterval`
 	 * @property {string} billingInterval The interval at which you're going to pay `price`
 	 * @property {integer} maxBillingIntervals The maximum number of billing intervals the tool is available for.
-         */
+		 */
 	const Listing = sequelize.define("Listing", {
 		price: {
 			type: DataTypes.DECIMAL,
@@ -315,7 +318,7 @@ const genModels = sequelize => {
 			type: DataTypes.BOOLEAN,
 			defaultValue: true
 		}
-	}, {tableName: 'listing', paranoid: true});
+	}, { tableName: 'listing', paranoid: true });
 	Listing.belongsTo(Tool, {
 		foreignKey: {
 			name: 'tool_id',
@@ -326,19 +329,19 @@ const genModels = sequelize => {
 
 	/**
 	 * @class UserMessage
-         * @classdesc Represents a conversation between two users.
+		 * @classdesc Represents a conversation between two users.
 	 * @augments sequelize.Model
-         * @property {string} content Message content
-         */
+		 * @property {string} content Message content
+		 */
 	const UserMessage = sequelize.define('UserMessage', {
 		content: {
-			type: DataTypes.STRING, 
+			type: DataTypes.STRING,
 			allowNull: false
 		}
-	}, {tableName: 'user_message', paranoid: true});
+	}, { tableName: 'user_message', paranoid: true });
 
 	UserMessage.belongsTo(User, {
-        	foreignKey: {
+		foreignKey: {
 			name: 'recipient_id',
 			allowNull: false
 		},
@@ -380,7 +383,7 @@ const genModels = sequelize => {
 		},
 	}, {
 		tableName: "userreview",
-		paranoid: true, 
+		paranoid: true,
 	});
 
 	User.hasMany(UserReview, {
@@ -405,7 +408,7 @@ const genModels = sequelize => {
 
 	/**
 	 * @class FileUpload
- 	 * @classdescription Represents a file that's uploaded.
+	   * @classdescription Represents a file that's uploaded.
 	 * @property {string} path Path of file, relative to uploads directory
 	 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
 	 * @property {integer} size Size of the file in bytes
@@ -413,13 +416,13 @@ const genModels = sequelize => {
 	 * @property {integer} uploader_id The ID of the uploader
 	 */
 	const FileUpload = sequelize.define('FileUpload', {
-		path: {type: DataTypes.STRING, allowNull: false},
-		originalName: {type: DataTypes.STRING, allowNull: true},
-		size: {type: DataTypes.INTEGER, validate: {min: 0}},
-		mimeType: {type: DataTypes.STRING},
-	}, {paranoid: true, tableName: 'file_upload'});
+		path: { type: DataTypes.STRING, allowNull: false },
+		originalName: { type: DataTypes.STRING, allowNull: true },
+		size: { type: DataTypes.INTEGER, validate: { min: 0 } },
+		mimeType: { type: DataTypes.STRING },
+	}, { paranoid: true, tableName: 'file_upload' });
 
-	FileUpload.prototype.getURL = function() {return path.join('/uploads/', path.relative(this.storedIn, this.path));};
+	FileUpload.prototype.getURL = function () { return path.join('/uploads/', path.relative(this.storedIn, this.path)); };
 
 	Tool.belongsTo(FileUpload, {
 		foreignKey: {
@@ -435,8 +438,8 @@ const genModels = sequelize => {
 		},
 		as: 'uploader'
 	});
-	
-	return {User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload};
+
+	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
 };
 
 module.exports = genModels;

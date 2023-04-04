@@ -218,7 +218,7 @@ async function startServer() {
 		app.use(authMiddleware(sequelize.models.User));
 		app.use(nunjucksMiddleware(app));
 
-		const routesModule = './routes.js';
+		const routesModule = './routes';
 		decache(routesModule);
 		require(routesModule)(app, sequelize.models);
 

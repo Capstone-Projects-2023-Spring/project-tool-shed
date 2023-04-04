@@ -26,7 +26,7 @@ const Listing = ({
 }) => {
   return (
     <div style={style}>
-      <h1 style={{ fontSize: "32px", fontWeight: "bold"}}>
+      <h1 style={{ fontSize: "24px", fontWeight: "bold"}}>
         <p>Listing Details</p>
       </h1>
       <h2 style={{ fontWeight: "bold" }}>
@@ -39,6 +39,9 @@ const Listing = ({
       <a href={`/inbox/${tool.owner_id}`}>
         <button>Contact Owner</button>
       </a>
+      <h1 style={{ fontSize: "24px", fontWeight: "bold"}}>
+        <p>Recommended Tools</p>
+      </h1>
     </div>
   );
 };

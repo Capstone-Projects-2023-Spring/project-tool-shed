@@ -488,8 +488,8 @@ module.exports = (app, models) => {
 			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
 		});
 
-		//res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
-		res.json({ listings, recommendations: filteredRecommendations});
+		res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
+		//res.json({ listings, recommendations: filteredRecommendations});
 		//res.render('listing_details.html', { listings, recommendations });
 	}));
 

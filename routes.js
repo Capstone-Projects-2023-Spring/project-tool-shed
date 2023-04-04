@@ -437,6 +437,7 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
 	/*
 		Listing Details Page
 	*/
@@ -467,22 +468,29 @@ module.exports = (app, models) => {
 				active: true,
 				id: {
 					[Op.ne]: listings.id
-				  }
+				}
 			},
 			include: [{
 				model: models.Tool,
-				as: 'tool'
-				// include: [{
-				// 	model: models.ToolCategory,
-				// 	as: 'category',
-				// 	where: {
-				// 		id: listings.tool.category_id // add null check here
-				// 	},
-				// }]
+				as: 'tool',
+				include: [{
+					model: models.ToolCategory,
+					as: 'category',
+					// where: {
+					// 	id: listings.tool.tool_category_id // add null check here
+					// },
+				}]
 			}]
 		});
-		//res.json({ listings, recommendations });
-		res.render('listing_details.html', { listings, recommendations });
+
+		// filter out the recommendations that have a tool with the same category as listings.tool.category_id
+		const filteredRecommendations = recommendations.filter(recommendation => {
+			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
+		});
+
+		//res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
+		res.json({ listings, recommendations: filteredRecommendations});
+		//res.render('listing_details.html', { listings, recommendations });
 	}));
 
 	/*

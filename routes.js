@@ -220,11 +220,6 @@ module.exports = (app, models) => {
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
 			tool_maker_id, tool_category_id
-		}, {
-			include: [
-				{ model: ToolCategory, as: "category" },
-				{ model: ToolMaker, as: "maker" }
-			]
 		});
 
 		const uploadedFile = req.file;
@@ -239,10 +234,14 @@ module.exports = (app, models) => {
 			});
 
 			await tool.setManual(fu);
-			res.json({ tool: { ...tool, manual: fu } });
-		} else {
-			res.json({ tool });
 		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
+		res.json({ tool });
 	})));
 
 	/* API: Edit tool */
@@ -458,10 +457,28 @@ module.exports = (app, models) => {
 		}
 
 		let results = await model.findAll({
-			where
+			where,
+			order: [
+				["name", 'ASC']
+			]
 		});
 		res.json({results, error: null});
 	}));
+
+	app.post('/api/create/:kind', asyncHandler(requiresAuth(async (req, res) => {
+		const { kind } = req.params;
+		const { name } = req.body;
+
+		let model = null;
+		if (kind === 'maker') {
+			model = ToolMaker;
+		} else if (kind === 'category') {
+			model = ToolCategory;
+		}
+
+		let x = await model.create({name});
+		res.json(x);
+	})));
 
 	/*
 		Listing Details Page

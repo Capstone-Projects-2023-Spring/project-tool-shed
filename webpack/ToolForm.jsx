@@ -14,28 +14,49 @@ import {billingIntervals} from '../constants';
 
 const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
 
-const searchCollection = col => s => fetch(`/api/search/${col}?q=${encodeURIComponent(s)}`, {
-	method: "GET",
-	credentials: "same-origin"
-}).then(x => x.json()).then(x => x.results);
-
 const SearchDropdown = ({name, collection}) => {
-		const {values, setFieldValue, handleBlur} = useFormikContext();
+	const [isLoading, setLoading] = useState(false);
+	const {values, setFieldValue, handleBlur, handleChange} = useFormikContext();
+	const [refreshToken, setRefreshToken] = useState(Math.random());
 
-		return (
-			<AsyncSelect
-				defaultOptions
-				value={values[name]}
-				onChange={o => {
-					setFieldValue(name, o);
-				}}
-				onBlur={handleBlur}
-				name={name}
-				getOptionLabel={e => e.name}
-				getOptionValue={e => e.id}
-				loadOptions={searchCollection(collection)} />
-		);
-	}
+	const handleCreate = inputValue => {
+		setLoading(true);
+		fetch(`/api/create/${collection}`, {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: inputValue}),
+				credentials: "same-origin"
+		}).then(x => x.json()).then(newOption => {
+			setLoading(false);
+			setRefreshToken(Math.random());
+			setFieldValue(name, newOption);
+		});
+	};
+
+	const searchCollection = s => fetch(`/api/search/${collection}?q=${encodeURIComponent(s)}`, {
+		method: "GET",
+		credentials: "same-origin"
+	}).then(x => x.json()).then(x => x.results);
+
+	return (
+		<AsyncCreatableSelect
+			key={refreshToken}
+			isDisabled={isLoading}
+			isLoading={isLoading}
+			defaultOptions
+			isClearable
+			value={values[name]}
+			onChange={o => setFieldValue(name, o)}
+			onBlur={handleBlur}
+			name={name}
+			getOptionLabel={e => e.__isNew__ ? e.label : e.name}
+			getOptionValue={e => e.__isNew__ ? undefined : e.id}
+			loadOptions={searchCollection}
+			onCreateOption={handleCreate} />
+	);
+}
 
 
 
@@ -115,8 +136,35 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			formData.append(k, v);
 		}
 
-		formData.append('tool_maker_id', maker ? maker.id : '');
-		formData.append('tool_category_id', category ? category.id : '');
+		let maker_id = maker ? maker.id : undefined;
+		if (maker && maker_id < 0) { // we have a new maker
+			const newMaker = await fetch('/api/create/maker', {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: maker.name}),
+				credentials: "same-origin"
+			}).then(x => x.json());
+			maker_id = newMaker.id;
+		}
+
+
+		let cat_id = category ? category.id : undefined;
+		if (category && cat_id < 0) { // we have a new maker
+			const newCat = await fetch('/api/create/category', {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: category.name}),
+				credentials: "same-origin"
+			}).then(x => x.json());
+			cat_id = newCat.id;
+		}
+
+		formData.append('tool_maker_id', maker_id ?? '');
+		formData.append('tool_category_id', cat_id ?? '');
 
 		if (manualFile) {
 			formData.append('manual', manualFile);

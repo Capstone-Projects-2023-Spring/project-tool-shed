@@ -10,7 +10,7 @@
 <script type="application/javascript">
 	window._toolFormProps = {
 		tool: {% if tool %}{{tool|json}}{% else %}undefined{% endif %},
-		listings: {{listings|json}}
+		listings: {% if listings %}{{listings|json}}{% else %}undefined{% endif %}
 	};
 </script>
 

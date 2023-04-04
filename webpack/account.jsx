@@ -27,7 +27,7 @@ function Account() {
             <br />
             To update your account information, you can click here to go directly to your account page and make any necessary changes:<br />
             <br />
-            <a href="http://127.0.0.1:5000/user/me" style={{ color: 'blue', fontWeight: 'bold' }}>Edit Account Information!</a>
+            <a href="/user/me" style={{ color: 'blue', fontWeight: 'bold' }}>Edit Account Information!</a>
           </Text>
         </>
       );
@@ -40,7 +40,7 @@ function Account() {
             <br />
             To view your Toolshed, you can click here to go directly to your ToolShed page and make any necessary changes:<br />
             <br />
-            <a href="http://127.0.0.1:5000/user/me/tools" style={{ color: 'blue', fontWeight: 'bold' }}>View your ToolShed!</a>
+            <a href="/user/me/tools" style={{ color: 'blue', fontWeight: 'bold' }}>View your ToolShed!</a>
           </Text>
         </>
       );

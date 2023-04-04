@@ -2,123 +2,65 @@
 <html>
 
 <head>
-    {% block header %}
 	<title>ToolShed | Share your tools!</title>
-    {% endblock %}
-    <link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/public/reset.css">
+	<style>
+		/* Flexbox styling for header, body, and footer */
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			margin: 0;
+		}
+
+		header {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 2em;
+			background-color: #f2f2f2;
+            z-index: 9999;
+		}
+
+		main {
+			flex: 1;
+			padding: 1em;
+		}
+
+		footer {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 1em;
+			background-color: #f2f2f2;
+		}
+	</style>
+	{% block header %}
+	<!--Header content-->
+	{% endblock %}
 </head>
 
 <body>
-    <!--Navigation bar-->
-    <div id="nav"></div>
-
-    {% block body %}
-
-    {% endblock %}
-    <script src="/node_modules/react/umd/react.development.js"></script>
-    <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
-    <script src="/node_modules/babel-standalone/babel.min.js"></script>
-
-    <script type="text/babel">
-        const user = {{ authUser|json }};
-        const NavBar = ({ user }) => {
-            let navItems = {};
-
-            if (user) {
-                
-                navItems["/user/me/tools"] = "Tools";
-                navItems["/tools/new"] = "Add Tool";
-                navItems["/inbox"] = "Messages";
-                navItems["/user/me/listings"] = "Listings"
-                navItems["/user/me/reviews"] = "My Review";
-                navItems["/review/users"] = "Review";
-                navItems['/account'] = 'Account';
-            } else {
-                navItems['/user/login'] = 'Log In';
-                navItems['/user/new'] = 'Sign Up';
-            }
-
-
-            navItems["/about"] = "About";
-
-            return <div>
-                <nav>
-                    <label className="logo"><a href="/">ToolShed</a></label>
-                    <ul>
-                        {Object.entries(navItems).map(([url, label]) =>
-                            <li key={url}><a href={url}>{label}</a></li>)}
-                    </ul>
-                </nav>
-            </div>;
-        };
-        ReactDOM.createRoot(document.getElementById('nav')).render(<NavBar user={user} />);
-    </script>
+	<!--Navigation bar-->
+	<header>
+		<div id="nav"></div>
+		<script type="application/javascript">
+			const _user = {{ authUser|json }};
+		</script>
+		<script src="/webpack/NavBar.js" type="application/javascript"></script>
+		<script src="/node_modules/react/umd/react.development.js"></script>
+		<script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+		<script src="/node_modules/babel-standalone/babel.min.js"></script>
+	</header>
+	<main>
+		{% block body %}
+		<!--Body content-->
+		{% endblock %}
+	</main>
+	<footer>
+		<!--Footer content-->
+	</footer>
 </body>
-
-<style>
-    /* Styling for nav */
-    * {
-        padding: 0;
-        margin: 0;
-        text-decoration: none;
-        list-style: none;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: montserrat;
-    }
-
-    nav {
-        background: #0082e6;
-        height: 80px;
-        width: 100%;
-    }
-
-    label.logo {
-        color: white;
-        font-size: 35px;
-        line-height: 80px;
-        padding: 0 100px;
-        font-weight: bold;
-    }
-
-    nav ul {
-        float: right;
-        margin-right: 20px;
-    }
-
-    nav ul li {
-        display: inline-block;
-        line-height: 80px;
-        margin: 0 5px;
-    }
-
-    nav ul li a {
-        color: white;
-        font-size: 17px;
-        padding: 7px 13px;
-        border-radius: 3px;
-        text-transform: uppercase;
-    }
-
-    ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    li {
-        float: left;
-    }
-
-    li a {
-        display: block;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-    }
-</style>
 
 </html>

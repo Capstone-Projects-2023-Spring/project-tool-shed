@@ -26,6 +26,9 @@ const Listing = ({
 }) => {
   return (
     <div style={style}>
+      <h1 style={{ fontSize: "32px", fontWeight: "bold"}}>
+        <p>Listing Details</p>
+      </h1>
       <h2 style={{ fontWeight: "bold" }}>
         <p>{tool.name} {owner}</p>
       </h2>
@@ -46,6 +49,44 @@ const ListingDetails = ({ listings }) => {
   </div>;
 };
 
+/*
+     * Creates a new Listing component with the given information
+     */
+
+const Recommendation= ({
+  owner,
+  price,
+  billingInterval,
+  maxBillingIntervals,
+  tool,
+}) => {
+  return (
+    <div style={style}>
+      <h2 style={{ fontWeight: "bold" }}>
+        <p>{tool.name} {owner}</p>
+      </h2>
+      <p>Tool Description: {tool.description}</p>
+      <p>Price & Rate : ${price} {billingInterval}</p>
+      <p>Available For: {maxBillingIntervals} units</p>
+
+      <a href={`/inbox/${tool.owner_id}`}>
+        <button>Contact Owner</button>
+      </a>
+    </div>
+  );
+};
+
+const RecommendationList = ({recommendations}) => {
+	return <div>
+		{recommendations.map(r => <Recommendation key={r.id} {...r} />)}
+	</div>
+};
+
 // use ReactDOM.createRoot to render the component
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<ListingDetails listings={window._listings} />);
+root.render(
+  <>
+    <ListingDetails listings={window._listings.listings} />
+    <RecommendationList recommendations={window._listings.recommendations} />
+  </>
+);

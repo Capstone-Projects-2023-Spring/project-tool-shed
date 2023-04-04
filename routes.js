@@ -462,7 +462,27 @@ module.exports = (app, models) => {
 			return res.status(404).json({ error: "Listing not found." });
 		}
 
-		res.render('listing_details.html', { listings });
+		const recommendations = await models.Listing.findAll({
+			where: {
+				active: true,
+				id: {
+					[Op.ne]: listings.id
+				  }
+			},
+			include: [{
+				model: models.Tool,
+				as: 'tool'
+				// include: [{
+				// 	model: models.ToolCategory,
+				// 	as: 'category',
+				// 	where: {
+				// 		id: listings.tool.category_id // add null check here
+				// 	},
+				// }]
+			}]
+		});
+		//res.json({ listings, recommendations });
+		res.render('listing_details.html', { listings, recommendations });
 	}));
 
 	/*
@@ -470,8 +490,8 @@ module.exports = (app, models) => {
 	 */
 
 	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
-        res.render('account.html', {});
-    })));
+		res.render('account.html', {});
+	})));
 
 
 	/*

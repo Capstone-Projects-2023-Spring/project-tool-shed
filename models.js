@@ -245,7 +245,6 @@ const genModels = sequelize => {
          * @property {integer} tool_category_id The id the category related to this tool
 	 	 * @property {integer} tool_maker_id The id of the maker of this tool.
 		 * @property {string} video YouTube video attached to a tool
-		 * @property {ts_vector} videoSearchVector A string of text that will ultimately be used for Video Searches
          */
 	const Tool = sequelize.define('Tool', {
         	name: {
@@ -261,7 +260,8 @@ const genModels = sequelize => {
 		},
 		video: {
 			type: DataTypes.STRING,
-			allowNull: true
+			allowNull: true,
+			defaultValue: 'https://www.youtube.com/'
 		}
 	}, {tableName: 'tool', paranoid: true});
     
@@ -301,14 +301,6 @@ const genModels = sequelize => {
 	
 		tool.searchVector = sequelize.fn('to_tsvector', content);
 	});
-
-	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
-		let videoContent = '';
-		videoContent += (tool.video ?? '') + ' ';
-
-		tool.searchVector = sequelize.fn('to_tsvector', videoContent);
-	});
-
 
 	/**
 	 * @class Listing

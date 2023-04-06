@@ -25,7 +25,12 @@ const Tool = ({
         maker,
         video
     }) => {
-	const videoLink = video;
+	const s = name + " " + description;
+    if(video == 'https://www.youtube.com/'){
+        video = `https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`
+    }
+    const realLink = video;
+
 
 	const onDelete = () => {
 		if (confirm(`Are you sure you want to delete ${name}?`)) { // TODO: something else
@@ -44,13 +49,14 @@ const Tool = ({
             <p>{description}</p>
         
             <a href={`/tools/${id}/edit`}>
-                <button>Edit Tool </button>
+                <button>Edit Tool</button>
             </a>
 
             <a onClick={onDelete}>
-                <button>Delete Tool </button>
+                <button>Delete Tool</button>
             </a>
-	    <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(videoLink)}`}><button>View on Youtube </button> <console className="log">Reached</console></a>
+
+        <a href={realLink}target="_blank" rel="noopener noreferrer" ><button>Youtube Video</button></a>
         </div>
 };
 

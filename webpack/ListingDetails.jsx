@@ -24,21 +24,49 @@ const Listing = ({
   maxBillingIntervals,
   tool,
 }) => {
-  return (
-    <div style={style}>
-      <h2 style={{ fontWeight: "bold" }}>
-        <p>{tool.name} {owner}</p>
-      </h2>
-      <p>Tool Description: {tool.description}</p>
-      <p>Price & Rate : ${price} {billingInterval}</p>
-      <p>Available For: {maxBillingIntervals} units</p>
+	const s = tool.name + " " + tool.description;
+    if(tool.video == 'https://www.youtube.com/'){
+        tool.video = `https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`
+    }
+    const realLink = tool.video;
+    const videoId = getVideoId(realLink);
 
-      <a href={`/inbox/${tool.owner_id}`}>
-        <button>Contact Owner</button>
-      </a>
-    </div>
-  );
-};
+    return (
+      <div style={style}>
+        <h2 style={{ fontWeight: "bold" }}>
+          <p>
+            {tool.name} {owner}
+          </p>
+        </h2>
+        <p>Tool Description: {tool.description}</p>
+        <p>Price & Rate : ${price} {billingInterval}</p>
+        <p>Available For: {maxBillingIntervals} units</p>
+        <div>
+          <p>Tool Video:</p>
+          {videoId ? (
+            <iframe
+              width="560"
+              height="315"
+              src={`https://www.youtube.com/embed/${videoId}`}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          ) : (
+            <p>{realLink}</p>
+          )}
+        </div>
+        <a href={`/inbox/${tool.owner_id}`}>
+          <button>Contact Owner</button>
+        </a>
+      </div>
+    );
+  };
+
+function getVideoId(videoUrl) {
+  const regex = /(?:\/|v=)([\w-]{11})(?:\?|&|$)/;
+  const match = videoUrl.match(regex);
+  return match ? match[1] : null;
+}
 
 const ListingDetails = ({ listings }) => {
   return <div>

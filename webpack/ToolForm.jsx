@@ -234,7 +234,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				</FormControl>
 				<FormControl>
 					<FormLabel>YouTube Video</FormLabel>
-					<Input name="video" type="text" value={values.video} onChange={handleChange} onBlur={handleBlur} />
+					<Input name="video" type="url" value={values.video} onChange={handleChange} onBlur={handleBlur} />
 				</FormControl>
 				<FormControl>
 					<FormLabel>Manual</FormLabel>

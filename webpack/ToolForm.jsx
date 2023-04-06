@@ -1,15 +1,66 @@
 import React, {useState} from 'react';
-import {createRoot} from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import { ChakraProvider, Box, Button, FormControl, FormHelperText,
 	 FormErrorMessage, FormLabel, Input, Stack, Select, Card, CardHeader,
-	 CardBody, Heading, Summary, Text, StackDivider, Divider } from '@chakra-ui/react';
+	 CardBody, Heading, Summary, Text, StackDivider, Divider,
+	 Link } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
+
+import { AsyncSelect, AsyncCreatableSelect } from "chakra-react-select";
+
 import toolSchema from '../validators/tool';
 import listingSchema from '../validators/listing';
 import {billingIntervals} from '../constants';
 
 const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+const SearchDropdown = ({name, collection}) => {
+	const [isLoading, setLoading] = useState(false);
+	const {values, setFieldValue, handleBlur, handleChange} = useFormikContext();
+	const [refreshToken, setRefreshToken] = useState(Math.random());
+
+	const handleCreate = inputValue => {
+		setLoading(true);
+		fetch(`/api/create/${collection}`, {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: inputValue}),
+				credentials: "same-origin"
+		}).then(x => x.json()).then(newOption => {
+			setLoading(false);
+			setRefreshToken(Math.random());
+			setFieldValue(name, newOption);
+		});
+	};
+
+	const searchCollection = s => fetch(`/api/search/${collection}?q=${encodeURIComponent(s)}`, {
+		method: "GET",
+		credentials: "same-origin"
+	}).then(x => x.json()).then(x => x.results);
+
+	return (
+		<AsyncCreatableSelect
+			key={refreshToken}
+			isDisabled={isLoading}
+			isLoading={isLoading}
+			defaultOptions
+			isClearable
+			value={values[name]}
+			onChange={o => setFieldValue(name, o)}
+			onBlur={handleBlur}
+			name={name}
+			getOptionLabel={e => e.__isNew__ ? e.label : e.name}
+			getOptionValue={e => e.__isNew__ ? undefined : e.id}
+			loadOptions={searchCollection}
+			onCreateOption={handleCreate} />
+	);
+}
+
+
 
 const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 	const [listing, setListing] = useState(_listing);
@@ -50,15 +101,15 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 			</FormControl>
 			<FormControl isInvalid={errors.price}>
 				<FormLabel>Price</FormLabel>
-				<Input name="price" type="number" value={values.price} onChange={handleChange} onBlur={handleBlur} />
+				<Input name="price" type="number" onChange={handleChange} onBlur={handleBlur} />
 			</FormControl>
 			<FormControl isInvalid={errors.maxBillingIntervals}>
 				<FormLabel>Max # of billing intervals</FormLabel>
-				<Input name="maxBillingIntervals" type="number" step="1" value={values.maxBillingIntervals} onChange={handleChange} onBlur={handleBlur} />
+				<Input name="maxBillingIntervals" type="number" step="1" onChange={handleChange} onBlur={handleBlur} />
 			</FormControl>
 			<FormControl>
 				<FormLabel>Billing Interval</FormLabel>
-				<Select placeholder="Select billing interval" name="billingInterval" value={values.billingInterval}>
+				<Select placeholder="Select billing interval" name="billingInterval">
 					{billingIntervals.map(x => <option key={x} value={x}>{capitalize(x)}</option>)}
 				</Select>
 			</FormControl>
@@ -71,17 +122,52 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 	);
 };
 
-const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}) => {
+const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMakers}) => {
 	const [tool, setTool] = useState(_tool);
 	const [listings, setListings] = useState(_listings);
 	const isEdit = !!tool;
 	const [manualFile, setManualFile] = useState();
-	const handleSubmit = async (values, { setSubmitting, resetForm, setErrors }, history) => {
+
+	const handleSubmit = async (_values, { setSubmitting, resetForm, setErrors }, history) => {
 		setSubmitting(true);
 		let formData = new FormData();
+
+		const {maker, category, ...values} = _values;
+
 		for (const [k, v] of Object.entries(values)) {
 			formData.append(k, v);
 		}
+
+		let maker_id = maker ? maker.id : undefined;
+		if (maker && maker_id < 0) { // we have a new maker
+			const newMaker = await fetch('/api/create/maker', {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: maker.name}),
+				credentials: "same-origin"
+			}).then(x => x.json());
+			maker_id = newMaker.id;
+		}
+
+
+		let cat_id = category ? category.id : undefined;
+		if (category && cat_id < 0) { // we have a new maker
+			const newCat = await fetch('/api/create/category', {
+				method: "POST",
+				headers: {
+					'Content-Type': "application/json"
+				},
+				body: JSON.stringify({name: category.name}),
+				credentials: "same-origin"
+			}).then(x => x.json());
+			cat_id = newCat.id;
+		}
+
+		formData.append('tool_maker_id', maker_id ?? '');
+		formData.append('tool_category_id', cat_id ?? '');
+
 		if (manualFile) {
 			formData.append('manual', manualFile);
 		}
@@ -91,15 +177,15 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				body: formData,
 				credentials: "same-origin"
 			}).then(x => x.json());
+
 			if (!isEdit) {
 				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
 			}
 
-			setTool(t);
 			setManualFile(null);
-
 			setSubmitting(false);
-			resetForm(t);
+			setTool(t);
+			resetForm({values: t});
 		} catch (error) {
 			setSubmitting(false);
 			setErrors({ submit: error.message });
@@ -126,7 +212,7 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			<CardHeader>
 			<Heading size="md">Tool Information</Heading>
 			<br />
-		<Formik enableReinitialize initialValues={tool ?? {}} validationSchema={toolSchema} onSubmit={handleSubmit}>
+		<Formik enableReinitialize initialValues={tool ?? {}} onSubmit={handleSubmit}>
         	{({ values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting }) => (
 			<Form>
 			<Stack spacing={3}>
@@ -140,28 +226,16 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 				</FormControl>
 				<FormControl>
 					<FormLabel>Category</FormLabel>
-					<Select placeholder="Select category" name="tool_category_id" value={values.tool_category_id}>
-						{toolCategories.map(c => (
-							<option key={c.id} value={c.id}>
-								{c.name}
-							</option>
-						))}
-					</Select>
+					<SearchDropdown collection="category" name="category" />
 				</FormControl>
 				<FormControl>
 					<FormLabel>Maker</FormLabel>
-					<Select placeholder="Select maker" name="tool_maker_id" value={values.tool_maker_id}>
-						{toolMakers.map(c => (
-							<option key={c.id} value={c.id}>
-								{c.name}
-							</option>
-						))}
-					</Select>
+					<SearchDropdown collection="maker" name="maker" />
 				</FormControl>
 				<FormControl>
 					<FormLabel>Manual</FormLabel>
 					<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
-					{manualURL && <FormHelperText>Currently uploaded: <a target="_blank" href={manualURL}>{manualName}</a></FormHelperText>}
+					{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 				</FormControl>
 				<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 			</Stack>
@@ -171,10 +245,9 @@ const ToolForm = ({tool: _tool, listings: _listings, toolCategories, toolMakers}
 			</CardHeader>
 			{isEdit && <Divider />}
 			{isEdit && <CardBody>
-				<Stack divider={<StackDivider />} spacing='4'>
+				<Stack divider={<StackDivider />} spacing={3}>
 					<Heading size='md'>Listings</Heading>
 					{listings.map(l => <ListingForm toolId={tool.id} key={l.id} listing={l} onDelete={onListingDelete} />)}
-
 					<Button mt={4} colorScheme="blue" onClick={onNewListing}>+ New Listing</Button>
 				</Stack>
 			</CardBody>}

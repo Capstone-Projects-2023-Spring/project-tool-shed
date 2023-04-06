@@ -22,9 +22,10 @@ const Tool = ({
         description, 
         id, 
         category,
-        maker
+        maker,
+        video
     }) => {
-	const s = name + " " + description;
+	const videoLink = video;
 
 	const onDelete = () => {
 		if (confirm(`Are you sure you want to delete ${name}?`)) { // TODO: something else
@@ -43,13 +44,13 @@ const Tool = ({
             <p>{description}</p>
         
             <a href={`/tools/${id}/edit`}>
-                <button>Edit Tool</button>
+                <button>Edit Tool </button>
             </a>
 
             <a onClick={onDelete}>
-                <button>Delete Tool</button>
+                <button>Delete Tool </button>
             </a>
-	    <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`}><button>View on Youtube</button></a>
+	    <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(videoLink)}`}><button>View on Youtube </button> <console className="log">Reached</console></a>
         </div>
 };
 

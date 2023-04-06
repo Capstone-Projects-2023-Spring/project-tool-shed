@@ -14,13 +14,13 @@ const genModels = sequelize => {
 	/**
 	 * @class User
          * @classdesc Represents a user.
-	 * @augments sequelize.Model
+	 	 * @augments sequelize.Model
          * @property {string} first_name The user's first name
-	 * @property {string} last_name The user's last name
+	 	 * @property {string} last_name The user's last name
          * @property {string} email The user's email, used for logging in
          * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
-	 * @property {int} address_id The ID of an Address record for the user.
-	 * @property {int} billing_address_id The ID of an Address record for the user.
+	 	 * @property {int} address_id The ID of an Address record for the user.
+	 	 * @property {int} billing_address_id The ID of an Address record for the user.
          */
 	const User = sequelize.define('User', {
 		first_name: {
@@ -245,6 +245,7 @@ const genModels = sequelize => {
          * @property {integer} tool_category_id The id the category related to this tool
 	 	 * @property {integer} tool_maker_id The id of the maker of this tool.
 		 * @property {string} video YouTube video attached to a tool
+		 * @property {ts_vector} videoSearchVector A string of text that will ultimately be used for Video Searches
          */
 	const Tool = sequelize.define('Tool', {
         	name: {
@@ -299,6 +300,13 @@ const genModels = sequelize => {
 		}
 	
 		tool.searchVector = sequelize.fn('to_tsvector', content);
+	});
+
+	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
+		let videoContent = '';
+		videoContent += (tool.video ?? '') + ' ';
+
+		tool.searchVector = sequelize.fn('to_tsvector', videoContent);
 	});
 
 

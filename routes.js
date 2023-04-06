@@ -215,11 +215,11 @@ module.exports = (app, models) => {
 
 	/* API: Create tools */
 	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
-			tool_maker_id, tool_category_id
+			tool_maker_id, tool_category_id, video
 		});
 
 		const uploadedFile = req.file;
@@ -247,7 +247,7 @@ module.exports = (app, models) => {
 	/* API: Edit tool */
 	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.findByPk(tool_id, {});
 
@@ -263,6 +263,7 @@ module.exports = (app, models) => {
 		// Update the tool with the new data
 		tool.name = name;
 		tool.description = description;
+		tool.video = video;
 		await tool.save();
 
 		await tool.setCategory(tool_category_id);

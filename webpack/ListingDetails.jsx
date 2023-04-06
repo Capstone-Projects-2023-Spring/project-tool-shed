@@ -10,7 +10,17 @@ const style = {
   backgroundColor: "#F1F1F1",
   padding: 5,
   borderRadius: 4,
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+  button: {
+    background: "#1e90ff",
+    color: "#fff",
+    fontSize: "1.2em",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "4px",
+    textDecoration: "none",
+    cursor: "pointer"
+  }
 };
 
 /*
@@ -42,7 +52,6 @@ const Listing = ({
         <p>Price & Rate : ${price} {billingInterval}</p>
         <p>Available For: {maxBillingIntervals} units</p>
         <div>
-          <p>Tool Video:</p>
           {videoId ? (
             <iframe
               width="560"
@@ -52,11 +61,14 @@ const Listing = ({
               allowFullScreen
             />
           ) : (
-            <p>{realLink}</p>
+            <a href={realLink}target="_blank" rel="noopener noreferrer">
+            <button style={style.button}>Recommended Videos</button>
+          </a>
+          
           )}
         </div>
         <a href={`/inbox/${tool.owner_id}`}>
-          <button>Contact Owner</button>
+          <button style={{fontWeight: "bold", color: "white", backgroundColor: "#0077ff", padding: "10px 15px", borderRadius: "4px", border: "none", cursor: "pointer"}}>Contact Owner</button>
         </a>
       </div>
     );

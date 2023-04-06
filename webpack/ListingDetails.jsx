@@ -29,7 +29,7 @@ const Listing = ({
       <h1 style={{ fontSize: "24px", fontWeight: "bold"}}>
         <p>Listing Details</p>
       </h1>
-      <h2 style={{ fontWeight: "bold" }}>
+      <h2>
         <p>{tool.name} {owner}</p>
       </h2>
       <p>Tool Description: {tool.description}</p>
@@ -65,7 +65,7 @@ const Recommendation= ({
 }) => {
   return (
     <div style={style}>
-      <h2 style={{ fontWeight: "bold" }}>
+      <h2>
         <p>{tool.name} {owner}</p>
       </h2>
       <p>Tool Description: {tool.description}</p>

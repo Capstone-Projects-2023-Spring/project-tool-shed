@@ -442,9 +442,9 @@ module.exports = (app, models) => {
 		Listing Details Page
 	*/
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
-		console.log("getting");
 		const { listing_id } = req.params;
 
+		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
@@ -462,7 +462,7 @@ module.exports = (app, models) => {
 		if (!listings) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
-
+		// query all listings with the same tool category as the listing choosen by the user
 		const recommendations = await models.Listing.findAll({
 			where: {
 				active: true,
@@ -475,22 +475,38 @@ module.exports = (app, models) => {
 				as: 'tool',
 				include: [{
 					model: models.ToolCategory,
-					as: 'category',
-					// where: {
-					// 	id: listings.tool.tool_category_id // add null check here
-					// },
+					as: 'category'
 				}]
 			}]
 		});
 
-		// filter out the recommendations that have a tool with the same category as listings.tool.category_id
+		// filter out the recommendations that have a tool without the same category as the tool category 
+		// associated with the listing (listings.tool.category.id)
 		const filteredRecommendations = recommendations.filter(recommendation => {
 			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
 		});
 
+		// search vectors of the tool associated with the listing choosen by user
+		const searchVector = listings.tool.searchVector;
+		// sort filteredRecommendations
+		filteredRecommendations.sort((a, b) => {
+			const aSearchVector = a.tool.searchVector;
+			const bSearchVector = b.tool.searchVector;
+
+			// Split the search vectors into an array of terms
+			const aTerms = aSearchVector.split(' ');
+			const bTerms = bSearchVector.split(' ');
+			const searchTerms = searchVector.split(' ');
+
+			// Count the number of shared search terms between each recommendation and the listing
+			const aSharedTerms = aTerms.filter(term => searchTerms.includes(term)).length;
+			const bSharedTerms = bTerms.filter(term => searchTerms.includes(term)).length;
+
+			// Sort the recommendations by number of shared terms (descending)
+			return bSharedTerms - aSharedTerms;
+		});
+		
 		res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
-		//res.json({ listings, recommendations: filteredRecommendations});
-		//res.render('listing_details.html', { listings, recommendations });
 	}));
 
 	/*

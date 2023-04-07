@@ -37,7 +37,7 @@ const Tool = ({
 	}
 
         return <div style={style}>
-            <h2 style={{ fontWeight: "bold" }}>{name}</h2>
+            <h2>{name}</h2>
 	    {maker && <h3>Maker: {maker.name}</h3>}
 	    {category && <h3>Category: {category.name}</h3>}
             <p>{description}</p>

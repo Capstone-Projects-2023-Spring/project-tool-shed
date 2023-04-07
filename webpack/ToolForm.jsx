@@ -233,6 +233,10 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 					<SearchDropdown collection="maker" name="maker" />
 				</FormControl>
 				<FormControl>
+					<FormLabel>YouTube Video</FormLabel>
+					<Input name="video" type="url" value={values.video} onChange={handleChange} onBlur={handleBlur} />
+				</FormControl>
+				<FormControl>
 					<FormLabel>Manual</FormLabel>
 					<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
 					{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}

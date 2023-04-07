@@ -238,14 +238,15 @@ const genModels = sequelize => {
 	 * @class Tool
 		 * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
-		 * @property {string} name Name of the tool.
-		 * @property {string} description An arbitrary description of the tool and its condition.
+         * @property {string} name Name of the tool.
+         * @property {string} description An arbitrary description of the tool and its condition.
+         * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+         * @property {integer} owner_id The id of the User record that owns this tool
+         * @property {integer} tool_category_id The id the category related to this tool
+	 	 * @property {integer} tool_maker_id The id of the maker of this tool.
+		 * @property {string} video YouTube video attached to a tool
+         */
 
-		 * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
-		 * @property {integer} owner_id The id of the User record that owns this tool
-		 * @property {integer} tool_category_id The id the category related to this tool
-	 * @property {integer} tool_maker_id The id of the maker of this tool.
-		 */
 	const Tool = sequelize.define('Tool', {
 		name: {
 			type: DataTypes.STRING,
@@ -257,6 +258,11 @@ const genModels = sequelize => {
 		},
 		searchVector: {
 			type: DataTypes.TSVECTOR
+		},
+		video: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			defaultValue: 'https://www.youtube.com/'
 		}
 	}, { tableName: 'tool', paranoid: true });
 
@@ -299,7 +305,6 @@ const genModels = sequelize => {
 
 		tool.searchVector = sequelize.fn('to_tsvector', content);
 	});
-
 
 	/**
 	 * @class Listing

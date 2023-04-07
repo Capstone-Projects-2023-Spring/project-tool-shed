@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 
-{% block header %}
-<title style="font-size: 32px; font-weight: bold;">Listing Details</title>
-{% endblock %}
-
 {% block body %}
 
 <div id="root"></div>
 
 <script type="application/javascript">
-    window._listings = {{ listings | json}};
+    window._listings = {
+        listings: {{ listings | json}},
+        recommendations: {{ recommendations | json }}
+    };
 </script>
 
 <script type="application/javascript" src="/webpack/ListingDetails.js"></script>

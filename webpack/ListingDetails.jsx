@@ -7,7 +7,8 @@ const style = {
     flexDirection: "column",
     backgroundColor: "#F1F1F1",
     padding: 10,
-    borderRadius: 4,
+    marginBottom:10,
+    borderRadius: 10,
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
     width: "50%",
   },
@@ -36,9 +37,14 @@ const style = {
     fontSize: 24,
     marginBottom: 5,
   },
-  info: {
+  info: { 
     fontSize: 18,
     marginBottom: 10,
+  },
+  link: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: "#0077ff",
   },
   videoContainer: {
     marginTop: 20,
@@ -60,6 +66,66 @@ const Listing = ({
   const videoId = getVideoId(realLink);
 
   return (
+    <div>
+      <div style={style.container}>
+        <div style={style.header}>
+          <h2 style={style.title}>
+            {tool.name}
+          </h2>
+          <a href={`/inbox/${tool.owner_id}`}>
+            <button style={style.button}>Contact Owner</button>
+          </a>
+        </div>
+        <div>
+          <p style={style.subtitle}>
+            {tool.description}
+          </p>
+          <p style={style.info}>
+            Price & Rate: ${price} {billingInterval}
+          </p>
+          <p style={style.info}>
+            Available For: {maxBillingIntervals} units
+          </p>
+        </div>
+        {videoId ? (
+          <div style={style.videoContainer}>
+            <iframe
+              width="560"
+              height="315"
+              src={`https://www.youtube.com/embed/${videoId}`}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <div style={style.videoContainer}>
+            <p style={style.subtitle}>Recommended Videos:<a style={style.link} href={realLink} target="_blank">{realLink}</a>
+            </p>
+          </div>
+        )}
+        <div style={style.header}>
+          <h2 style={style.title}>
+            <p>Recommended Tools ⬇️⬇️⬇️</p>
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+/*
+* Creates a new Listing component with the given information
+*/
+const Recommendation = ({
+  owner,
+  price,
+  billingInterval,
+  maxBillingIntervals,
+  tool,
+}) => {
+  return (
     <div style={style.container}>
       <div style={style.header}>
         <h2 style={style.title}>
@@ -79,22 +145,7 @@ const Listing = ({
         <p style={style.info}>
           Available For: {maxBillingIntervals} units
         </p>
-      <h1 style={{ fontSize: "24px", fontWeight: "bold"}}>
-        <p>Recommended Tools</p>
-      </h1>
       </div>
-      {videoId && (
-        <div style={style.videoContainer}>
-          <iframe
-            width="560"
-            height="315"
-            src={`https://www.youtube.com/embed/${videoId}`}
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-          />
-        </div>
-      )}
-
     </div>
   );
 };
@@ -111,33 +162,6 @@ const ListingDetails = ({ listings }) => {
   </div>;
 };
 
-
-/*
-     * Creates a new Listing component with the given information
-     */
-
-const Recommendation= ({
-  owner,
-  price,
-  billingInterval,
-  maxBillingIntervals,
-  tool,
-}) => {
-  return (
-    <div style={style}>
-      <h2>
-        <p>{tool.name} {owner}</p>
-      </h2>
-      <p>Tool Description: {tool.description}</p>
-      <p>Price & Rate : ${price} {billingInterval}</p>
-      <p>Available For: {maxBillingIntervals} units</p>
-
-      <a href={`/inbox/${tool.owner_id}`}>
-        <button>Contact Owner</button>
-      </a>
-    </div>
-  );
-};
 
 const RecommendationList = ({recommendations}) => {
 	return <div>

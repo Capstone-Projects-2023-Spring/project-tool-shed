@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ReactDOM from 'react-dom/client';
 import { ChakraProvider, Flex, Spacer, Box, IconButton, Menu, MenuButton, MenuList, MenuItem, useDisclosure, Button } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -23,6 +23,17 @@ const NavBar = ({ authUser }) => {
     
   }
   const {isOpen, onOpen, onClose} = useDisclosure();
+
+  const [notif, setNotifColor] = useState(false);
+
+  useEffect(() => {
+    const url = `ws://localhost:5000/websocket/notification`;
+    let s = new WebSocket(url);
+    s.addEventListener('message', ({data}) => {
+      const msg = JSON.parse(data);
+      setNotifColor(true);
+    });
+      }, []);
 
   return (
       <Box bg="blue.500" position="sticky" top="0" left="0" w="100%" p="4">
@@ -112,6 +123,7 @@ const NavBar = ({ authUser }) => {
                     variant="ghost"
                     icon={label}
                     fontSize="24px"
+                    color={url === "/inbox" && setNotifColor ? "red" : "white"}
                     mr={2}
                     _hover={{ bg: "blue.400" }}
                     _focus={{ bg: "blue.600", boxShadow: "inner",  }}

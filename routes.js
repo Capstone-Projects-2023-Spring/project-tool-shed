@@ -4,6 +4,32 @@ const { loginUserSchema, searchListingsSchema, newReviewSchema,
 const path = require('path');
 const { Op } = require("sequelize");
 
+class WebSocketsStructure {
+	
+	constructor(){
+		this.map = {};
+	}
+	//Hashmap, key userId,
+	addConnection(userId, key, socket){
+		if(!this.map[userId]){
+			this.map[userId] = []
+		} 
+		this.map[userId].push({key, socket})
+	}
+	getConnections(userId, key){
+		const connections = []
+		for(const connection of this.map[userId]){
+			if(connection.key === key){
+				connections.push(connection.socket)
+			}
+			
+		}
+		return connections;
+	}	
+}
+
+global.webSockets = new WebSocketsStructure();
+
 /*
 	Routes
 	Contains routes.
@@ -763,6 +789,12 @@ module.exports = (app, models, sequelize) => {
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
 
+
+	/*Notifications websocket*/
+
+	app.ws('/websocket/:key', asyncHandler(async(ws, req) => {
+		global.webSockets.addConnection(req.user.id, req.params.key, ws);
+	}));
 };
 
 

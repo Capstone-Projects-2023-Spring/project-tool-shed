@@ -1,5 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import renderComponent from './util/renderComponent';
+
 /**
  * A tool object represents a physical tool that a user can add to their inventory.
  * It contains information such as the tool's name, description, owner ID, category ID,
@@ -66,6 +67,4 @@ const ToolList = ({tools}) => {
 	</div>
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-	<ToolList tools={window._tools} />
-);
+renderComponent('#root', <ToolList tools={window._tools} />)

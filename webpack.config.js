@@ -19,6 +19,7 @@ module.exports = {
 		ToolForm: path.resolve(__dirname, 'webpack/ToolForm.jsx'),
 		NavBar: path.resolve(__dirname, 'webpack/NavBar.jsx'),
 		ListingDetails: path.resolve(__dirname, 'webpack/ListingDetails.jsx'),
+		Login: path.resolve(__dirname, 'webpack/Login.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

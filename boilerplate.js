@@ -4,15 +4,20 @@
 
 const path = require('path');
 const fs = require('fs');
+
 const decache = require('decache'); // Allow us to reload code via require
 const multer = require('multer'); // File upload framework
 const express = require('express'); // Web framework
 const nunjucks = require('nunjucks'); // Templating engine
+const expressWs = require('express-ws'); // WebSockets
 const { Sequelize, DataTypes } = require('sequelize'); // DB connection/migrations
-const { MoldyMeat } = require('moldymeat');
+const { MoldyMeat } = require('moldymeat'); // "migrations"
+
 const authMiddleware = require('./middleware/auth.js');
 const cookieParser = require('cookie-parser');
 const asyncHandler = require('express-async-handler');
+const debounce = require('debounce');
+const dotenv = require('dotenv');
 
 /*
 	TODO:
@@ -33,16 +38,6 @@ const settings = {
 };
 
 /**
- * List of files to avoid watching.
- */
-const watchIgnoreFiles = [
-	'boilerplate.js',
-	'models.js',
-	'index.js',
-	'webpack.config.js'	
-];
-
-/**
  * The connection parameters for connecting to the database.
  * @type {object}
  * @property {string} database Overridable via PGDATABASE
@@ -56,6 +51,31 @@ const databaseSettings = {
 	password: process.env.PGPASSWORD ?? 'postgres',
 	host: process.env.PGHOST ?? 'localhost'
 };
+
+/**
+ * List of files to avoid watching.
+ */
+const watchIgnoreFiles = [
+	'boilerplate.js',
+	'models.js',
+	'index.js',
+	'webpack.config.js'	
+];
+
+async function waitForCodeChange() {
+	return new Promise((resolve, reject) => {
+		let finish = debounce(resolve, 200);
+		let x = fs.watch(__dirname, {persistent: true}, (eventType, filename) => {
+			let shouldReload = filename.endsWith('.js');
+			shouldReload = shouldReload && !filename.endsWith('.test.js');
+			shouldReload = shouldReload && !watchIgnoreFiles.includes(filename);
+			if (shouldReload) {
+				x.unref();
+				finish(filename);
+			}
+		});
+	});
+}
 
 /**
  * Create middleware to render nunjucks templates.
@@ -101,44 +121,9 @@ async function sleep(ms) {
  * @async
  */
 async function initSequelize() {
-	const {database, username, password, host} = databaseSettings;
-
-	// first, connect to postgres manually.
-	const { Client } = require("pg");
-
-	let client = null;
-
-	for (let i = 10; i--;) {
-		try {
-			client = new Client({
-				user: username,
-				password,
-				host
-			});
-
-			await client.connect();
-			break;
-		} catch (e) {
-			await client.end();
-			await sleep(1000);
-		} 
-	}
-
-	// then, create the database specified in dbSettings.
-	// if it fails, we're assuming it failed because the
-	// database already exists.
-	try {
-		await client.query(`CREATE DATABASE "${database}";`);
-	} catch (err) {};
-
-	await client.end();
-
-	let s = new Sequelize({
-		database,
-		username,
-		password,
-		host,
-		dialect: 'postgres'
+	const s = new Sequelize({
+		dialect: 'postgres',
+		...databaseSettings
 	});
 
 	try {
@@ -162,7 +147,8 @@ async function initSequelize() {
  * @async
  */
 async function loadModels(sequelize) {
-	return require('./models.js')(sequelize); 
+	decache('./models');
+	return require('./models')(sequelize); 
 }
 
 /**
@@ -183,33 +169,35 @@ async function syncDatabase(sequelize) {
  * @async
  */
 async function startServer() {
-	const sequelize = await initSequelize();
-
-	const runServer = async () => {
-		const app = express();
-		app.wsInstance = require('express-ws')(app, undefined, {wsOptions: {clientTracking: true}});
-
-		const uploadPath = path.join(__dirname, '.uploads');
-		const uploadStorage = multer.diskStorage({
-			destination: (req, file, cb) => {
-				cb(null, uploadPath);
-			},
-			filename: (req, file, cb) => {
-				const as = file.originalname.split('.');
-				let ext = as.pop();
-				ext = ext ? `.${ext}` : '';
-				cb(null, `${as.join('.')}.${Math.round(Math.random() * 1E9)}${ext}`);
-			}
-		});
-		app.upload = multer({storage: uploadStorage});
-
-		// middleware to respond to errors with page
-		function handleError(err, req, res, next) {
-			console.error(err);
-			res.status(500);
-			res.render('error.html', {error: err});
-			next();
+	dotenv.config();
+	const uploadPath = path.join(__dirname, '.uploads');
+	const uploadStorage = multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, uploadPath);
+		},
+		filename: (req, file, cb) => {
+			const as = file.originalname.split('.');
+			let ext = as.pop();
+			ext = ext ? `.${ext}` : '';
+			cb(null, `${as.join('.')}.${Math.round(Math.random() * 1E9)}${ext}`);
 		}
+	});
+	const multerUpload = multer({storage: uploadStorage});
+	
+	// middleware to respond to errors with page
+	function handleError(err, req, res, next) {
+		console.error(err);
+		res.status(500);
+		res.render('error.html', {error: err});
+		next();
+	}
+
+	const sequelize = await initSequelize();
+	const runServer = async (mainSilent = false) => {
+		const app = express();
+		app.wsInstance = expressWs(app, undefined, {wsOptions: {clientTracking: true}});
+
+		app.upload = multerUpload;
 
 		app.use(handleError);
 		app.use(express.json());
@@ -220,7 +208,7 @@ async function startServer() {
 
 		const routesModule = './routes';
 		decache(routesModule);
-		require(routesModule)(app, sequelize.models);
+		require(routesModule)(app, sequelize.models, sequelize);
 
 		app.use('/uploads', express.static(uploadPath)); // serve files
 		app.use('/public', express.static(path.join(__dirname, "public")));
@@ -229,13 +217,13 @@ async function startServer() {
 
 		// Starts the web server.
 		const server = await app.listen(settings.port);
-		console.log(`tool-node is running on port ${settings.port}`);
+		if (!mainSilent) console.log(`tool-node is running on port ${settings.port}`);
 
-		const shutDown = () => new Promise((resolve, reject) => {
-			console.log(`shutting down tool-node`);
+		const shutDown = (silent = false) => new Promise((resolve, reject) => {
+			if (!silent) console.log(`shutting down tool-node`);
 			server.closeAllConnections();
 			server.close(() => {
-				console.log(`successfully shut down tool-node`);
+				if (!silent) console.log(`successfully shut down tool-node`);
 				resolve();
 			});
 		});
@@ -243,31 +231,20 @@ async function startServer() {
 		return shutDown;
 	}
 
-	let stopServer = {current: async () => {}};
+	let stopServer = null;
 	if (settings.reloadCode) {
-		stopServer.current = await runServer();
-		fs.watch(__dirname, {persistent: true}, (eventType, filename) => {
-				let shouldReload = filename.endsWith('.js') && !filename.endsWith('.test.js');
-				if (shouldReload) {
-					console.log("Directory Change", eventType, filename);
-					stopServer.current().then(() => {
-						runServer().then(s => {
-							stopServer.current = s;
-						});
-					});
-				}
-		});
+		stopServer = await runServer();
+		while (true) {
+			const changedFile = await waitForCodeChange();
+			console.log(`${changedFile} was modified, reloading`);
+			await stopServer(true);
+			stopServer = await runServer(true);
+		}
 	} else {
-		stopServer.current = runServer();
+		stopServer = await runServer();
 	}
 
-	const shutDown = () => {
-		if (stopServer.current) {
-			stopServer.current().then(() => process.exit(0));
-		} else {
-			process.exit(0);
-		}
-	};
+	const shutDown = () => stopServer().then(() => process.exit(0));
 	
 	process.on('SIGTERM', shutDown);
 	process.on('SIGINT', shutDown);

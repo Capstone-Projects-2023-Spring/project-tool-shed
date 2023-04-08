@@ -156,17 +156,18 @@ module.exports = (app, models) => {
 
 	/* PAGE: Create a tool */
 	app.get('/tools/new', asyncHandler(requiresAuth(async (req, res) => {
-		res.render('tool_form.html', {
-			toolCategories: await ToolCategory.findAll(),
-			toolMakers: await ToolMaker.findAll()
-		});
+		res.render('tool_form.html', {});
 	})));
 
 	/* PAGE: Edit a tool */
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, { include: [{ model: FileUpload, as: 'manual' }] });
+		const tool = await models.Tool.findByPk(tool_id, { include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		] });
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -180,8 +181,6 @@ module.exports = (app, models) => {
 		const listings = await Listing.findAll({ where: { tool_id } });
 
 		res.render('tool_form.html', {
-			toolCategories: await ToolCategory.findAll(),
-			toolMakers: await ToolMaker.findAll(),
 			tool,
 			listings
 		});
@@ -216,16 +215,11 @@ module.exports = (app, models) => {
 
 	/* API: Create tools */
 	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
-			tool_maker_id, tool_category_id
-		}, {
-			include: [
-				{ model: ToolCategory, as: "category" },
-				{ model: ToolMaker, as: "maker" }
-			]
+			tool_maker_id, tool_category_id, video
 		});
 
 		const uploadedFile = req.file;
@@ -240,24 +234,22 @@ module.exports = (app, models) => {
 			});
 
 			await tool.setManual(fu);
-			res.json({ tool: { ...tool, manual: fu } });
-		} else {
-			res.json({ tool });
 		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
+		res.json({ tool });
 	})));
 
 	/* API: Edit tool */
 	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
-		const tool = await models.Tool.findByPk(tool_id, {
-			include: [
-				{ model: FileUpload, as: 'manual' },
-				{ model: ToolCategory, as: "category" },
-				{ model: ToolMaker, as: "maker" }
-			]
-		});
+		const tool = await models.Tool.findByPk(tool_id, {});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -271,11 +263,11 @@ module.exports = (app, models) => {
 		// Update the tool with the new data
 		tool.name = name;
 		tool.description = description;
-		tool.tool_category_id = tool_category_id;
-		tool.tool_maker_id = tool_maker_id;
+		tool.video = video;
 		await tool.save();
 
-		// TODO: load the new categories and makers
+		await tool.setCategory(tool_category_id);
+		await tool.setMaker(tool_maker_id);
 
 		const uploadedFile = req.file;
 		if (uploadedFile) {
@@ -290,6 +282,12 @@ module.exports = (app, models) => {
 
 			await tool.setManual(fu);
 		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
 
 		res.json({ tool });
 	})));
@@ -437,13 +435,59 @@ module.exports = (app, models) => {
 		});
 		res.json({ results });
 	}));
+
+	app.get('/api/search/:kind', asyncHandler(async (req, res) => {
+		const { kind } = req.params;
+		const { q } = req.query;
+
+		let model = null;
+		if (kind === 'maker') {
+			model = ToolMaker;
+		} else if (kind === 'category') {
+			model = ToolCategory;
+		}
+		
+		if (!model) return res.status(404).json({error: "Not found", results: null});
+
+		const sq = (q ?? '').split(' ').filter(x => x.length > 2).map(x => `${x}:*`).join(' <-> ');
+
+		let where = {};
+
+		if (sq.length > 0) {
+			where.searchVector = {[Op.match]: sequelize.fn('to_tsquery', sq)};
+		}
+
+		let results = await model.findAll({
+			where,
+			order: [
+				["name", 'ASC']
+			]
+		});
+		res.json({results, error: null});
+	}));
+
+	app.post('/api/create/:kind', asyncHandler(requiresAuth(async (req, res) => {
+		const { kind } = req.params;
+		const { name } = req.body;
+
+		let model = null;
+		if (kind === 'maker') {
+			model = ToolMaker;
+		} else if (kind === 'category') {
+			model = ToolCategory;
+		}
+
+		let x = await model.create({name});
+		res.json(x);
+	})));
+
 	/*
 		Listing Details Page
 	*/
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
-		console.log("getting");
 		const { listing_id } = req.params;
 
+		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
@@ -461,8 +505,51 @@ module.exports = (app, models) => {
 		if (!listings) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
+		// query all listings with the same tool category as the listing choosen by the user
+		const recommendations = await models.Listing.findAll({
+			where: {
+				active: true,
+				id: {
+					[Op.ne]: listings.id
+				}
+			},
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				include: [{
+					model: models.ToolCategory,
+					as: 'category'
+				}]
+			}]
+		});
 
-		res.render('listing_details.html', { listings });
+		// filter out the recommendations that have a tool without the same category as the tool category 
+		// associated with the listing (listings.tool.category.id)
+		const filteredRecommendations = recommendations.filter(recommendation => {
+			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
+		});
+
+		// search vectors of the tool associated with the listing choosen by user
+		const searchVector = listings.tool.searchVector;
+		// sort filteredRecommendations
+		filteredRecommendations.sort((a, b) => {
+			const aSearchVector = a.tool.searchVector;
+			const bSearchVector = b.tool.searchVector;
+
+			// Split the search vectors into an array of terms
+			const aTerms = aSearchVector.split(' ');
+			const bTerms = bSearchVector.split(' ');
+			const searchTerms = searchVector.split(' ');
+
+			// Count the number of shared search terms between each recommendation and the listing
+			const aSharedTerms = aTerms.filter(term => searchTerms.includes(term)).length;
+			const bSharedTerms = bTerms.filter(term => searchTerms.includes(term)).length;
+
+			// Sort the recommendations by number of shared terms (descending)
+			return bSharedTerms - aSharedTerms;
+		});
+		
+		res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
 	}));
 
 	/*
@@ -470,8 +557,8 @@ module.exports = (app, models) => {
 	 */
 
 	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
-        res.render('account.html', {});
-    })));
+		res.render('account.html', {});
+	})));
 
 
 	/*

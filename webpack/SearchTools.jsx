@@ -11,6 +11,7 @@ import getBrowserCoords from './util/getBrowserCoords';
 const defaultApiKey = GOOGLE_MAPS_API_KEY; // see webpack.config.js, module.exports.plugins
 const defaultCoordinates = { lat: 39.98020784788337, lon: -75.15746555080395 }; // temple university
 const defaultSearchRadius = 10;
+const defaultUserRating = 1;
 
 const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) => {
 	const [results, setResults] = useState([]);
@@ -18,6 +19,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchRadius, setSearchRadius] = useState(defaultSearchRadius);
 	const [selectedCategory, setSelectedCategory] = useState('');
+	const [userRating, setuserRating] = useState('');
 
 	const [map, setMap] = useState();
 	const mapRef = useRef();
@@ -46,7 +48,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 		fetch(`/api/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
 			.then(x => x.json())
 			.then(x => setResults(x.results));
-	}, [coords, searchQuery, searchRadius, selectedCategory]);
+	}, [coords, searchQuery, searchRadius, selectedCategory, userRating]);
 
 	useLayoutEffect(() => {
 		if (!mapRef.current) return;
@@ -152,7 +154,8 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 			// add an event listener for the "click" event
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the production site details page
-				window.open(`/listing/${listing_id}/details`);
+				// For now, routing to localhost listing details page
+				window.open(`http://localhost:5000/listing/${listing_id}/details`);
 			});
 
 			markers.push(marker);
@@ -205,6 +208,24 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 								</option>
 							))}
 						</Select>
+					</FormControl>
+
+					<FormControl mb={4}>
+						<FormLabel>User Rating</FormLabel>
+						<Box>
+							<Slider w='100%' defaultValue={defaultUserRating} max={5} onChange={x => setuserRating(x)}>
+								<SliderTrack>
+									<SliderFilledTrack bg="blue.500" />
+								</SliderTrack>
+								<SliderThumb bg="blue.500" />
+								<SliderMark value={1} {...labelStyles}>2</SliderMark>
+								<SliderMark value={2} {...labelStyles}>2</SliderMark>
+								<SliderMark value={3} {...labelStyles}>3</SliderMark>
+								<SliderMark value={4} {...labelStyles}>4</SliderMark>
+								<SliderMark value={5} {...labelStyles}>5</SliderMark>
+								<SliderMark value={userRating} {...sliderValueStyle}>{userRating}Stars</SliderMark>
+							</Slider>
+						</Box>
 					</FormControl>
 				</Container>
 				<Divider my={4} />

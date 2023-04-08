@@ -735,6 +735,31 @@ module.exports = (app, models) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
+
+	app.get('/users/:user_id/average-rating', async (req, res) => {
+		const { user_id } = req.params;
+	  
+		try {
+		  // Find the user with the specified ID
+		  const user = await User.findByPk(user_id, {
+			include: {
+			  model: UserReview,
+			  as: 'reviews',
+			},
+		  });
+	  
+		  // Calculate the average rating of the user's reviews
+		  const ratings = user.reviews.map(review => review.ratings);
+		  const averageRating = ratings.reduce((acc, val) => acc + val, 0) / ratings.length;
+	  
+		  // Send the response with the average rating
+		  res.send(`The average rating for user ${user.first_name} ${user.last_name} is ${averageRating}`);
+		} catch (error) {
+		  console.error(error);
+		  res.status(500).send('An error occurred while calculating the average rating');
+		}
+	  });
+
 };
 
 

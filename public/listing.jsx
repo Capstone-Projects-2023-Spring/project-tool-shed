@@ -13,7 +13,7 @@ const Listing = ({
 }) => {
   return (
     <div>
-      <h2 style={{ fontWeight: "bold" }}>
+      <h2>
         <p>{tool.name} {owner}</p>
       </h2>
       <p>Tool Description: {tool.description}</p>

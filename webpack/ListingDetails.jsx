@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import renderComponent from './util/renderComponent';
 
 const style = {
   container: {
@@ -51,7 +51,20 @@ const style = {
   },
 };
 
+const ContactOwnerButton = ({listingId, owner}) => {
+	let url = `/inbox/${owner.id}`;
+	if (listingId) {
+		url += `?listingId=${listingId}`;
+	};
+	return (
+		<a href={url}>
+			<button style={style.button}>Contact {owner.first_name}</button>
+		</a>
+	);
+};
+
 const Listing = ({
+  id: listingId,
   owner,
   price,
   billingInterval,
@@ -72,9 +85,7 @@ const Listing = ({
           <h2 style={style.title}>
             {tool.name}
           </h2>
-          <a href={`/inbox/${tool.owner_id}`}>
-            <button style={style.button}>Contact Owner</button>
-          </a>
+          <ContactOwnerButton listingId={listingId} owner={tool.owner} />
         </div>
         <div>
           <p style={style.subtitle}>
@@ -124,6 +135,7 @@ const Recommendation = ({
   billingInterval,
   maxBillingIntervals,
   tool,
+  id: listingId
 }) => {
   return (
     <div style={style.container}>
@@ -131,9 +143,7 @@ const Recommendation = ({
         <h2 style={style.title}>
           {tool.name}
         </h2>
-        <a href={`/inbox/${tool.owner_id}`}>
-          <button style={style.button}>Contact Owner</button>
-        </a>
+        <ContactOwnerButton listingId={listingId} owner={tool.owner} />
       </div>
       <div>
         <p style={style.subtitle}>
@@ -171,8 +181,7 @@ const RecommendationList = ({recommendations}) => {
 
 // use ReactDOM.createRoot to render the component
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+renderComponent('#root', 
   <>
     <ListingDetails listings={window._listings.listings} />
     <RecommendationList recommendations={window._listings.recommendations} />

@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from 'react-dom/client';
-import { useParams } from "react-router-dom";
-import { ChakraProvider, Box, Button, Flex, Input, Text, Textarea, VStack } from "@chakra-ui/react";
+import renderComponent from './util/renderComponent';
+import { Box, Button, Flex, Input, Text, Textarea, VStack } from "@chakra-ui/react";
 
-function UserMessaging({messages: _messages, recipientId}) {
-    const [messages, setMessages] = useState(_messages);  
+function formatDate(dateString) {
+	const date = new Date(dateString);
+	return `${date.toLocaleTimeString()}`;
+}
+
+function UserMessaging({messages: _messages, recipientId, listingId, authUser}) {
+    const [messages, setMessages] = useState(_messages);
+    const [content, setContent] = useState("");
+    const [useListingId, setUseListingId] = useState(!!listingId);
 	
     useEffect(() => {
 	const url = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + `/websocket/inbox/${recipientId}`;
@@ -15,11 +21,11 @@ function UserMessaging({messages: _messages, recipientId}) {
 	});
     }, []);
 
-    const [content, setContent] = useState("");
-
-    const handleMessageChange = (event) => {
-      setContent(event.target.value);
+    if (authUser.id === recipientId) {
+        return "it's me";
     }
+
+    const handleMessageChange = e => setContent(e.target.value);
 
     const handleSendMessage = async () => {
         try {
@@ -28,8 +34,9 @@ function UserMessaging({messages: _messages, recipientId}) {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify(useListingId ? { listingId, content } : {content}),
           }).then(x => x.json());
+	  setUseListingId(false);
 	  setMessages(ms => [...ms, message]);
           setContent("");
     } catch (error) {
@@ -37,20 +44,8 @@ function UserMessaging({messages: _messages, recipientId}) {
     }
   }
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return `${date.toLocaleTimeString()}`;
-  }
-
   return (
-    <Flex
-      justify="flex-end"
-      align="flex-start"
-      paddingTop="20px"
-      minH="100vh"
-      w="50vw"
-      bg="blue.100"
-    >
+    <Flex justify="flex-end" align="flex-start" paddingTop="20px" minH="100vh" w="50vw" bg="blue.100">
       <VStack spacing={4} w={["100%", "80%", "70%"]} mx="auto" alignItems="flex-start">
       <Box
           backgroundColor="white"
@@ -62,35 +57,28 @@ function UserMessaging({messages: _messages, recipientId}) {
           borderRadius={8}
           boxShadow="md"
         >
-          {messages.map(({ content, createdAt, sender_id, recipient_id }, index) => {
-            const recipients = Object.values({ recipient_id });
-            const contents = Object.values({ content });
-            const creations = Object.values({ createdAt });
-            const senders = Object.values({ sender_id });
-
+          {messages.map(({ content, createdAt, sender_id, recipient_id, listing }, index) => {
+	    const isToOther = recipient_id.toString() === recipientId;
             return (
               <Flex
                 key={index}
-                justifyContent={recipients.toString() === recipientId ? "flex-end" : "flex-start"}
+                justifyContent={isToOther ? "flex-end" : "flex-start"}
                 mb={2}
-                flexWrap="wrap"
-              >
-                <><Flex flexDirection="column">
+                flexWrap="wrap">
+		<Flex flexDirection="column">
                   <Text
-                  key={index}
-                  backgroundColor={recipients.toString() === recipientId ? "blue.200" : "gray.200"}
+                  backgroundColor={isToOther ? "blue.200" : "gray.200"}
                   borderRadius={8}
-                  p={3}
-                  color={recipients.toString() === recipientId ? "white" : "black"}
-                  mb={0}
-                  maxWidth={500}
-                >
-                  {contents}
-                </Text>
+                  p={3} mb={0}
+                  color={isToOther ? "white" : "black"}
+                  maxWidth={500}>{content}</Text>
                 <Text fontSize="xs" color="gray.400">
-                  {formatDate(creations)}
+                  {formatDate(createdAt)}
                 </Text>
-                </Flex></>
+		{listing && <>
+			<Text fontSize="xs" color="gray.500"><a href={`/listing/${listing.id}/details`}>Sent about {listing.tool.name}</a></Text>
+		</>}
+                </Flex>
               </Flex>
             );
           })}
@@ -104,12 +92,5 @@ function UserMessaging({messages: _messages, recipientId}) {
   );
 }
 
+renderComponent('#root', <UserMessaging {...window._UserMessagingProps} />);
 
-const root = document.getElementById('root');
-ReactDOM.createRoot(root).render(
-  <ChakraProvider>
-      <UserMessaging
-      messages={window._messages}
-      recipientId={window._recipientId} />
-  </ChakraProvider>
-);

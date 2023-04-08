@@ -6,9 +6,13 @@
 
 {% block body %}
 <div id="root"></div>
-<script type="application/javascript">window._recipientId = {{ user_id|json }};
-window._messages = {{ messages|json}};
-console.log(window.recipientId);
+<script type="application/javascript">
+window._UserMessagingProps = {
+	listingId: {% if listingId %}{{ listingId }}{% else %}undefined{%endif%},
+	recipientId: {{ user_id }},
+	messages: {{ messages|json}},
+	authUser: {% if authUser %}{{ authUser|json }}{% else %}undefined{% endif %},
+};
 </script>
 <script src="/webpack/UserMessaging.js" type="application/javascript"></script>
 

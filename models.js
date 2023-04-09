@@ -41,7 +41,7 @@ const genModels = sequelize => {
 		},
 		avg_rating: {
 			type: DataTypes.INTEGER,
-			defaultValue: 0
+			defaultValue: 5
 		},
 		active: {
 			type: DataTypes.BOOLEAN,

@@ -11,7 +11,7 @@ import getBrowserCoords from './util/getBrowserCoords';
 const defaultApiKey = GOOGLE_MAPS_API_KEY; // see webpack.config.js, module.exports.plugins
 const defaultCoordinates = { lat: 39.98020784788337, lon: -75.15746555080395 }; // temple university
 const defaultSearchRadius = 10;
-const defaultUserRating = 1;
+const defaultUserRating = 0;
 
 const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) => {
 	const [results, setResults] = useState([]);
@@ -45,7 +45,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 		// Remove any leading or trailing '&' symbols
 		newSearchQuery = newSearchQuery.replace(/^&+|&+$/g, '');
 
-		fetch(`/api/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&useUserAddress=false`)
+		fetch(`/api/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&userRating=${userRating}&useUserAddress=false`)
 			.then(x => x.json())
 			.then(x => setResults(x.results));
 	}, [coords, searchQuery, searchRadius, selectedCategory, userRating]);
@@ -112,6 +112,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				const name = res.tool.name;
 				const description = res.tool.description;
 				const listing_id = res.id;
+				const rating = res.tool.owner.avg_rating;
 				const position = { lat: geocoded_lat, lng: geocoded_lon };
 				const owner_id = res.tool.owner_id;
 				const first_name = res.tool.owner.first_name;
@@ -218,12 +219,12 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 									<SliderFilledTrack bg="blue.500" />
 								</SliderTrack>
 								<SliderThumb bg="blue.500" />
-								<SliderMark value={1} {...labelStyles}>2</SliderMark>
+								<SliderMark value={1} {...labelStyles}>1</SliderMark>
 								<SliderMark value={2} {...labelStyles}>2</SliderMark>
 								<SliderMark value={3} {...labelStyles}>3</SliderMark>
 								<SliderMark value={4} {...labelStyles}>4</SliderMark>
 								<SliderMark value={5} {...labelStyles}>5</SliderMark>
-								<SliderMark value={userRating} {...sliderValueStyle}>{userRating}Stars</SliderMark>
+								<SliderMark value={userRating} {...sliderValueStyle}>{userRating} Stars</SliderMark>
 							</Slider>
 						</Box>
 					</FormControl>

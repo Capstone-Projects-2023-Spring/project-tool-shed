@@ -173,6 +173,8 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 	const labelStyles = { mt: '2', ml: '-2.5', fontSize: 'sm' };
 	const sliderValueStyle = { textAlign: 'center', bg: 'blue.500', color: 'white', mt: '-10', ml: '-5', w: '12' };
 	const maxDist = 200;
+
+
 	return (
 		<ChakraProvider>
 			<Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
@@ -231,6 +233,11 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				</Container>
 				<Divider my={4} />
 				<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
+				<Divider my={4} />
+				
+				<iframe src="https://www.youtube.com/embed/1kEhhP-bjks" width="560" height="315" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 
 			</Box>
 		</ChakraProvider>

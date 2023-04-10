@@ -381,7 +381,8 @@ module.exports = (app, models) => {
 			searchRadius, // kilometers
 			userLat, userLon, // degrees
 			useUserAddress, // boolean
-			selectedCategory // string from dropdown menu // find out why this is undefined
+			selectedCategory, // string from dropdown menu // find out why this is undefined
+			userRating //integer
 		} = await searchListingsSchema.validate(req.query);
 
 		let lat = userLat;
@@ -417,6 +418,7 @@ module.exports = (app, models) => {
 					model: models.User,
 					as: 'owner',
 					required: true,
+					where: { avg_rating: { [Op.gte]: userRating } }, // Added condition to check avg_rating
 					include: [{
 						model: models.Address,
 						as: 'address',
@@ -735,6 +737,7 @@ module.exports = (app, models) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
+
 };
 
 

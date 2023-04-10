@@ -39,6 +39,10 @@ const genModels = sequelize => {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
+		avg_rating: {
+			type: DataTypes.INTEGER,
+			defaultValue: 5
+		},
 		active: {
 			type: DataTypes.BOOLEAN,
 			defaultValue: true
@@ -47,7 +51,6 @@ const genModels = sequelize => {
 		tableName: "user",
 		paranoid: true, // soft delete enabled
 	});
-
 
 	// TODO: rewrite setPassword into a setter on password_hash
 	// https://sequelize.org/docs/v6/core-concepts/getters-setters-virtuals/#setters
@@ -207,9 +210,9 @@ const genModels = sequelize => {
 		 * @property {string} name The name of the manufacturer
 		 */
 	const ToolMaker = sequelize.define('ToolMaker', {
-		name: {type: DataTypes.STRING, allowNull: false},
-		searchVector: { type: DataTypes.TSVECTOR}
-	}, {tableName: 'tool_maker', paranoid: true});
+		name: { type: DataTypes.STRING, allowNull: false },
+		searchVector: { type: DataTypes.TSVECTOR }
+	}, { tableName: 'tool_maker', paranoid: true });
 
 	ToolMaker.addHook('beforeSave', 'populate_maker_vector', async (x, opts) => {
 		x.searchVector = sequelize.fn('to_tsvector', x.name);
@@ -223,9 +226,9 @@ const genModels = sequelize => {
 		 * @property {string} name The name of the category
 		 */
 	const ToolCategory = sequelize.define("ToolCategory", {
-		name: {type: DataTypes.STRING, allowNull: false},
-		searchVector: { type: DataTypes.TSVECTOR}
-	}, {tableName: "tool_category", paranoid: true});
+		name: { type: DataTypes.STRING, allowNull: false },
+		searchVector: { type: DataTypes.TSVECTOR }
+	}, { tableName: "tool_category", paranoid: true });
 
 	ToolCategory.addHook('beforeSave', 'populate_category_vector', async (x, opts) => {
 		x.searchVector = sequelize.fn('to_tsvector', x.name);
@@ -238,14 +241,14 @@ const genModels = sequelize => {
 	 * @class Tool
 		 * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
-         * @property {string} name Name of the tool.
-         * @property {string} description An arbitrary description of the tool and its condition.
-         * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
-         * @property {integer} owner_id The id of the User record that owns this tool
-         * @property {integer} tool_category_id The id the category related to this tool
-	 	 * @property {integer} tool_maker_id The id of the maker of this tool.
+		 * @property {string} name Name of the tool.
+		 * @property {string} description An arbitrary description of the tool and its condition.
+		 * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+		 * @property {integer} owner_id The id of the User record that owns this tool
+		 * @property {integer} tool_category_id The id the category related to this tool
+		   * @property {integer} tool_maker_id The id of the maker of this tool.
 		 * @property {string} video YouTube video attached to a tool
-         */
+		 */
 
 	const Tool = sequelize.define('Tool', {
 		name: {
@@ -276,7 +279,7 @@ const genModels = sequelize => {
 
 	Tool.belongsTo(ToolCategory, {
 		foreignKey: {
-			name: 'tool_category_id', 
+			name: 'tool_category_id',
 			allowNull: true
 		},
 		as: 'category'
@@ -284,7 +287,7 @@ const genModels = sequelize => {
 
 	Tool.hasOne(ToolMaker, {
 		as: 'maker',
-		foreignKey: {name: 'tool_maker_id', allowNull: true}
+		foreignKey: { name: 'tool_maker_id', allowNull: true }
 	});
 
 	Tool.addHook('beforeSave', 'populate_vector', async (tool, opts) => {
@@ -418,41 +421,57 @@ const genModels = sequelize => {
 		as: 'reviewee'
 	});
 
+	// updates average ratings for a user after each UserReview is created or updated
+	UserReview.afterSave(async (userReview) => {
+		const { reviewee_id } = userReview;
+		const [result] = await UserReview.findAll({
+			where: {
+				reviewee_id,
+			},
+			attributes: [
+				[sequelize.fn('avg', sequelize.col('ratings')), 'avgRatingValue'],
+			],
+			raw: true,
+		});
 
-	/**
-	 * @class FileUpload
-	   * @classdescription Represents a file that's uploaded.
-	 * @property {string} path Path of file, relative to uploads directory
-	 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
-	 * @property {integer} size Size of the file in bytes
-	 * @property {string} mimeType The mimetype of the file
-	 * @property {integer} uploader_id The ID of the uploader
-	 */
-	const FileUpload = sequelize.define('FileUpload', {
-		path: { type: DataTypes.STRING, allowNull: false },
-		originalName: { type: DataTypes.STRING, allowNull: true },
-		size: { type: DataTypes.INTEGER, validate: { min: 0 } },
-		mimeType: { type: DataTypes.STRING },
-	}, { paranoid: true, tableName: 'file_upload' });
-
-	FileUpload.prototype.getURL = function () { return path.join('/uploads/', path.relative(this.storedIn, this.path)); };
-
-	Tool.belongsTo(FileUpload, {
-		foreignKey: {
-			name: 'manual_id',
-			allowNull: true
-		},
-		as: 'manual'
+		const avgRatingValue = Math.round(result.avgRatingValue);
+		await User.update({ avg_rating: avgRatingValue }, { where: { id: reviewee_id } });
 	});
-	FileUpload.belongsTo(User, {
-		foreignKey: {
-			name: 'uploader_id',
-			allowNull: false
-		},
-		as: 'uploader'
-	});
+	
+		/**
+		 * @class FileUpload
+		   * @classdescription Represents a file that's uploaded.
+		 * @property {string} path Path of file, relative to uploads directory
+		 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
+		 * @property {integer} size Size of the file in bytes
+		 * @property {string} mimeType The mimetype of the file
+		 * @property {integer} uploader_id The ID of the uploader
+		 */
+		const FileUpload = sequelize.define('FileUpload', {
+			path: { type: DataTypes.STRING, allowNull: false },
+			originalName: { type: DataTypes.STRING, allowNull: true },
+			size: { type: DataTypes.INTEGER, validate: { min: 0 } },
+			mimeType: { type: DataTypes.STRING },
+		}, { paranoid: true, tableName: 'file_upload' });
 
-	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
-};
+		FileUpload.prototype.getURL = function () { return path.join('/uploads/', path.relative(this.storedIn, this.path)); };
 
-module.exports = genModels;
+		Tool.belongsTo(FileUpload, {
+			foreignKey: {
+				name: 'manual_id',
+				allowNull: true
+			},
+			as: 'manual'
+		});
+		FileUpload.belongsTo(User, {
+			foreignKey: {
+				name: 'uploader_id',
+				allowNull: false
+			},
+			as: 'uploader'
+		});
+
+		return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
+	};
+
+	module.exports = genModels;

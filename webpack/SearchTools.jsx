@@ -1,7 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
-	ChakraProvider, Select, Box, Heading, Divider, Container,
+	ChakraProvider, Select, Box, Heading, Divider, Container, Flex,
 	FormControl, FormLabel, FormErrorMessage, FormHelperText,
 	Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb
 } from '@chakra-ui/react';
@@ -20,6 +20,9 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 	const [searchRadius, setSearchRadius] = useState(defaultSearchRadius);
 	const [selectedCategory, setSelectedCategory] = useState('');
 	const [userRating, setuserRating] = useState(defaultUserRating);
+	//const [videoId1, setVideoId1] = useState('');
+	//const [videoId2, setVideoId2] = useState('');
+	//const [videoId3, setVideoId3] = useState('');
 
 	const [map, setMap] = useState();
 	const mapRef = useRef();
@@ -174,7 +177,6 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 	const sliderValueStyle = { textAlign: 'center', bg: 'blue.500', color: 'white', mt: '-10', ml: '-5', w: '12' };
 	const maxDist = 200;
 
-
 	return (
 		<ChakraProvider>
 			<Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
@@ -234,15 +236,23 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				<Divider my={4} />
 				<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
 				<Divider my={4} />
-				
-				<iframe src="https://www.youtube.com/embed/1kEhhP-bjks" width="560" height="315" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
-
+				<Flex>
+				  <Box mr={10}>
+    				<iframe src={`https://www.youtube.com/embed/DuU2mnJcxPM`} width="560" height="315" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  				  </Box>
+				  <Box mr={10}>
+    				<iframe src={`https://www.youtube.com/embed/CHTHif55nSw`} width="560" height="315" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  				  </Box>
+				  <Box mr={10}>
+    				<iframe src={`https://www.youtube.com/embed/y7mz191MkT0`} width="560" height="315" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  				  </Box>
+				</Flex>
 			</Box>
 		</ChakraProvider>
 	);
 };
+
+
 
 export default SearchTools;
 

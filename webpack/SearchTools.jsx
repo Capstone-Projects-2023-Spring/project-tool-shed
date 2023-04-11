@@ -189,7 +189,7 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the production site details page
 				// For now, routing to localhost listing details page
-				window.open(`http://localhost:5000/listing/${listing_id}/details`);
+				window.location.href = `/listing/${listing_id}/details`;
 			});
 
 			markers.push(marker);
@@ -214,22 +214,6 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 				<FormLabel>Search Query</FormLabel>
 				<Input placeholder='Enter search query here...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
 			</FormControl>
-	  
-			  <FormControl mb={4} mr={4}>
-				<FormLabel>Search Radius</FormLabel>
-				<Box>
-				  <Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
-					<SliderTrack>
-					  <SliderFilledTrack bg="blue.500" />
-					</SliderTrack>
-					<SliderThumb bg="blue.500" />
-					<SliderMark value={50} {...labelStyles}>50km</SliderMark>
-					<SliderMark value={100} {...labelStyles}>100km</SliderMark>
-					<SliderMark value={150} {...labelStyles}>150km</SliderMark>
-					<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
-				  </Slider>
-				</Box>
-			  </FormControl>
 	  
 			  <FormControl mb={4}>
 				<FormLabel>User Rating</FormLabel>

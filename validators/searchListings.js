@@ -8,6 +8,7 @@ const searchListingsSchema = yup.object({
 	searchRadius: yup.number().positive().required(), // kilometers
 	makerId: yup.number().positive(),
 	categoryId: yup.number().positive(),
+	userRating: yup.number().min(1).max(5).nullable(true).default(1), // minimum user rating
 });
 
 module.exports = searchListingsSchema;

@@ -214,11 +214,11 @@ module.exports = (app, models, sequelize) => {
 
 	/* API: Create tools */
 	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
 			name, description, owner_id: req.user.id,
-			tool_maker_id, tool_category_id
+			tool_maker_id, tool_category_id, video
 		});
 
 		const uploadedFile = req.file;
@@ -246,7 +246,7 @@ module.exports = (app, models, sequelize) => {
 	/* API: Edit tool */
 	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
-		const { name, description, tool_category_id, tool_maker_id } = await toolSchema.validate(req.body);
+		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.findByPk(tool_id, {});
 
@@ -262,6 +262,7 @@ module.exports = (app, models, sequelize) => {
 		// Update the tool with the new data
 		tool.name = name;
 		tool.description = description;
+		tool.video = video;
 		await tool.save();
 
 		await tool.setCategory(tool_category_id);
@@ -380,6 +381,7 @@ module.exports = (app, models, sequelize) => {
 			selectedCategory, // string from dropdown menu // find out why this is undefined
 			makerId, // integer
 			categoryId, // integer
+			userRating //integer
 		} = await searchListingsSchema.validate(req.query);
 
 		let lat = userLat;
@@ -437,6 +439,7 @@ module.exports = (app, models, sequelize) => {
 					model: models.User,
 					as: 'owner',
 					required: true,
+					where: { avg_rating: { [Op.gte]: userRating } }, // Added condition to check avg_rating
 					include: [{
 						model: models.Address,
 						as: 'address',
@@ -497,9 +500,9 @@ module.exports = (app, models, sequelize) => {
 		Listing Details Page
 	*/
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
-		console.log("getting");
 		const { listing_id } = req.params;
 
+		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
@@ -517,8 +520,51 @@ module.exports = (app, models, sequelize) => {
 		if (!listings) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
+		// query all listings with the same tool category as the listing choosen by the user
+		const recommendations = await models.Listing.findAll({
+			where: {
+				active: true,
+				id: {
+					[Op.ne]: listings.id
+				}
+			},
+			include: [{
+				model: models.Tool,
+				as: 'tool',
+				include: [{
+					model: models.ToolCategory,
+					as: 'category'
+				}]
+			}]
+		});
 
-		res.render('listing_details.html', { listings });
+		// filter out the recommendations that have a tool without the same category as the tool category 
+		// associated with the listing (listings.tool.category.id)
+		const filteredRecommendations = recommendations.filter(recommendation => {
+			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
+		});
+
+		// search vectors of the tool associated with the listing choosen by user
+		const searchVector = listings.tool.searchVector;
+		// sort filteredRecommendations
+		filteredRecommendations.sort((a, b) => {
+			const aSearchVector = a.tool.searchVector;
+			const bSearchVector = b.tool.searchVector;
+
+			// Split the search vectors into an array of terms
+			const aTerms = aSearchVector.split(' ');
+			const bTerms = bSearchVector.split(' ');
+			const searchTerms = searchVector.split(' ');
+
+			// Count the number of shared search terms between each recommendation and the listing
+			const aSharedTerms = aTerms.filter(term => searchTerms.includes(term)).length;
+			const bSharedTerms = bTerms.filter(term => searchTerms.includes(term)).length;
+
+			// Sort the recommendations by number of shared terms (descending)
+			return bSharedTerms - aSharedTerms;
+		});
+		
+		res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
 	}));
 
 	/*
@@ -526,8 +572,8 @@ module.exports = (app, models, sequelize) => {
 	 */
 
 	app.get('/account', asyncHandler(requiresAuth(async (req, res) => {
-        res.render('account.html', {});
-    })));
+		res.render('account.html', {});
+	})));
 
 
 	/*
@@ -704,6 +750,7 @@ module.exports = (app, models, sequelize) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
+
 };
 
 

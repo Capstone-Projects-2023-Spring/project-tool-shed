@@ -502,24 +502,28 @@ module.exports = (app, models, sequelize) => {
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
 		const { listing_id } = req.params;
 
+		// Query parameters to include 
+		const include = [
+			{model: Tool, as: 'tool', include: [
+				{model: ToolCategory, as: 'category'},
+				{model: ToolMaker, as: 'maker'},
+				{model: User, as: 'owner'}
+			]}
+		];
+
 		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
 				active: true
 			},
-			include: [{
-				model: models.Tool,
-				as: 'tool',
-				include: [{
-					model: models.ToolCategory,
-					as: 'category'
-				}]
-			}]
+			include
 		});
+
 		if (!listings) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
+
 		// query all listings with the same tool category as the listing choosen by the user
 		const recommendations = await models.Listing.findAll({
 			where: {
@@ -528,14 +532,7 @@ module.exports = (app, models, sequelize) => {
 					[Op.ne]: listings.id
 				}
 			},
-			include: [{
-				model: models.Tool,
-				as: 'tool',
-				include: [{
-					model: models.ToolCategory,
-					as: 'category'
-				}]
-			}]
+			include
 		});
 
 		// filter out the recommendations that have a tool without the same category as the tool category 
@@ -544,6 +541,7 @@ module.exports = (app, models, sequelize) => {
 			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
 		});
 
+		// FIXME: see /api/listings/search.json for how to use TSVectors
 		// search vectors of the tool associated with the listing choosen by user
 		const searchVector = listings.tool.searchVector;
 		// sort filteredRecommendations
@@ -637,6 +635,7 @@ module.exports = (app, models, sequelize) => {
 
 	app.get('/inbox/:user_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { user_id } = req.params;
+		const { listingId } = req.query;
 
 		const messages = await models.UserMessage.findAll({
 			where: {
@@ -657,21 +656,32 @@ module.exports = (app, models, sequelize) => {
 			},
 			order: [
 				['createdAt', 'ASC']
-			]
+			],
+			include: {
+				model: Listing,
+				as: 'listing',
+				include: {
+					model: Tool,
+					as: 'tool'
+				}
+			}
 		});
 
 		// templates/user_messaging.html renders all the messages in a conversation.
-		res.render('user_messaging.html', { messages, user_id }); // auth'd user is authUser
+		res.render('user_messaging.html', { messages, user_id, listingId }); // auth'd user is authUser
 	})));
 
 	// Sends a message.
 	app.post('/inbox/:user_id/send.json', asyncHandler(requiresAuth(async (req, res) => {
-		const { content } = await messageSchema.validate(req.body);
+		const { content, listingId } = await messageSchema.validate(req.body);
 		const { user_id } = req.params;
 
 		try {
 			const message = await models.UserMessage.create({
-				content, sender_id: req.user.id, recipient_id: user_id
+				content, sender_id: req.user.id, recipient_id: user_id, listing_id: listingId
+			});
+			await message.reload({
+				include: {model: Listing, as: 'listing', include: {model: Tool, as: 'tool'}}
 			});
 
 			res.json({ status: 'ok', error: null, message });
@@ -690,7 +700,9 @@ module.exports = (app, models, sequelize) => {
 	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
 		const handleData = userMessage => {
 			if (userMessage.recipient_id === req.user.id) {
-				ws.send(JSON.stringify(userMessage));
+				userMessage.reload({include: {model: Listing, as: "listing", include: {model: Tool, as: 'tool'}}}).then(() => {
+					ws.send(JSON.stringify(userMessage));
+				});
 			}
 		};
 		unixListeners.push(handleData);

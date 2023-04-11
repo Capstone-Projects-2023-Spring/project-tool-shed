@@ -347,6 +347,9 @@ const genModels = sequelize => {
 	 * @classdesc Represents a conversation between two users.
 	 * @augments sequelize.Model
 	 * @property {string} content Message content
+	 * @property {int} recipient_id The ID of the recipient User model
+	 * @property {int} sender_id The ID of the sending User model
+	 * @property {int} listing_id The ID of the listing this message was sent about.
 	 */
 	const UserMessage = sequelize.define('UserMessage', {
 		content: {
@@ -371,8 +374,18 @@ const genModels = sequelize => {
 		as: 'sender'
 	});
 
+	UserMessage.belongsTo(Listing, {
+		foreignKey: {
+			name: 'listing_id',
+			allowNull: true
+		},
+		as: 'listing'
+	});
+
 	UserMessage.addHook('afterCreate', 'call_socket', async (msg, opts) => {
-		UserMessage.messageCreated(msg); // UserMessage.messageCreated gets set in routes.js
+		if (UserMessage.messageCreated) {
+			UserMessage.messageCreated(msg); // UserMessage.messageCreated gets set in routes.js
+		}
 	});
 
 

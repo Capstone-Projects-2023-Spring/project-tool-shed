@@ -534,7 +534,7 @@ module.exports = (app, models, sequelize) => {
 			},
 			include
 		});
-
+/*
 		// filter out the recommendations that have a tool without the same category as the tool category 
 		// associated with the listing (listings.tool.category.id)
 		const filteredRecommendations = recommendations.filter(recommendation => {
@@ -561,8 +561,8 @@ module.exports = (app, models, sequelize) => {
 			// Sort the recommendations by number of shared terms (descending)
 			return bSharedTerms - aSharedTerms;
 		});
-		
-		res.render('listing_details.html', { listings, recommendations: filteredRecommendations });
+	*/	
+		res.render('listing_details.html', { listings, recommendations: [] });// filteredRecommendations });
 	}));
 
 	/*

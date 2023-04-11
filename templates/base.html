@@ -2,24 +2,18 @@
 <html>
 
 <head>
+	<link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/public/reset.css">
 	<title>ToolShed | Share your tools!</title>
 	<style>
-		/* Flexbox styling for header, body, and footer */
 		body {
 			display: flex;
 			flex-direction: column;
-			min-height: 100vh;
+			min-height: 100vh !important;
 			margin: 0;
 		}
 
 		header {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: space-between;
-			padding: 2em;
-			background-color: #f2f2f2;
-            z-index: 9999;
+			z-index: 9999;
 		}
 
 		main {
@@ -32,7 +26,7 @@
 			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;
-			padding: 1em;
+			padding: 1rem;
 			background-color: #f2f2f2;
 		}
 	</style>
@@ -43,16 +37,14 @@
 
 <body>
 	<!--Navigation bar-->
-	<header>
-		<div id="nav"></div>
-		<script type="application/javascript">
-			const _user = {{ authUser|json }};
-		</script>
-		<script src="/webpack/NavBar.js" type="application/javascript"></script>
-		<script src="/node_modules/react/umd/react.development.js"></script>
-		<script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
-		<script src="/node_modules/babel-standalone/babel.min.js"></script>
+	<header id="nav">
 	</header>
+	<script type="application/javascript">
+		window.__NavBarProps = {
+			authUser: {% if authUser %}{{authUser|json}}{% else %}undefined{% endif %}
+		};
+	</script>
+	<script src="/webpack/NavBar.js" type="application/javascript"></script>
 	<main>
 		{% block body %}
 		<!--Body content-->
@@ -61,6 +53,8 @@
 	<footer>
 		<!--Footer content-->
 	</footer>
+
+	<script src="/node_modules/babel-standalone/babel.min.js"></script>
 </body>
 
 </html>

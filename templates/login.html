@@ -5,12 +5,11 @@
 {% endblock %}
 
 {% block body %}
-<form method="POST" action="/user/login">
-	{% if redirectURI %}
-	<input name="redirectURI" type="hidden" value="{{ redirectURI }}">
-	{% endif %}
-	<input name="email">
-	<input name="password" type="password">
-	<input type="submit">
-</form>
+<div id="root"></div>
+<script type="application/javascript">
+	window.__loginProps = {
+		redirectURI: {% if redirectURI %}{{redirectURI|json}}{% else %}undefined{%endif%}
+	};
+</script>
+<script type="application/javascript" src="/webpack/Login.js"></script>
 {% endblock %}

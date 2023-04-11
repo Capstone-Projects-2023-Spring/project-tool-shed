@@ -13,15 +13,15 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 const genModels = sequelize => {
 	/**
 	 * @class User
-		 * @classdesc Represents a user.
+	 * @classdesc Represents a user.
 	 * @augments sequelize.Model
-		 * @property {string} first_name The user's first name
+	 * @property {string} first_name The user's first name
 	 * @property {string} last_name The user's last name
-		 * @property {string} email The user's email, used for logging in
-		 * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
+	 * @property {string} email The user's email, used for logging in
+	 * @property {string} password_hash A hashed version of the user's password using bcrypt. Not to be set directly, use setPassword and passwordMatches().
 	 * @property {int} address_id The ID of an Address record for the user.
 	 * @property {int} billing_address_id The ID of an Address record for the user.
-		 */
+	*/
 	const User = sequelize.define('User', {
 		first_name: {
 			type: DataTypes.STRING,
@@ -56,10 +56,10 @@ const genModels = sequelize => {
 	// https://sequelize.org/docs/v6/core-concepts/getters-setters-virtuals/#setters
 
 	/**
-		 * Sets a user's password. 
+	 * Sets a user's password. 
 	 * @param {string} v The user's new password.
 	 * @method module:models~User#setPassword
-		 */
+	 */
 	User.prototype.setPassword = async function (v) {
 		const s = await bcrypt.genSalt(10);
 		this.password_hash = await bcrypt.hash(v, s);
@@ -77,16 +77,16 @@ const genModels = sequelize => {
 
 	/**
 	 * @class Address
-		 * @classdesc Represents an address.
+	 * @classdesc Represents an address.
 	 * @augments sequelize.Model
-		 * @property {string} line_two
+	 * @property {string} line_two
 	 * @property {string} city
 	 * @property {string} state - The state of the address, should be a 2-digit uppercase value like "NJ" or "PA"
 	 * @property {string} zip_code
 	 * @property {bool} geocoded - Whether or not the address has been geocoded yet
 	 * @property {double} geocoded_lat - the latitude value from geocoding - not user set
 	 * @property {double} geocoded_lon - the longitude value from geocoding - not user set
-		 */
+	 */
 	const Address = sequelize.define('Address', {
 		line_one: {
 			type: DataTypes.STRING,
@@ -136,7 +136,8 @@ const genModels = sequelize => {
 		let coord = null;
 		let err = null;
 		try {
-			const { coordinate, error } = await fetch(`http://0.0.0.0:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());
+			let host = process.env.GEOCODE_HOST ?? '0.0.0.0';
+			const {coordinate, error} = await fetch(`http://${host}:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
 			coord = coordinate;
 			err = error;
 		} catch (e) {
@@ -144,9 +145,9 @@ const genModels = sequelize => {
 		}
 
 		if (coord) {
-			const { lat, lon, accuracyPercent } = coord;
-			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${accuracyPercent}%)`);
-			return { lat, lon };
+			const {lat, lon, accuracyPercent} = coord;
+			console.log(`Geocoded "${addressString}" to (${lat}, ${lon})`);
+			return {lat, lon};
 		}
 
 		console.log(`Failed to geocode "${addressString}: ${err ? err : "unknown error"}".`);
@@ -202,13 +203,12 @@ const genModels = sequelize => {
 	});
 
 
-
 	/**
 	 * @class ToolMaker
-		 * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
+	 * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
 	 * @augments sequelize.Model
-		 * @property {string} name The name of the manufacturer
-		 */
+	 * @property {string} name The name of the manufacturer
+	 */
 	const ToolMaker = sequelize.define('ToolMaker', {
 		name: { type: DataTypes.STRING, allowNull: false },
 		searchVector: { type: DataTypes.TSVECTOR }
@@ -221,10 +221,10 @@ const genModels = sequelize => {
 
 	/**
 	 * @class ToolCategory
-		 * @classdesc Represents a kind of tool - like hammer, saw, or drill.
+	 * @classdesc Represents a kind of tool - like hammer, saw, or drill.
 	 * @augments sequelize.Model
-		 * @property {string} name The name of the category
-		 */
+	 * @property {string} name The name of the category
+	 */
 	const ToolCategory = sequelize.define("ToolCategory", {
 		name: { type: DataTypes.STRING, allowNull: false },
 		searchVector: { type: DataTypes.TSVECTOR }
@@ -239,17 +239,16 @@ const genModels = sequelize => {
 
 	/**
 	 * @class Tool
-		 * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
+	 * @classdesc Represents an individual tool, like the drill in your garage, or your neighbor's drill press.
 	 * @augments sequelize.Model
-		 * @property {string} name Name of the tool.
-		 * @property {string} description An arbitrary description of the tool and its condition.
-		 * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
-		 * @property {integer} owner_id The id of the User record that owns this tool
-		 * @property {integer} tool_category_id The id the category related to this tool
-		   * @property {integer} tool_maker_id The id of the maker of this tool.
-		 * @property {string} video YouTube video attached to a tool
-		 */
-
+	 * @property {string} name Name of the tool.
+	 * @property {string} description An arbitrary description of the tool and its condition.
+	 * @property {ts_vector} searchVector A representation of a bunch of text related to the tool that's used with fulltext search.
+	 * @property {integer} owner_id The id of the User record that owns this tool
+	 * @property {integer} tool_category_id The id the category related to this tool
+	 * @property {integer} tool_maker_id The id of the maker of this tool.
+	 * @property {string} video YouTube video attached to a tool
+	 */
 	const Tool = sequelize.define('Tool', {
 		name: {
 			type: DataTypes.STRING,
@@ -285,7 +284,7 @@ const genModels = sequelize => {
 		as: 'category'
 	});
 
-	Tool.hasOne(ToolMaker, {
+	Tool.belongsTo(ToolMaker, {
 		as: 'maker',
 		foreignKey: { name: 'tool_maker_id', allowNull: true }
 	});
@@ -311,12 +310,12 @@ const genModels = sequelize => {
 
 	/**
 	 * @class Listing
-		 * @classdesc Represents a tool's being listed for sale.
+	 * @classdesc Represents a tool's being listed for sale.
 	 * @augments sequelize.Model
-		 * @property {number} price The amount the listing costs per `billingInterval`
+	 * @property {number} price The amount the listing costs per `billingInterval`
 	 * @property {string} billingInterval The interval at which you're going to pay `price`
 	 * @property {integer} maxBillingIntervals The maximum number of billing intervals the tool is available for.
-		 */
+	 */
 	const Listing = sequelize.define("Listing", {
 		price: {
 			type: DataTypes.DECIMAL,
@@ -345,10 +344,10 @@ const genModels = sequelize => {
 
 	/**
 	 * @class UserMessage
-		 * @classdesc Represents a conversation between two users.
+	 * @classdesc Represents a conversation between two users.
 	 * @augments sequelize.Model
-		 * @property {string} content Message content
-		 */
+	 * @property {string} content Message content
+	 */
 	const UserMessage = sequelize.define('UserMessage', {
 		content: {
 			type: DataTypes.STRING,
@@ -438,40 +437,40 @@ const genModels = sequelize => {
 		await User.update({ avg_rating: avgRatingValue }, { where: { id: reviewee_id } });
 	});
 	
-		/**
-		 * @class FileUpload
-		   * @classdescription Represents a file that's uploaded.
-		 * @property {string} path Path of file, relative to uploads directory
-		 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
-		 * @property {integer} size Size of the file in bytes
-		 * @property {string} mimeType The mimetype of the file
-		 * @property {integer} uploader_id The ID of the uploader
-		 */
-		const FileUpload = sequelize.define('FileUpload', {
-			path: { type: DataTypes.STRING, allowNull: false },
-			originalName: { type: DataTypes.STRING, allowNull: true },
-			size: { type: DataTypes.INTEGER, validate: { min: 0 } },
-			mimeType: { type: DataTypes.STRING },
-		}, { paranoid: true, tableName: 'file_upload' });
+	/**
+	 * @class FileUpload
+	 * @classdescription Represents a file that's uploaded.
+	 * @property {string} path Path of file, relative to uploads directory
+	 * @property {string} originalName Original name of the file, as appearing on the uploader's computer
+	 * @property {integer} size Size of the file in bytes
+	 * @property {string} mimeType The mimetype of the file
+	 * @property {integer} uploader_id The ID of the uploader
+	 */
+	const FileUpload = sequelize.define('FileUpload', {
+		path: { type: DataTypes.STRING, allowNull: false },
+		originalName: { type: DataTypes.STRING, allowNull: true },
+		size: { type: DataTypes.INTEGER, validate: { min: 0 } },
+		mimeType: { type: DataTypes.STRING },
+	}, { paranoid: true, tableName: 'file_upload' });
 
-		FileUpload.prototype.getURL = function () { return path.join('/uploads/', path.relative(this.storedIn, this.path)); };
+	FileUpload.prototype.getURL = function () { return path.join('/uploads/', path.relative(this.storedIn, this.path)); };
 
-		Tool.belongsTo(FileUpload, {
-			foreignKey: {
-				name: 'manual_id',
-				allowNull: true
-			},
-			as: 'manual'
-		});
-		FileUpload.belongsTo(User, {
-			foreignKey: {
-				name: 'uploader_id',
-				allowNull: false
-			},
-			as: 'uploader'
-		});
+	Tool.belongsTo(FileUpload, {
+		foreignKey: {
+			name: 'manual_id',
+			allowNull: true
+		},
+		as: 'manual'
+	});
+	FileUpload.belongsTo(User, {
+		foreignKey: {
+			name: 'uploader_id',
+			allowNull: false
+		},
+		as: 'uploader'
+	});
 
-		return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
-	};
+	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
+};
 
-	module.exports = genModels;
+module.exports = genModels;

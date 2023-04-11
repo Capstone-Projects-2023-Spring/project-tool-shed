@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { ChakraProvider, Box, Heading, Text, UnorderedList, ListItem, Button } from '@chakra-ui/react';
+import renderComponent from './util/renderComponent';
+import { Box, Heading, Text, UnorderedList, ListItem, Button } from '@chakra-ui/react';
 
 function About() {
   const [currentTab, setCurrentTab] = useState('About');
@@ -154,7 +154,7 @@ function About() {
 
   return (
     <Box maxW="600px" mx="auto" p="4">
-      <UnorderedList mb="8" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
+      <UnorderedList mb="8" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center" listStyleType="none">
         <ListItem>
           <Button onClick={() => handleTabChange('About')}>About</Button>
         </ListItem>
@@ -174,9 +174,4 @@ function About() {
   );
 }
 
-const root = document.getElementById('root');
-ReactDOM.createRoot(root).render(
-  <ChakraProvider>
-    <About />
-  </ChakraProvider>
-);
+renderComponent("#root", <About />);

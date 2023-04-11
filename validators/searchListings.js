@@ -6,7 +6,9 @@ const searchListingsSchema = yup.object({
 	userLon: yup.number().min(-180).max(180), // where the user is located (lon)
 	useUserAddress: yup.boolean().default(false), // whether or not to use the authenticated user's address instead their frontend's location
 	searchRadius: yup.number().positive().required(), // kilometers
-	userRating: yup.number().min(1).max(5).nullable(true).default(1) // minimum user rating
+	makerId: yup.number().positive(),
+	categoryId: yup.number().positive(),
+	userRating: yup.number().min(1).max(5).nullable(true).default(1), // minimum user rating
 });
 
 module.exports = searchListingsSchema;

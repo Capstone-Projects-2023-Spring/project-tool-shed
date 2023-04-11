@@ -6,6 +6,8 @@ import {
 	Accordion, AccordionItem, AccordionButton, AccordionPanel,
 	Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb
 } from '@chakra-ui/react';
+import {AsyncSelect} from 'chakra-react-select';
+import { debounce } from 'debounce';
 
 import getBrowserCoords from './util/getBrowserCoords';
 
@@ -14,12 +16,35 @@ const defaultCoordinates = { lat: 39.98020784788337, lon: -75.15746555080395 }; 
 const defaultSearchRadius = 10;
 const defaultUserRating = 1;
 
-const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) => {
+const SelectorDropdown = ({name, collection, onChange, ...props}) => {
+	const [isLoading, setLoading] = useState(false);
+
+	const searchCollection = s => fetch(`/api/search/${collection}?q=${encodeURIComponent(s)}`, {
+		method: "GET",
+		credentials: "same-origin"
+	}).then(x => x.json()).then(x => x.results);
+
+	return (
+		<AsyncSelect
+			isClearable
+			defaultOptions
+			{...props}
+			isDisabled={isLoading}
+			isLoading={isLoading}
+			onChange={o => onChange(o)}
+			getOptionLabel={e => e.__isNew__ ? e.label : e.name}
+			getOptionValue={e => e.__isNew__ ? undefined : e.id}
+			loadOptions={searchCollection} />
+	);
+}
+
+const SearchTools = ({ apiKey = defaultApiKey }) => {
 	const [results, setResults] = useState([]);
 	const [coords, setCoords] = useState();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchRadius, setSearchRadius] = useState(defaultSearchRadius);
-	const [selectedCategory, setSelectedCategory] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState();
+	const [selectedMaker, setSelectedMaker] = useState();
 	const [userRating, setuserRating] = useState(defaultUserRating);
 	//const [videoId1, setVideoId1] = useState('');
 	//const [videoId2, setVideoId2] = useState('');
@@ -32,27 +57,31 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 		getBrowserCoords(defaultCoordinates).then(setCoords);
 	}, []);
 
-	useEffect(() => {
+	useEffect(debounce(() => {
 		if (!coords) return;
 
-		let newSearchQuery = '';
-		// Determine the new search query based on the current searchQuery and selectedCategory values
-		if (searchQuery === '' && selectedCategory !== '') {
-			newSearchQuery = selectedCategory;
-		} else if (searchQuery !== '' && selectedCategory === '') {
-			newSearchQuery = searchQuery.replace(/\s+/g, '&');
-		} else if (searchQuery !== '' && selectedCategory !== '') {
-			// Replace any occurrences of multiple '&' symbols with a single '&' symbol
-			newSearchQuery = (searchQuery.replace(/\s+/g, '&') + '&' + selectedCategory).replace(/&+/g, '&');
+		const params = {
+			searchQuery,
+			searchRadius,
+			userRating,
+			userLat: coords.lat,
+			userLon: coords.lon,
+			useUserAddress: 'false',
+		};
+
+		if (selectedMaker) {
+			params.makerId = selectedMaker.id;
 		}
 
-		// Remove any leading or trailing '&' symbols
-		newSearchQuery = newSearchQuery.replace(/^&+|&+$/g, '');
+		if (selectedCategory) {
+			params.categoryId = selectedCategory.id;
+		}
 
-		fetch(`/api/listings/search.json?searchQuery=${encodeURIComponent(newSearchQuery)}&searchRadius=${searchRadius}&userLat=${coords.lat}&userLon=${coords.lon}&userRating=${userRating}&useUserAddress=false`)
+		const paramsString = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+		fetch(`/api/listings/search.json?${paramsString}`)
 			.then(x => x.json())
 			.then(x => setResults(x.results));
-	}, [coords, searchQuery, searchRadius, selectedCategory, userRating]);
+	}, 200), [coords, searchQuery, searchRadius, selectedCategory, selectedMaker, userRating]);
 
 	useLayoutEffect(() => {
 		if (!mapRef.current) return;
@@ -179,15 +208,12 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 	const maxDist = 200;
 
 	return (
-		<ChakraProvider>
-		  <Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
-			<Flex className="SearchTools__Filters" w='100%' direction="row">
-			  <FormControl mb={4} mr={4}>
+		<React.Fragment>
+			<Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
+			<FormControl mb={4} mr={4}>
 				<FormLabel>Search Query</FormLabel>
-				<Input placeholder='Enter search query here...'
-				  value={searchQuery}
-				  onChange={x => setSearchQuery(x.target.value)} />
-			  </FormControl>
+				<Input placeholder='Enter search query here...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
+			</FormControl>
 	  
 			  <FormControl mb={4} mr={4}>
 				<FormLabel>Search Radius</FormLabel>
@@ -205,21 +231,10 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				</Box>
 			  </FormControl>
 	  
-			  <FormControl mb={4} mr={4}>
-				<FormLabel>Tool Category</FormLabel>
-				<Select placeholder="Select category" onChange={x => setSelectedCategory(x)}>
-				  {categories.map(c => (
-					<option key={c.value} value={c.value}>
-					  {c.label}
-					</option>
-				  ))}
-				</Select>
-			  </FormControl>
-	  
 			  <FormControl mb={4}>
 				<FormLabel>User Rating</FormLabel>
 				<Box>
-				  <Slider w='100%' defaultValue={defaultUserRating} max={5} onChange={x => setuserRating(x)}>
+				  <Slider w='100%' defaultValue={defaultUserRating} max={5} step={1} onChange={x => setuserRating(x)}>
 					<SliderTrack>
 					  <SliderFilledTrack bg="blue.500" />
 					</SliderTrack>
@@ -233,18 +248,38 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
 				  </Slider>
 				</Box>
 			  </FormControl>
-			</Flex>
-		  </Box>
+			<FormControl mb={4}>
+				<FormLabel>Tool Category</FormLabel>
+				<SelectorDropdown collection="category" placeholder="Select Category" onChange={x => setSelectedCategory(x)} />
+			</FormControl>
+			<FormControl mb={4}>
+				<FormLabel>Tool Maker</FormLabel>
+				<SelectorDropdown collection="maker" placeholder="Select Maker" onChange={x => setSelectedMaker(x)} />
+			</FormControl>
+			<Divider my={4} />
+			<FormControl mb={4}>
+				<FormLabel>Search Radius</FormLabel>
+				<Box mt={10} mb={10}>
+					<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
+						<SliderTrack>
+							<SliderFilledTrack bg="blue.500" />
+						</SliderTrack>
+						<SliderThumb bg="blue.500" />
+						<SliderMark value={50} {...labelStyles}>50km</SliderMark>
+						<SliderMark value={100} {...labelStyles}>100km</SliderMark>
+						<SliderMark value={150} {...labelStyles}>150km</SliderMark>
+						<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
+					</Slider>
+				</Box>
+			</FormControl>
+
 			<Divider my={4} />
 			<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
-			<Divider my={4} />
-
+		</Box>
 			
 		<Accordion allowMultiple>
   			<AccordionItem>
-    			<AccordionButton>
-      				Video Library
-    			</AccordionButton>
+    			<AccordionButton>Video Library</AccordionButton>
     		<AccordionPanel>
       			<Accordion allowMultiple>
         			<AccordionItem>
@@ -305,8 +340,7 @@ const SearchTools = ({ apiKey = defaultApiKey, categories = [], makers = [] }) =
     		</AccordionPanel>
   			</AccordionItem>
 		</Accordion>
-				
-		</ChakraProvider>
+	</React.Fragment>
 	);
 };
 

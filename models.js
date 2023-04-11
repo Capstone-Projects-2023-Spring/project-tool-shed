@@ -137,8 +137,8 @@ const genModels = sequelize => {
 		let err = null;
 		try {
 			let host = process.env.GEOCODE_HOST ?? '0.0.0.0';
-			const {coordinate, error} = await fetch(`http://${host}:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
-			coord = coordinate;
+			const {coordinates, error} = await fetch(`http://${host}:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
+			coord = coordinates;
 			err = error;
 		} catch (e) {
 			err = e.toString();

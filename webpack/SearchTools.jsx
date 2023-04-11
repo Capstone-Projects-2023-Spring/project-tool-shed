@@ -189,7 +189,7 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 			marker.addListener("click", () => {
 				// Placeholder.  This will be modified to the production site details page
 				// For now, routing to localhost listing details page
-				window.open(`http://localhost:5000/listing/${listing_id}/details`);
+				window.open(`http://toolshed.symer.io:5000/listing/${listing_id}/details`);
 			});
 
 			markers.push(marker);

@@ -26,8 +26,7 @@ const NavBar = ({ authUser }) => {
   }
 
   return (
-    <Flex>
-      <Box bg="blue.500" position="fixed" top="0" left="0" w="100%" p="4">
+      <Box bg="blue.500" position="sticky" top="0" left="0" w="100%" p="4">
         <Flex alignItems="center" justify="space-between">
           <Flex alignItems="center" justify="space-between" w={authUser ? "30%" : "10%"}>
             <a href="/" style={{ color: "white", fontSize: "24px" }}>
@@ -93,13 +92,12 @@ const NavBar = ({ authUser }) => {
           </Flex>
         </Flex>
       </Box>
-    </Flex>
   );
 };
 
 
 ReactDOM.createRoot(document.getElementById('nav')).render(
   <ChakraProvider>
-      <NavBar authUser={_user} />
+      <NavBar {...window.__NavBarProps} />
   </ChakraProvider>
 );

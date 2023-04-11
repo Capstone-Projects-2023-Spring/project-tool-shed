@@ -8,7 +8,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 
-import { AsyncSelect, AsyncCreatableSelect } from "chakra-react-select";
+import { AsyncCreatableSelect } from "chakra-react-select";
 
 import toolSchema from '../validators/tool';
 import listingSchema from '../validators/listing';

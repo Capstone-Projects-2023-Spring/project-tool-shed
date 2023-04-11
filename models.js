@@ -133,8 +133,9 @@ const genModels = sequelize => {
 		let coord = null;
 		let err = null;
 		try {
-			const {coordinate, error} = await fetch(`http://0.0.0.0:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
-			coord = coordinate;
+			let host = process.env.GEOCODE_HOST ?? '0.0.0.0';
+			const {coordinates, error} = await fetch(`http://${host}:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
+			coord = coordinates;
 			err = error;
 		} catch (e) {
 			err = e.toString();
@@ -142,7 +143,7 @@ const genModels = sequelize => {
 
 		if (coord) {
 			const {lat, lon, accuracyPercent} = coord;
-			console.log(`Geocoded "${addressString}" to (${lat}, ${lon}) (accuracy: ${accuracyPercent}%)`);
+			console.log(`Geocoded "${addressString}" to (${lat}, ${lon})`);
 			return {lat, lon};
 		}
 
@@ -268,12 +269,12 @@ const genModels = sequelize => {
 		as: 'owner'
 	});
 
-	Tool.hasOne(ToolCategory, {
+	Tool.belongsTo(ToolCategory, {
 		as: "category",
 		foreignKey: {name: 'tool_category_id', allowNull: true}
 	});
 
-	Tool.hasOne(ToolMaker, {
+	Tool.belongsTo(ToolMaker, {
 		as: 'maker',
 		foreignKey: {name: 'tool_maker_id', allowNull: true}
 	});

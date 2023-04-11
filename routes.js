@@ -1,9 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const { loginUserSchema, searchListingsSchema, newReviewSchema,
 	userWithAddressSchema, toolSchema, messageSchema, listingSchema } = require('./validators');
-const sequelize = require('sequelize');
-const { Op } = sequelize;
 const path = require('path');
+const { Op } = require("sequelize");
 
 /*
 	Routes
@@ -27,7 +26,7 @@ function requiresAuth(routeFunc) {
 	};
 }
 
-module.exports = (app, models) => {
+module.exports = (app, models, sequelize) => {
 	const { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserMessage, UserReview, FileUpload } = models;
 
 	app.get('/', asyncHandler(async (req, res) => {
@@ -312,7 +311,6 @@ module.exports = (app, models) => {
 	})));
 
 	/* API: Create a listing */
-	// refer to templates/_add_listing.html
 	app.post('/api/listings/new', asyncHandler(requiresAuth(async (req, res) => {
 		const { toolId, price,
 			billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
@@ -328,7 +326,6 @@ module.exports = (app, models) => {
 	})));
 
 	/* API: Edit a listing */
-	// refer to templates/_edit_listing.html
 	app.put('/api/listings/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
 		const { price, billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
@@ -380,7 +377,9 @@ module.exports = (app, models) => {
 			searchRadius, // kilometers
 			userLat, userLon, // degrees
 			useUserAddress, // boolean
-			selectedCategory // string from dropdown menu // find out why this is undefined
+			selectedCategory, // string from dropdown menu // find out why this is undefined
+			makerId, // integer
+			categoryId, // integer
 		} = await searchListingsSchema.validate(req.query);
 
 		let lat = userLat;
@@ -400,18 +399,40 @@ module.exports = (app, models) => {
 		let ownersLat = `radians("tool->owner->address"."geocoded_lat")`;
 		let ownersLon = `radians("tool->owner->address"."geocoded_lon")`;
 
-		const distanceKm = `(6371 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
+		const distanceKm = `(6357 * acos(cos(${lat}) * cos(${ownersLat}) * cos(${lon} - ${ownersLon}) + sin(${lat}) * sin(${ownersLat})))`;
+
+		let where = {};
+		if (searchQuery) {
+			where.searchVector = {
+				[Op.match]: sequelize.fn('to_tsquery', searchQuery)
+			}
+		}
+
+		if (makerId) {
+			where.tool_maker_id = makerId;
+		}
+
+		if (categoryId) {
+			where.tool_category_id = categoryId;
+		}
 
 		let results = await models.Listing.findAll({
-			where: { active: true },
+			where: {
+				[Op.and]: [
+					{active: true},
+					sequelize.literal(`${distanceKm} < ${searchRadius}`)
+				]
+			},
+			attributes: {
+				include: [
+					[sequelize.literal(distanceKm), 'distance']
+				]
+			},
+			order: sequelize.col('distance'), // ASC order
 			include: [{
 				model: models.Tool,
 				as: 'tool',
-				where: !searchQuery ? {} : {
-					searchVector: {
-						[Op.match]: sequelize.fn('to_tsquery', searchQuery)
-					}
-				},
+				where,
 				include: [{
 					model: models.User,
 					as: 'owner',
@@ -420,14 +441,6 @@ module.exports = (app, models) => {
 						model: models.Address,
 						as: 'address',
 						required: true,
-						attributes: {
-							include: [[
-								sequelize.literal(distanceKm),
-								'distance'
-							]]
-						},
-						order: sequelize.col('distance'),
-						where: sequelize.literal(`${distanceKm} < ${searchRadius}`)
 					}]
 				}]
 			}]

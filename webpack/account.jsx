@@ -3,9 +3,23 @@ import ReactDOM from 'react-dom';
 import { ChakraProvider, Box, Heading, Text, UnorderedList, ListItem, Button } from '@chakra-ui/react';
 
 function Account() {
+  console.log("entered accounts");
   const [currentTab, setCurrentTab] = useState('');
   const handleTabChange = (tabName) => {
     setCurrentTab(tabName);
+  };
+
+  const handleLogout = () => {
+    fetch('/user/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).then(response => {
+      console.log('User has been logged out');
+      window.location.href = '/';
+    }).catch(error => {
+      console.error('Error logging out:', error);
+    });
+
   };
 
   const authUser = window._user; // Access the authUser variable from the global _user variable
@@ -61,10 +75,6 @@ function Account() {
     default:
       content = '';
   }
-
-  const handleLogout = () => {
-    window.location.href = '/user/logout';
-  };
 
     return (
         <Box maxW="600px" mx="auto" p="4">

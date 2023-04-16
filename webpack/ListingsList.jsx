@@ -1,3 +1,6 @@
+import React from 'react';
+import renderComponent from './util/renderComponent';
+
 /**
  * A Listing is an object a user can add to their inventory.
  */
@@ -27,6 +30,16 @@ const Listing = ({
   );
 };
 
+const ListingsList = ({ listings }) => {
+	return (
+		<div>
+			{listings.map(l => <Listing key={l.id} {...l} />)}
+		</div>
+	);
+};
+
 /**
  * Note: button only goes to /me
  */
+
+renderComponent("#root", <ListingsList {...window._ListingsListProps} />);

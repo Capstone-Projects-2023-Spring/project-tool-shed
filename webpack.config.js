@@ -21,6 +21,7 @@ module.exports = {
 		ListingDetails: path.resolve(__dirname, 'webpack/ListingDetails.jsx'),
 		Login: path.resolve(__dirname, 'webpack/Login.jsx'),
 		ReviewList: path.resolve(__dirname, 'webpack/ReviewList.jsx'),
+		ListingsList: path.resolve(__dirname, 'webpack/ListingsList.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

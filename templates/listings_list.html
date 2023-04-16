@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<div id="root"></div>
+
+<script type="application/javascript">
+	window._ListingsListProps = {
+		listings: {{ listings|json }},
+		owner: {{ owner|json }},
+	};
+</script>
+<script src="/webpack/ListingsList.js" type="application/javascript"></script>
+
+{% endblock %}

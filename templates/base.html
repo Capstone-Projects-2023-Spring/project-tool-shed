@@ -3,7 +3,7 @@
 
 <head>
 	<link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/public/reset.css">
-	<title>ToolShed | Share your tools!</title>
+	<title>ToolShed | {% block title %}Share your tools!{%endblock%}</title>
 	<style>
 		body {
 			display: flex;
@@ -36,15 +36,11 @@
 </head>
 
 <body>
+	<script src="/webpack/runtime.js"></script>
+	<script src="/webpack/vendor.js"></script>
 	<!--Navigation bar-->
 	<header id="nav">
 	</header>
-	<script type="application/javascript">
-		window.__NavBarProps = {
-			authUser: {% if authUser %}{{authUser|json}}{% else %}undefined{% endif %}
-		};
-	</script>
-	<script src="/webpack/NavBar.js" type="application/javascript"></script>
 	<main>
 		{% block body %}
 		<!--Body content-->
@@ -53,8 +49,13 @@
 	<footer>
 		<!--Footer content-->
 	</footer>
+	<script type="application/javascript">
+		window.__NavBarProps = {
+			authUser: {% if authUser %}{{authUser|json}}{% else %}undefined{% endif %}
+		};
+	</script>
+	<script src="/webpack/NavBar.js" type="application/javascript"></script>
 
-	<script src="/node_modules/babel-standalone/babel.min.js"></script>
 </body>
 
 </html>

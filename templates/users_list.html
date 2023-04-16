@@ -1,31 +1,16 @@
 {% extends "base.html" %}
 
-{% block head %}
-
-{% endblock %}
+{% block title %}Users{% endblock %}
 
 {% block body %}
 
 <div id="root"></div>
 
-<script src="/public/user.jsx" type="text/babel"></script>
-
-<script type="text/babel">
-	const UserList = ({users}) => {
-	
-		return <div>
-			<form action="/user" method="get">
-				<button type="submit">Get Users</button>
-			</form>
-			{users.map(u => <User key={u.id} {...u} />)}
-		</div>;
+<script type="application/javascript">
+	window._UsersListProps = {
+		users: {{ users|json }}
 	};
-
-	const root = ReactDOM.createRoot(document.getElementById('root'));
-
-	const users = {{ users|json }};
-	console.log(users);
-	root.render(<UserList users={users} />);
 </script>
+<script src="/webpack/UsersList.js" type="application/javascript"></script>
 
 {% endblock %}

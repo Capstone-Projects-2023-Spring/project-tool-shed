@@ -1,3 +1,4 @@
+import React from 'react';
 
 const User = (function() {
 	const {useState} = React;
@@ -47,3 +48,5 @@ const User = (function() {
 		</div>
 	};
 })();
+
+export default User;

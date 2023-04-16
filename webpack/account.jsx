@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { ChakraProvider, Box, Heading, Text, UnorderedList, ListItem, Button } from '@chakra-ui/react';
 
 function Account() {
-  console.log("entered accounts");
   const [currentTab, setCurrentTab] = useState('');
   const handleTabChange = (tabName) => {
     setCurrentTab(tabName);

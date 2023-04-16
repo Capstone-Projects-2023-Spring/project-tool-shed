@@ -110,7 +110,7 @@ module.exports = (app, models, sequelize) => {
 	app.post('/user/logout', asyncHandler(requiresAuth(async (req, res) => {
 		res.setUser(null);
 		res.redirect('/');
-	  })));
+	})));
 
 
 	/*
@@ -513,6 +513,7 @@ module.exports = (app, models, sequelize) => {
 				{model: User, as: 'owner'}
 			]}
 		];
+		
 		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {

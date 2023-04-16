@@ -1,189 +1,68 @@
 import React, { useState, useEffect } from 'react';
+import {Card, CardHeader, CardBody, CardFooter, Text, Heading, Flex, Link} from '@chakra-ui/react';
+import {ExternalLinkIcon} from '@chakra-ui/icons'
+
+import ContactOwnerButton from './components/ContactOwnerButton';
 import renderComponent from './util/renderComponent';
+import {billingIntervalPluralNouns, billingIntervalNouns} from '../constants';
 
-const style = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#F1F1F1",
-    padding: 10,
-    marginBottom:10,
-    borderRadius: 10,
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-    width: "50%",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 36,
-  },
-  button: {
-    fontWeight: "bold",
-    color: "white",
-    backgroundColor: "#0077ff",
-    padding: "10px 15px",
-    borderRadius: "4px",
-    border: "none",
-    cursor: "pointer",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontWeight: "bold",
-    fontSize: 24,
-    marginBottom: 5,
-  },
-  info: { 
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  link: {
-    fontSize: 18,
-    marginBottom: 10,
-    color: "#0077ff",
-  },
-  videoContainer: {
-    marginTop: 20,
-  },
-};
-
-const ContactOwnerButton = ({listingId, owner}) => {
-	let url = `/inbox/${owner.id}`;
-	if (listingId) {
-		url += `?listingId=${listingId}`;
-	};
-	return (
-		<a href={url}>
-			<button style={style.button}>Contact {owner.first_name}</button>
-		</a>
-	);
-};
-
-const Listing = ({
-  id: listingId,
-  owner,
-  price,
-  billingInterval,
-  maxBillingIntervals,
-  tool,
-}) => {
-  const s = tool.name + " " + tool.description;
-  if (tool.video === 'https://www.youtube.com/') {
-    tool.video = `https://www.youtube.com/results?search_query=${encodeURIComponent(s)}`;
-  }
-  const realLink = tool.video;
-  const videoId = getVideoId(realLink);
-
-  return (
-    <div>
-      <div style={style.container}>
-        <div style={style.header}>
-          <h2 style={style.title}>
-            {tool.name}
-          </h2>
-          <ContactOwnerButton listingId={listingId} owner={tool.owner} />
-        </div>
-        <div>
-          <p style={style.subtitle}>
-            {tool.description}
-          </p>
-          <p style={style.info}>
-            Price & Rate: ${price} {billingInterval}
-          </p>
-          <p style={style.info}>
-            Available For: {maxBillingIntervals} units
-          </p>
-        </div>
-        {videoId ? (
-          <div style={style.videoContainer}>
+const Video = ({url}) => 
             <iframe
               width="560"
               height="315"
-              src={`https://www.youtube.com/embed/${videoId}`}
+              src={url}
               allow="autoplay; encrypted-media"
               allowFullScreen
-            />
-          </div>
-        ) : (
-          <div style={style.videoContainer}>
-            <p style={style.subtitle}>Recommended Videos:<a style={style.link} href={realLink} target="_blank">{realLink}</a>
-            </p>
-          </div>
-        )}
-        <div style={style.header}>
-          <h2 style={style.title}>
-            <p>Recommended Tools ⬇️⬇️⬇️</p>
-          </h2>
-        </div>
-      </div>
-    </div>
-  );
+            />;
+
+const Listing = ({ id: listingId, owner, price, billingInterval, maxBillingIntervals, tool, isPrimary=false }) => {
+	if (tool.video === 'https://www.youtube.com/') tool.video = null;
+	
+	const videoId = getVideoId(tool.video);
+
+	const biNoun = (maxBillingIntervals === 1 ? billingIntervalNouns : billingIntervalPluralNouns)[billingInterval];
+	const isRental = billingInterval !== 'eternity';
+
+	return (
+		<Card>
+			<CardHeader>
+				<Flex direction="row" justifyContent="space-between">
+					<Heading size="lg">{tool.name}</Heading>
+					<ContactOwnerButton listingId={listingId} owner={tool.owner} />
+				</Flex>
+			</CardHeader>
+			<CardBody>
+				<Text>{tool.description}</Text>
+				{isPrimary && videoId && <Video url={`https://www.youtube.com/embed/${videoId}`} />}
+				{isPrimary && !videoId && tool.video && <Video url={tool.video} />}
+				{isPrimary && !videoId && !tool.video && <Link href={getSearchURL(tool)} isExternal>Videos on youtube <ExternalLinkIcon /></Link>}
+			</CardBody>
+			<CardFooter>
+				{isRental ? 
+				<Text>For rent for ${price} {billingInterval} (max {maxBillingIntervals} {biNoun})</Text>
+				: <Text>For sale for ${price}</Text>}
+			</CardFooter>
+		</Card>
+	);
 };
 
-
-
-/*
-* Creates a new Listing component with the given information
-*/
-const Recommendation = ({
-  owner,
-  price,
-  billingInterval,
-  maxBillingIntervals,
-  tool,
-  id: listingId
-}) => {
-  return (
-    <div style={style.container}>
-      <div style={style.header}>
-        <h2 style={style.title}>
-          {tool.name}
-        </h2>
-        <ContactOwnerButton listingId={listingId} owner={tool.owner} />
-      </div>
-      <div>
-        <p style={style.subtitle}>
-          {tool.description}
-        </p>
-        <p style={style.info}>
-          Price & Rate: ${price} {billingInterval}
-        </p>
-        <p style={style.info}>
-          Available For: {maxBillingIntervals} units
-        </p>
-      </div>
-    </div>
-  );
-};
-
-function getVideoId(videoUrl) {
-  const regex = /(?:\/|v=)([\w-]{11})(?:\?|&|$)/;
-  const match = videoUrl.match(regex);
-  return match ? match[1] : null;
+function getSearchURL(tool) {
+	return `https://www.youtube.com/results?search_query=${encodeURIComponent(tool.name)}`;
 }
 
-const ListingDetails = ({ listings }) => {
-  return <div>
-    <Listing {...listings} />
-  </div>;
-};
+function getVideoId(videoUrl) {
+	if (!videoUrl) return null;
+	const regex = /(?:\/|v=)([\w-]{11})(?:\?|&|$)/;
+	const match = videoUrl.match(regex);
+	return match ? match[1] : null;
+}
 
-
-const RecommendationList = ({recommendations}) => {
+const ListingDetails = ({listings, recommendations}) => {
 	return <div>
-		{recommendations.map(r => <Recommendation key={r.id} {...r} />)}
+		<Listing {...listings} isPrimary/>
+		{recommendations.length > 0 && <Heading size="md">Recommended Tools ⬇️⬇️⬇️</Heading>}
+		{recommendations.map(r => <Listing key={r.id} {...r} />)}
 	</div>
 };
 
-// use ReactDOM.createRoot to render the component
-
-renderComponent('#root', 
-  <>
-    <ListingDetails listings={window._listings.listings} />
-    <RecommendationList recommendations={window._listings.recommendations} />
-  </>
-);
+renderComponent('#root', <ListingDetails {...window._listings} />);

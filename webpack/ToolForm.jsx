@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import {createRoot} from 'react-dom/client';
-import { ChakraProvider, Box, Button, FormControl, FormHelperText,
+import { Box, Button, FormControl, FormHelperText,
 	 FormErrorMessage, FormLabel, Input, Stack, Select, Card, CardHeader,
 	 CardBody, Heading, Summary, Text, StackDivider, Divider,
 	 Link } from '@chakra-ui/react';
@@ -9,6 +8,8 @@ import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 
 import { AsyncCreatableSelect } from "chakra-react-select";
+
+import renderComponent from './util/renderComponent';
 
 import toolSchema from '../validators/tool';
 import listingSchema from '../validators/listing';
@@ -259,9 +260,4 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 	</Box>
 )};
 
-const root = document.getElementById('root');
-createRoot(root).render(
-  <ChakraProvider>
-      <ToolForm {...window._toolFormProps} />
-  </ChakraProvider>
-);
+renderComponent("#root", <ToolForm {...window._toolFormProps} />);

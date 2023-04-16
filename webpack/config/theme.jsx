@@ -1,7 +1,13 @@
-import { theme } from "@chakra-ui/react"
+import { extendTheme } from "@chakra-ui/react"
 
-const toolshedTheme = {
-  ...theme,
-}
+const toolshedTheme = extendTheme({
+	components: {
+		Button: {
+			baseStyle: {
+				cursor: 'pointer'
+			}
+		}
+	}
+});
 
 export default toolshedTheme

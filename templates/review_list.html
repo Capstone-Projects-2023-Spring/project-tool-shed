@@ -7,22 +7,10 @@
 {% block body %}
 <div id="root"></div>
 
-<script src="/public/reviews.jsx" type="text/babel"></script>
-
-<script type="text/babel">
-	const ReviewList = ({reviews}) => {
-	
-		return <div>
-			{reviews.map(r => <Review key={r.id} {...r} />)}
-            
-		</div>;
-	};
-
-	const root = ReactDOM.createRoot(document.getElementById('root'));
-
-	const reviews = {{ reviews | json }};
-	console.log(reviews);
-	root.render(<ReviewList reviews={reviews}/>);
+<script type="application/javascript">
+	window._reviews = {{ reviews|json }};
 </script>
+
+<script src="/webpack/ReviewList.js" type="application/javascript"></script>
 
 {% endblock %}

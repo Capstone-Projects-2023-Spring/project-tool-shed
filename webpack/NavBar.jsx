@@ -15,7 +15,6 @@ const NavBar = ({ authUser }) => {
   if (authUser) {
     navItemsRight["/inbox"] = <MdOutlineEmail />;
     navItemsRight["/account"] = <MdOutlineAccountCircle />;
-    navItemsLeft["/user/me/reviews"] = "My Review";
     navItemsLeft["/review/users"] = "Review";
   } else {
     navItemsRight["/user/login"] = "Log In";
@@ -59,6 +58,14 @@ const NavBar = ({ authUser }) => {
                             _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
                             px="4"
                   >Listings</MenuItem>
+                  <MenuItem as="a" href="/user/me/reviews" 
+                            color="white"
+                            bg="blue.500"
+                            _hover={{ bg: "blue.400" }}
+                            _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
+                            px="4"
+                  >My Reviews</MenuItem>
+
                 </MenuList>
               </Menu>
               ) : null}

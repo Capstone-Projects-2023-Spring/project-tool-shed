@@ -20,6 +20,7 @@ module.exports = {
 		NavBar: path.resolve(__dirname, 'webpack/NavBar.jsx'),
 		ListingDetails: path.resolve(__dirname, 'webpack/ListingDetails.jsx'),
 		Login: path.resolve(__dirname, 'webpack/Login.jsx'),
+		ReviewList: path.resolve(__dirname, 'webpack/ReviewList.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),

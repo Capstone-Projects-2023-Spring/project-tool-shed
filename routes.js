@@ -724,11 +724,11 @@ module.exports = (app, models, sequelize) => {
 	 */
 
 	/* Create a review on another user*/
-	app.get('/review/users', asyncHandler(async (req, res) => {
+/*	app.get('/review/users', asyncHandler(async (req, res) => {
 		res.render('user_reviews.html', {
 			users: await models.User.findAll()
 		});
-	}));
+	}));*/
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { reviewee_id } = req.params;
@@ -767,7 +767,6 @@ module.exports = (app, models, sequelize) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
-
 };
 
 

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block head %}
-
-{% endblock %}
+{% block title %}{% if user.id === authUser.id %}My{% else %}{{ user.first_name}}'s{% endif %} Reviews{% endblock %}
 
 {% block body %}
 <div id="root"></div>
 
 <script type="application/javascript">
-	window._reviews = {{ reviews|json }};
+	window._ReviewListProps = {
+		reviews: {{ reviews|json }}
+	};
 </script>
 
 <script src="/webpack/ReviewList.js" type="application/javascript"></script>

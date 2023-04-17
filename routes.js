@@ -177,7 +177,7 @@ module.exports = (app, models, sequelize) => {
 			return res.status(403).json({ error: "You are not authorized to edit this tool." });
 		}
 
-		const listings = await Listing.findAll({ where: { tool_id } });
+		const listings = await Listing.findAll({ where: { tool_id }, order: [['createdAt', 'ASC']] });
 
 		res.render('tool_form.html', {
 			tool,
@@ -313,10 +313,10 @@ module.exports = (app, models, sequelize) => {
 
 	/* API: Create a listing */
 	app.post('/api/listings/new', asyncHandler(requiresAuth(async (req, res) => {
-		const { toolId, price,
+		const { toolId, price, active,
 			billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
-		console.log(req.body, { toolId, price, billingInterval, maxBillingIntervals });
 		const l = await models.Listing.create({
+			active,
 			price,
 			billingInterval,
 			maxBillingIntervals,
@@ -329,19 +329,22 @@ module.exports = (app, models, sequelize) => {
 	/* API: Edit a listing */
 	app.put('/api/listings/:listing_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { listing_id } = req.params;
-		const { price, billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
+		const { active, price, billingInterval, maxBillingIntervals } = await listingSchema.validate(req.body);
 
-		const listing = await models.Listing.findByPk(listing_id);
+		const listing = await models.Listing.findByPk(listing_id, {include: [
+			{model: Tool, as: 'tool'}
+		]});
 
 		if (!listing) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
 
-		if (listing.owner_id !== req.user.id) {
+		if (listing.tool.owner_id !== req.user.id) {
 			return res.status(403).json({ error: "not your listing!" });
 		}
 
 		// Update the listing data with the new data
+		listing.active = active;
 		listing.price = price;
 		listing.billingInterval = billingInterval;
 		listing.maxBillingIntervals = maxBillingIntervals;
@@ -722,13 +725,6 @@ module.exports = (app, models, sequelize) => {
 	/*
 	 * User Reviews
 	 */
-
-	/* Create a review on another user*/
-/*	app.get('/review/users', asyncHandler(async (req, res) => {
-		res.render('user_reviews.html', {
-			users: await models.User.findAll()
-		});
-	}));*/
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { reviewee_id } = req.params;

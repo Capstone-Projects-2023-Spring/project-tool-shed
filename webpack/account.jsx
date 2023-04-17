@@ -58,6 +58,20 @@ function Account() {
         </>
       );
       break;
+
+    case 'My Reviews':
+      content = (
+        <>
+          <Text>
+            User Reviews<br />
+            <br />
+            To view reviews given to you by other users, click here to view your reviews.
+            <br />
+            <a href="/user/me/reviews" style={{ color: 'blue', fontWeight: 'bold'}}>My Reviews</a>
+          </Text>
+        </>  
+      );
+      break;    
     case 'Log Out':
       content = (
         <>
@@ -83,6 +97,9 @@ function Account() {
                 </ListItem>
                 <ListItem>
                     <Button onClick={() => handleTabChange('View your Toolshed')}>Toolshed</Button>
+                </ListItem>
+                <ListItem>
+                    <Button onClick={() => handleTabChange('My Reviews')}>My Reviews</Button>
                 </ListItem>
                 <ListItem>
                     <Button onClick={() => handleTabChange('Log Out')}>Log Out</Button>

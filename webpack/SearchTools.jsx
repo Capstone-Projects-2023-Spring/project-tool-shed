@@ -222,7 +222,7 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 					<SliderTrack>
 					  <SliderFilledTrack bg="blue.500" />
 					</SliderTrack>
-					<SliderThumb bg="blue.500" />
+					<SliderThumb zIndex={0} bg="blue.500" />
 					<SliderMark value={1} {...labelStyles} pl={1.5}>1</SliderMark>
 					<SliderMark value={2} {...labelStyles} pl={1.5}>2</SliderMark>
 					<SliderMark value={3} {...labelStyles} pl={1.5}>3</SliderMark>
@@ -248,7 +248,7 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 						<SliderTrack>
 							<SliderFilledTrack bg="blue.500" />
 						</SliderTrack>
-						<SliderThumb bg="blue.500" />
+						<SliderThumb zIndex={0} bg="blue.500" />
 						<SliderMark value={50} {...labelStyles}>50km</SliderMark>
 						<SliderMark value={100} {...labelStyles}>100km</SliderMark>
 						<SliderMark value={150} {...labelStyles}>150km</SliderMark>

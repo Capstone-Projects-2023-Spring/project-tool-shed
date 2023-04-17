@@ -212,7 +212,7 @@ module.exports = (app, models, sequelize) => {
 			}]
 		});
 
-		res.render('listing_list.html', { listings, user: owner });
+		res.render('listings_list.html', { listings, owner });
 	}));
 
 	/* API: Create tools */
@@ -505,22 +505,19 @@ module.exports = (app, models, sequelize) => {
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
 		const { listing_id } = req.params;
 
-		// Query parameters to include 
-		const include = [
-			{model: Tool, as: 'tool', include: [
-				{model: ToolCategory, as: 'category'},
-				{model: ToolMaker, as: 'maker'},
-				{model: User, as: 'owner'}
-			]}
-		];
-		
 		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
 				active: true
 			},
-			include
+			include: [
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category'},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
+			]
 		});
 
 		if (!listings) {
@@ -533,9 +530,17 @@ module.exports = (app, models, sequelize) => {
 				active: true,
 				id: {
 					[Op.ne]: listings.id
-				}
+				},
 			},
-			include
+			include: [
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category', where: listings.category ? {
+						id: {[Op.ne]: listings.category.id}
+					} : {}},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
+			]
 		});
 /*
 		// filter out the recommendations that have a tool without the same category as the tool category 
@@ -722,11 +727,11 @@ module.exports = (app, models, sequelize) => {
 	 */
 
 	/* Create a review on another user*/
-	app.get('/review/users', asyncHandler(async (req, res) => {
+/*	app.get('/review/users', asyncHandler(async (req, res) => {
 		res.render('user_reviews.html', {
 			users: await models.User.findAll()
 		});
-	}));
+	}));*/
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { reviewee_id } = req.params;
@@ -765,7 +770,6 @@ module.exports = (app, models, sequelize) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
-
 };
 
 

@@ -3,7 +3,7 @@
  */
 
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const decache = require('decache'); // Allow us to reload code via require
 const multer = require('multer'); // File upload framework
@@ -171,6 +171,12 @@ async function syncDatabase(sequelize) {
 async function startServer() {
 	dotenv.config();
 	const uploadPath = path.join(__dirname, '.uploads');
+
+	const uploadExists = await fs.access(uploadPath).then(() => true, () => false);
+	if (!uploadExists) {
+		await fs.mkdir(uploadPath, {recursive: true});
+	}
+
 	const uploadStorage = multer.diskStorage({
 		destination: (req, file, cb) => {
 			cb(null, uploadPath);

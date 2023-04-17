@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -21,6 +20,9 @@ module.exports = {
 		ListingDetails: path.resolve(__dirname, 'webpack/ListingDetails.jsx'),
 		Login: path.resolve(__dirname, 'webpack/Login.jsx'),
 		ReviewList: path.resolve(__dirname, 'webpack/ReviewList.jsx'),
+		ListingsList: path.resolve(__dirname, 'webpack/ListingsList.jsx'),
+		UserSingular: path.resolve(__dirname, "webpack/UserSingular.jsx"),
+		UsersList: path.resolve(__dirname, 'webpack/UsersList.jsx'),
 	},
 	output: {
 		path: path.resolve(__dirname, "webpack/dist"),
@@ -45,9 +47,23 @@ module.exports = {
 		new webpack.DefinePlugin({
 			GOOGLE_MAPS_API_KEY: JSON.stringify(process.env.GOOGLE_MAPS_API_KEY)
 		}),
-//		new BundleAnalyzerPlugin()
 	],
 	resolve: {
 		extensions: ['*', '.js', '.jsx']
+	},
+	// Splits all code in ./node_modules off into its own file.
+	// This makes it so that multiple components on the page don't
+	// each download the same code
+	optimization: {
+		runtimeChunk: "single",
+		splitChunks: {
+			cacheGroups: {
+				vendor: {
+					test: /[\\/]node_modules[\\/]/,
+					name: 'vendor',
+					chunks: 'all'
+				}
+			}
+		}
 	},
 }

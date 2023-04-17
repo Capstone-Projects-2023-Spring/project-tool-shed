@@ -93,14 +93,13 @@ const NavBar = ({ authUser }) => {
                 )
               ))}
           </Flex>
-          <Flex alignItems="center" justify="space-around" w={authUser ? "5%" : "10%"}>
+          <Flex alignItems="center" justify="space-around" boxSizing='border-box' w={authUser ? "5%" : "10%"}>
             {Object.entries(navItemsRight).map(([url, label]) => (
               <a
                 key={url}
                 href={url}
                 style={{
                   color: "white",
-                  marginLeft: "8px",
                   textDecoration: "none",
                   transition: "color 0.2s ease",
                 }}
@@ -119,7 +118,6 @@ const NavBar = ({ authUser }) => {
                     variant="ghost"
                     icon={label}
                     fontSize="24px"
-                    mr={2}
                     _hover={{ bg: "blue.400" }}
                     _focus={{ bg: "blue.600", boxShadow: "inner",  }}
                   />

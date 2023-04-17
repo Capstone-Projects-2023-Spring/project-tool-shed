@@ -1,6 +1,6 @@
+import React, {useState} from 'react';
 
 const User = (function() {
-	const {useState} = React;
 	const style = {
 		backgroundColor: "#F1F1F1",
 		padding: 5,
@@ -36,6 +36,7 @@ const User = (function() {
 			<h2>{firstName} {lastName} {id} {active}</h2>
 			<p>Email: {email}</p>
 			<a href={`/inbox/${id}`}>Send Message</a>
+			<a href={`/review/new/${id}`}>Review User</a>
 			{isEditable && 
 			<form action="/users/edit" method="post" style={{display: 'flex', flexFlow: 'column nowrap'}}>
 				<FormInput name='first_name' label="First Name:" value={firstName} setter={setFirstName} />
@@ -47,3 +48,5 @@ const User = (function() {
 		</div>
 	};
 })();
+
+export default User;

@@ -271,18 +271,20 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 				</FormControl>
 				<FormControl mb={4}>
 					<FormLabel>User Rating</FormLabel>
-					<Slider w='100%' defaultValue={defaultUserRating} max={5} step={1} onChange={x => setuserRating(x)}>
-						<SliderTrack>
-							<SliderFilledTrack bg="blue.500" />
-						</SliderTrack>
-						<SliderThumb zIndex={0} bg="blue.500" />
-						<SliderMark value={1} {...labelStyles} pl={1.5}>1</SliderMark>
-						<SliderMark value={2} {...labelStyles} pl={1.5}>2</SliderMark>
-						<SliderMark value={3} {...labelStyles} pl={1.5}>3</SliderMark>
-						<SliderMark value={4} {...labelStyles} pl={1.5}>4</SliderMark>
-						<SliderMark value={5} {...labelStyles} pl={1.5}>5</SliderMark>
-						<SliderMark value={userRating} {...sliderValueStyle} w={50} ml={-6}>{userRating} Star</SliderMark>
-					</Slider>
+					<Box mt={10} mb={10}>
+						<Slider w='100%' defaultValue={defaultUserRating} max={5} step={1} onChange={x => setuserRating(x)}>
+							<SliderTrack>
+								<SliderFilledTrack bg="blue.500" />
+							</SliderTrack>
+							<SliderThumb zIndex={0} bg="blue.500" />
+							<SliderMark value={1} {...labelStyles} pl={1.5}>1</SliderMark>
+							<SliderMark value={2} {...labelStyles} pl={1.5}>2</SliderMark>
+							<SliderMark value={3} {...labelStyles} pl={1.5}>3</SliderMark>
+							<SliderMark value={4} {...labelStyles} pl={1.5}>4</SliderMark>
+							<SliderMark value={5} {...labelStyles} pl={1.5}>5</SliderMark>
+							<SliderMark value={userRating} {...sliderValueStyle} w={50} ml={-6}>{userRating} Star</SliderMark>
+						</Slider>
+					</Box>
 				</FormControl>
 				<FormControl mb={4}>
 					<FormLabel>Tool Category</FormLabel>

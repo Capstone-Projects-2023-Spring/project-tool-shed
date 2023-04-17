@@ -8,6 +8,19 @@ function Account() {
     setCurrentTab(tabName);
   };
 
+  const handleLogout = () => {
+    fetch('/user/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).then(response => {
+      console.log('User has been logged out');
+      window.location.href = '/';
+    }).catch(error => {
+      console.error('Error logging out:', error);
+    });
+
+  };
+
   const authUser = window._user; // Access the authUser variable from the global _user variable
 
   let content = '';
@@ -75,10 +88,6 @@ function Account() {
     default:
       content = '';
   }
-
-  const handleLogout = () => {
-    window.location.href = '/user/logout';
-  };
 
     return (
         <Box maxW="600px" mx="auto" p="4">

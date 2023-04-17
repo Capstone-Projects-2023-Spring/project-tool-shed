@@ -208,6 +208,7 @@ const genModels = sequelize => {
 	 * @classdesc Represents a manufacturer of tools, like Milwaukee or DeWalt.
 	 * @augments sequelize.Model
 	 * @property {string} name The name of the manufacturer
+	 * @property {string} searchVector TSVector, not to be used in JavaScript code (DB-side only)
 	 */
 	const ToolMaker = sequelize.define('ToolMaker', {
 		name: { type: DataTypes.STRING, allowNull: false },
@@ -224,6 +225,7 @@ const genModels = sequelize => {
 	 * @classdesc Represents a kind of tool - like hammer, saw, or drill.
 	 * @augments sequelize.Model
 	 * @property {string} name The name of the category
+	 * @property {string} searchVector TSVector, not to be used in JavaScript code (DB-side only)
 	 */
 	const ToolCategory = sequelize.define("ToolCategory", {
 		name: { type: DataTypes.STRING, allowNull: false },
@@ -263,8 +265,7 @@ const genModels = sequelize => {
 		},
 		video: {
 			type: DataTypes.STRING,
-			allowNull: true,
-			defaultValue: 'https://www.youtube.com/'
+			allowNull: true
 		}
 	}, { tableName: 'tool', paranoid: true });
 
@@ -396,6 +397,8 @@ const genModels = sequelize => {
 	 * @augments sequelize.Model
 	 * @property {text} content The contents of the review
 	 * @property {integer} ratings The star ratings of another user
+	 * @property {integer} reviewee_id
+	 * @property {integer} reviewer_id
 	 */
 	const UserReview = sequelize.define('UserReview', {
 		content: {

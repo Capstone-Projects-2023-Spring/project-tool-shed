@@ -17,16 +17,25 @@ const warningStyle = {
         borderRadius: "4px"
 };
 
-const Review = ({ email, reviewer_id, content, ratings, detailed = false }) => {
+const Review = ({ email, reviewee_id, content, ratings, detailed = false }) => {
         if (detailed) {
             return "TODO";
         }
 
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            if (i < ratings) {
+              stars.push(<img key={i} src="/public/FilledStar.png" alt="Star filled"  style={{display: 'inline-block', width: '1em'}}/>);
+            } else {
+              stars.push(<img key={i} src="/public/EmptyStar.png" alt="Star empty"  style={{display: 'inline-block', width: '1em'}}/>);
+            }
+        }
+
         return (
             <div style={style}>
-                <h2>Reviewer: {email} {reviewer_id}</h2>
+                <h2>Reviewer: {email} {reviewee_id}</h2>
                 <p>{content}</p>
-                <p>ratings: {ratings}/5</p>
+                <p>Rating: {stars}</p>
 		{ratings === 0 && <p style={warningStyle}>&#128295; &#128295; WARNING &#128295; &#128295;</p>}
 		{ratings === 0 && <p style={warningStyle}>You have received a 0/5 rating and now have an infraction on your account</p>}
             </div>

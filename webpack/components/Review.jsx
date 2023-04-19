@@ -24,7 +24,7 @@ const Review = ({ email, reviewee_id, content, ratings, detailed = false }) => {
 
         const stars = [];
         for (let i = 1; i <= 5; i++) {
-            if (i < ratings) {
+            if (i <= ratings) {
               stars.push(<img key={i} src="/public/FilledStar.png" alt="Star filled"  style={{display: 'inline-block', width: '1em'}}/>);
             } else {
               stars.push(<img key={i} src="/public/EmptyStar.png" alt="Star empty"  style={{display: 'inline-block', width: '1em'}}/>);

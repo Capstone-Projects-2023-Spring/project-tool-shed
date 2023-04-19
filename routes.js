@@ -795,6 +795,13 @@ module.exports = (app, models, sequelize) => {
 	app.ws('/websocket/:key', asyncHandler(async(ws, req) => {
 		global.webSockets.addConnection(req.user.id, req.params.key, ws);
 	}));
+
+	const sendNotification = (userId, key) => {
+		const connections = global.webSockets.getConnections(userId); // Get all connections for the user
+		for (const connection of connections) {
+		  connection.send(JSON.stringify(key)); // Send the notification to each connection
+		}
+	};
 };
 
 

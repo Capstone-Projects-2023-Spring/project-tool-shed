@@ -388,6 +388,12 @@ const genModels = sequelize => {
 		}
 	});
 
+	UserMessage.addHook('afterCreate', 'notify', async (userId, key, sock) => {
+		if(UserMessage.messageNotification){
+			return {userId, key, sock};
+		}
+	});
+
 
 
 	/**
@@ -483,47 +489,7 @@ const genModels = sequelize => {
 		as: 'uploader'
 	});
 
-	/**
-	 * @class Notification
-	 * @classdesc Represents a notification of new message or listing availability
-	 * @augments sequelize.Model
-	 * @property {string} content Message content
-	 * @property {int} recipient_id The ID of the recipient UserMessage model
-	 * @property {int} sender_id The ID of the sending UserMessage model
-	 * @property {int} watcher_id The ID of the User watching the listing that triggers notification
-	 */
-	const Notification = sequelize.define('Notification', {
-		content: {
-			type: DataTypes.STRING,
-			allowNull: false
-		}
-	}, { tableName: 'notification', paranoid: true });
-
-	Notification.belongsTo(UserMessage, {
-		foreignKey: {
-			name: 'recipient_id',
-			allowNull: false
-		},
-		as: 'recipient'
-	});
-
-	Notification.belongsTo(UserMessage, {
-		foreignKey: {
-			name: 'sender_id',
-			allowNull: false
-		},
-		as: 'sender'
-	});
-
-	Notification.belongsTo(Listing, {
-		foreignKey: {
-			name: 'watcher_id',
-			allowNull: false
-		},
-		as: 'watcher'
-	});
-
-	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload, Notification };
+	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };
 };
 
 module.exports = genModels;

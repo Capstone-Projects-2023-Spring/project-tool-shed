@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block body %}
+<script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 <style>
     form {
         margin-left: 10px;
@@ -47,6 +48,27 @@
     input[type="submit"]:hover {
         background-color: #3182ce;
     }
+    .stars span {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    .stars input[type="radio"] {
+        display: none;
+    }
+    .stars label {
+        color: #d2d2d2;
+        font-size: 30px;
+        padding: 0 5px;
+        cursor: pointer;
+    }
+    .stars label:hover,
+    .stars input[type="radio"]:checked ~ label {
+        color: #f8c601;
+    }   
+    .stars label:hover ~ label {
+        color: #f8c601;
+    }
 </style>
 
 <form action="/review/new", method="POST">
@@ -54,13 +76,18 @@
     <label for="content">Review</label><br>
     <textarea rows="10" col="80" id="content" name="content"></textarea><br><br>
     <label for="ratings">Ratings</label><br>
-    <input type="number" id="ratings" name="ratings" min="0" max="5"><br><br>
+
+    <div class="stars">
+        <span>
+          <input id="ratings1" type="radio" name="ratings" value="1"><label for="ratings1">★</label>
+          <input id="ratings2" type="radio" name="ratings" value="2"><label for="ratings2">★</label>
+          <input id="ratings3" type="radio" name="ratings" value="3"><label for="ratings3">★</label>
+          <input id="ratings4" type="radio" name="ratings" value="4"><label for="ratings4">★</label>
+          <input id="ratings5" type="radio" name="ratings" value="5"><label for="ratings5">★</label>
+        </span>
+      </div>
+      
+      <br><br> 
     <input type="submit" value="Submit">
 </form>
-
-<style>
-    form {
-        margin-left: 10px;
-    }
-</style>
 {% endblock %}

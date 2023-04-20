@@ -5,9 +5,10 @@
 
 const net = require('net');
 const path = require('path');
-const { DataTypes, QueryTypes } = require('sequelize');
+const { DataTypes, QueryTypes, Model } = require('sequelize');
 const bcrypt = require('bcrypt');
 const { billingIntervals } = require('./constants');
+const { ModelTrainingSharp } = require('@mui/icons-material');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const genModels = sequelize => {
@@ -481,6 +482,23 @@ const genModels = sequelize => {
 			allowNull: false
 		},
 		as: 'uploader'
+	});
+
+	Tool.belongsToMany(User, {
+		through: 'WatchTool',
+		foreignKey: 'watched_tool_id',
+		as: 'watcher'
+	});
+
+	User.belongsToMany(Tool, {
+		through: 'WatchTool',
+		foreignKey: 'watcher_id',
+		as: 'watchedtool'
+	});
+
+	//check if new listing made for watched tool and send notificationi
+	Tool.addHook('afterSave', async(tool) => {
+
 	});
 
 	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };

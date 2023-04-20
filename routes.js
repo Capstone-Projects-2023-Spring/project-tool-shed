@@ -770,6 +770,15 @@ module.exports = (app, models, sequelize) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
+
+	//Watch a tool
+	app.post('/notification/tool', asyncHandler(requiresAuth(async (req, res) => {
+		const { watched_tool_id } = req.body;
+		const tool = await Tool.findByPk(watched_tool_id);
+		await tool.addWatcher(req.user);
+		res.json({status: "okay"});
+	})));
+	
 };
 
 

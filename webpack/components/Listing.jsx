@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Card, CardHeader, CardBody, CardFooter, Text, Heading, Flex, Link} from '@chakra-ui/react';
+import {Card, CardHeader, CardBody, CardFooter, Text, Heading, Flex, Link, Button} from '@chakra-ui/react';
 import {ExternalLinkIcon} from '@chakra-ui/icons'
 
 import LinkButton from './LinkButton';
@@ -21,6 +21,23 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 
 	const biNoun = (maxBillingIntervals === 1 ? billingIntervalNouns : billingIntervalPluralNouns)[billingInterval];
 	const isRental = billingInterval !== 'eternity';
+	
+
+	//const [tool, setTool] = useState(); //is this necessary? 
+	//something's wrong in this function
+	const watchTool = async () => {
+		await fetch('/notification/tool', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ watched_tool_id: tool.id }),
+			credentials: "same-origin"
+		}).then(() => {
+			console.log('watching tool');
+		})
+	};
+
 
 	return (
 		<Card>
@@ -30,6 +47,7 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 					{!isOwn && <LinkButton url={`/inbox/${tool.owner.id}/?listingId=${listingId}`}>Contact {tool.owner.first_name}</LinkButton>}
 					{isOwn && <LinkButton url={`/tools/${tool.id}/edit`}>Edit</LinkButton>}
 				</Flex>
+				{!isOwn && <Button onClick={watchTool}>Watch Tool</Button>}
 			</CardHeader>
 			<CardBody>
 				<Text>{tool.description}</Text>

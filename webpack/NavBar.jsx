@@ -15,7 +15,6 @@ const NavBar = ({ authUser }) => {
   if (authUser) {
     navItemsRight["/inbox"] = <MdOutlineEmail />;
     navItemsRight["/account"] = <MdOutlineAccountCircle />;
-    navItemsLeft["/review/users"] = "Review";
   } else {
     navItemsRight["/user/login"] = "Log In";
     navItemsRight["/user/new"] = "Sign Up";

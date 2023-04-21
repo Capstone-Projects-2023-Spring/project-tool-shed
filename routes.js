@@ -545,7 +545,7 @@ module.exports = (app, models, sequelize) => {
 				id: {
 					[Op.ne]: listings.id
 				},
-				'$tool.tool_category_id$': listings.tool.category.id,			
+				'$tool.tool_category_id$': listings.tool.category.id //filter out all listings with a tool with a different category
 			},
 			include: [
 				{
@@ -561,7 +561,7 @@ module.exports = (app, models, sequelize) => {
 			order: [
 				// sort by the number of matched search vectors in descending order
 				[sequelize.fn('ts_rank', 
-				sequelize.col('tool.searchVector'), 
+				sequelize.col('tool.searchVector'),
 				sequelize.fn('to_tsquery', subquery)), 
 				'DESC'
 				]

@@ -37,6 +37,17 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 			console.log('watching tool');
 		})
 	};
+	const unwatchTool = async () => {
+		await fetch(`/notification/tool/${tool.id}`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: "same-origin"
+		}).then(() => {
+			console.log('unwatch tool');
+		})
+	};
 
 
 	return (
@@ -48,6 +59,7 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 					{isOwn && <LinkButton url={`/tools/${tool.id}/edit`}>Edit</LinkButton>}
 				</Flex>
 				{!isOwn && <Button onClick={watchTool}>Watch Tool</Button>}
+				{!isOwn && <Button onClick={unwatchTool}>Unwatch Tool</Button>}
 			</CardHeader>
 			<CardBody>
 				<Text>{tool.description}</Text>

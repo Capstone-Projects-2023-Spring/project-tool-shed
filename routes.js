@@ -779,6 +779,14 @@ module.exports = (app, models, sequelize) => {
 		res.json({status: "okay"});
 	})));
 	
+	//unwatch a tool
+	app.delete('/notification/tool/:tool_id', asyncHandler(requiresAuth(async(req, res) => {
+        const { tool_id } = req.params;
+        const tool = await Tool.findByPk(tool_id);
+		await tool.removeWatcher(req.user);
+        res.json({status: "okay"});
+    })));
+
 };
 
 

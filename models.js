@@ -496,9 +496,16 @@ const genModels = sequelize => {
 		as: 'watchedtool'
 	});
 
-	//check if new listing made for watched tool and send notificationi
+	//check if new listing made for watched tool and send notification
 	Tool.addHook('afterSave', async(tool) => {
-
+		const newListings = await Listing.findAll({
+			where: {
+				tool_id: tool.id
+			}
+		});
+		if(newListings){
+			
+		}
 	});
 
 	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };

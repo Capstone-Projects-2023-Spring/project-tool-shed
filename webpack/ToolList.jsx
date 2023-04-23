@@ -13,11 +13,11 @@ const style = {
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
 };
 
-    /**
-     * Creates a new Tool component with the given name, description, id, detailed flag, owner,
-     * search vector, owner ID, category ID, and maker ID. If the detailed flag is set to true, 
-     * a more detailed view of the tool is shown.
-     */
+/**
+ * Creates a new Tool component with the given name, description, id, detailed flag, owner,
+ * search vector, owner ID, category ID, and maker ID. If the detailed flag is set to true, 
+ * a more detailed view of the tool is shown.
+*/
 const Tool = ({ 
         name, 
         description, 

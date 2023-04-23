@@ -9,23 +9,76 @@ class WebSocketsStructure {
 	constructor(){
 		this.map = {};
 	}
-	//Hashmap, key userId,
-	addConnection(userId, key, socket){
-		if(!this.map[userId]){
-			this.map[userId] = []
-		} 
-		this.map[userId].push({key, socket})
+	_ensure(user, key) {
+		if (!user) throw new Error("user is falsey");
+		if (!key) throw new Error('key is falsey');
+		// ensure this._map is properly formed
+		if (!this._map[user]) this._map[user] = {};
+		if (!this._map[user][key]) this._map[user][key] = [];
 	}
-	getConnections(userId, key){
-		const connections = []
-		for(const connection of this.map[userId]){
-			if(connection.key === key){
-				connections.push(connection.socket)
+	/**
+	 * Sends a message to all websockets belonging to a user
+	 * that match a given `key`.
+ 	 * @param {any} userId A user ID, UUID, etc
+	 * @param {any} key Preferrably a string or int, used to organize websockets based on what kind of data they expect/work with.
+	 * @param {string} data The data to send.
+	 * @param {function} onData Called when the websocket gets a message. Takes one parameter, the message string. Optional.
+	 */
+	add(userId, key, ws, onData = null) {
+		this._ensure(userId, key);
+
+		// store the websocket
+		let el = {ws, onData};
+		this._map[userId][key].push(el);
+
+		// removes the socket (by reference)
+		// from this._map
+		const removeSocket = () => this._map[userId][key] = this._map[userId][key].filter(x => x !== el);
+
+		// ensure that the websocket is removed from the data structure when its closed.
+		ws.addEventListener('close', (code, reason) => {
+			removeSocket();
+		});
+
+		// if we get an error on the websocket, bail.
+		ws.addEventListener('error', (error) => {
+			removeSocket();
+		});
+
+		// Call our onData function
+		ws.addEventListener('message', e => {
+			if (onData) {
+				onData(e.data);
 			}
-			
-		}
-		return connections;
-	}	
+		});
+	}
+	/**
+	 * Sends a message to all websockets belonging to a user
+	 * that match a given `key`.
+ 	 * @param {any} userId A user ID, UUID, etc
+	 * @param {any} key Preferrably a string or int, used to organize websockets based on what kind of data they expect/work with.
+	 * @param {string} data The data to send.
+	 * @param {object} options Options to be passed to WebSocket.send()
+	 */
+	send(userId, key, data, options = {}) {
+		this._ensure(userId, key);
+		return new Promise((resolve, reject) => {
+			let wses = this._map[userId][key];
+			let promises = [];
+			for (const {ws} of wses) {
+				promises.push(new Promise((_resolve, _reject) => {
+					ws.send(data, options, function(err) {
+						if (err) {
+							_reject(err);
+						} else {
+							_resolve();
+						}
+					});
+				}));
+			}
+			Promise.all(promises).then(resolve);
+		});
+	}
 }
 
 global.webSockets = new WebSocketsStructure();
@@ -130,8 +183,11 @@ module.exports = (app, models, sequelize) => {
 		}
 	}));
 
+	/*
+	*	User Logout
+	*/
 	app.post('/user/logout', asyncHandler(requiresAuth(async (req, res) => {
-		req.setUser(null);
+		res.setUser(null);
 		res.redirect('/');
 	})));
 
@@ -235,7 +291,7 @@ module.exports = (app, models, sequelize) => {
 			}]
 		});
 
-		res.render('listing_list.html', { listings, user: owner });
+		res.render('listings_list.html', { listings, owner });
 	}));
 
 	/* API: Create tools */
@@ -528,22 +584,19 @@ module.exports = (app, models, sequelize) => {
 	app.get('/listing/:listing_id/details', asyncHandler(async (req, res) => {
 		const { listing_id } = req.params;
 
-		// Query parameters to include 
-		const include = [
-			{model: Tool, as: 'tool', include: [
-				{model: ToolCategory, as: 'category'},
-				{model: ToolMaker, as: 'maker'},
-				{model: User, as: 'owner'}
-			]}
-		];
-
 		// get the listing choosen by user
 		const listings = await models.Listing.findOne({
 			where: {
 				id: listing_id,
 				active: true
 			},
-			include
+			include: [
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category'},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
+			]
 		});
 
 		if (!listings) {
@@ -556,9 +609,17 @@ module.exports = (app, models, sequelize) => {
 				active: true,
 				id: {
 					[Op.ne]: listings.id
-				}
+				},
 			},
-			include
+			include: [
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category', where: listings.category ? {
+						id: {[Op.ne]: listings.category.id}
+					} : {}},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
+			]
 		});
 /*
 		// filter out the recommendations that have a tool without the same category as the tool category 
@@ -745,11 +806,11 @@ module.exports = (app, models, sequelize) => {
 	 */
 
 	/* Create a review on another user*/
-	app.get('/review/users', asyncHandler(async (req, res) => {
+/*	app.get('/review/users', asyncHandler(async (req, res) => {
 		res.render('user_reviews.html', {
 			users: await models.User.findAll()
 		});
-	}));
+	}));*/
 
 	app.get('/review/new/:reviewee_id', asyncHandler(requiresAuth(async (req, res) => {
 		const { reviewee_id } = req.params;
@@ -792,16 +853,15 @@ module.exports = (app, models, sequelize) => {
 
 	/*Notifications websocket*/
 
-	app.ws('/websocket/:key', asyncHandler(async(ws, req) => {
-		global.webSockets.addConnection(req.user.id, req.params.key, ws);
+	app.ws('/websocket/:key', asyncHandler(async (ws, req) => {
+		const {user_id} = req.query;
+		const {key} = req.params;
+		global.webSockets.add(user_id, key, ws, data => {
+			const {recipient, message} = JSON.parse(data);
+			global.webSockets.send(recipient, key, JSON.stringify({message, from: user_id}));
+		});
 	}));
-
-	const sendNotification = (userId, key) => {
-		const connections = global.webSockets.getConnections(userId); // Get all connections for the user
-		for (const connection of connections) {
-		  connection.send(JSON.stringify(key)); // Send the notification to each connection
-		}
-	};
+	
 };
 
 

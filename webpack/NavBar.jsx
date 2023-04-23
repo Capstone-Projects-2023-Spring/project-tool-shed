@@ -15,8 +15,6 @@ const NavBar = ({ authUser }) => {
   if (authUser) {
     navItemsRight["/inbox"] = <MdOutlineEmail />;
     navItemsRight["/account"] = <MdOutlineAccountCircle />;
-    navItemsLeft["/user/me/reviews"] = "My Review";
-    navItemsLeft["/review/users"] = "Review";
   } else {
     navItemsRight["/user/login"] = "Log In";
     navItemsRight["/user/new"] = "Sign Up";
@@ -27,10 +25,11 @@ const NavBar = ({ authUser }) => {
   const [notif, setNotifColor] = useState(false);
 
   useEffect(() => {
-    const url = `ws://localhost:5000/websocket/notification`;
+    const url = `ws://localhost:5000/websocket/inbox/:user_id`;
     let s = new WebSocket(url);
     s.addEventListener('message', ({data}) => {
       const msg = JSON.parse(data);
+      console.log(msg);
       setNotifColor(true);
     });
       }, []);
@@ -70,6 +69,14 @@ const NavBar = ({ authUser }) => {
                             _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
                             px="4"
                   >Listings</MenuItem>
+                  <MenuItem as="a" href="/user/me/reviews" 
+                            color="white"
+                            bg="blue.500"
+                            _hover={{ bg: "blue.400" }}
+                            _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
+                            px="4"
+                  >My Reviews</MenuItem>
+
                 </MenuList>
               </Menu>
               ) : null}
@@ -97,14 +104,13 @@ const NavBar = ({ authUser }) => {
                 )
               ))}
           </Flex>
-          <Flex alignItems="center" justify="space-around" w={authUser ? "5%" : "10%"}>
+          <Flex alignItems="center" justify="space-around" boxSizing='border-box' w={authUser ? "5%" : "10%"}>
             {Object.entries(navItemsRight).map(([url, label]) => (
               <a
                 key={url}
                 href={url}
                 style={{
                   color: "white",
-                  marginLeft: "8px",
                   textDecoration: "none",
                   transition: "color 0.2s ease",
                 }}
@@ -123,7 +129,7 @@ const NavBar = ({ authUser }) => {
                     variant="ghost"
                     icon={label}
                     fontSize="24px"
-                    color={url === "/inbox" && setNotifColor ? "red" : "white"}
+                    color={url === "/inbox" && notif ? "red" : "white"}
                     mr={2}
                     _hover={{ bg: "blue.400" }}
                     _focus={{ bg: "blue.600", boxShadow: "inner",  }}

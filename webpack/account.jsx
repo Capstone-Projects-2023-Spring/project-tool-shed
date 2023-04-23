@@ -8,6 +8,19 @@ function Account() {
     setCurrentTab(tabName);
   };
 
+  const handleLogout = () => {
+    fetch('/user/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).then(response => {
+      console.log('User has been logged out');
+      window.location.href = '/';
+    }).catch(error => {
+      console.error('Error logging out:', error);
+    });
+
+  };
+
   const authUser = window._user; // Access the authUser variable from the global _user variable
 
   let content = '';
@@ -45,6 +58,20 @@ function Account() {
         </>
       );
       break;
+
+    case 'My Reviews':
+      content = (
+        <>
+          <Text>
+            User Reviews<br />
+            <br />
+            To view reviews given to you by other users, click here to view your reviews.
+            <br />
+            <a href="/user/me/reviews" style={{ color: 'blue', fontWeight: 'bold'}}>My Reviews</a>
+          </Text>
+        </>  
+      );
+      break;    
     case 'Log Out':
       content = (
         <>
@@ -62,10 +89,6 @@ function Account() {
       content = '';
   }
 
-  const handleLogout = () => {
-    window.location.href = '/user/logout';
-  };
-
     return (
         <Box maxW="600px" mx="auto" p="4">
             <UnorderedList mb="8" display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
@@ -74,6 +97,9 @@ function Account() {
                 </ListItem>
                 <ListItem>
                     <Button onClick={() => handleTabChange('View your Toolshed')}>Toolshed</Button>
+                </ListItem>
+                <ListItem>
+                    <Button onClick={() => handleTabChange('My Reviews')}>My Reviews</Button>
                 </ListItem>
                 <ListItem>
                     <Button onClick={() => handleTabChange('Log Out')}>Log Out</Button>

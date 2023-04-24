@@ -79,6 +79,7 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 			}).then(x => x.json());
 
 			setManualFile(null);
+			setPhotoFile(null);
 			setListing(l);
 			resetForm(l);
 		} catch (error) {
@@ -128,6 +129,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 	const [listings, setListings] = useState(_listings);
 	const isEdit = !!tool;
 	const [manualFile, setManualFile] = useState();
+	const [photoFile, setPhotoFile] = useState();
 
 	const handleSubmit = async (_values, { setSubmitting, resetForm, setErrors }, history) => {
 		setSubmitting(true);
@@ -191,6 +193,28 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 			setSubmitting(false);
 			setErrors({ submit: error.message });
 		}
+		if (photoFile) {
+			formData.append('photo', photoFile);
+		}
+		try {
+			const {tool: t} = await fetch(isEdit ? `/api/tools/${tool.id}` : '/api/tools/new', {
+				method: isEdit ? "PATCH" : 'POST',
+				body: formData,
+				credentials: "same-origin"
+			}).then(x => x.json());
+
+			if (!isEdit) {
+				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
+			}
+
+			setPhotoFile(null);
+			setSubmitting(false);
+			setTool(t);
+			resetForm({values: t});
+		} catch (error) {
+			setSubmitting(false);
+			setErrors({ submit: error.message });
+		}
 	};
 
 	const onNewListing = () => {
@@ -206,6 +230,9 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 
 	const manualURL = tool && tool.manual ? `/uploads/${tool.manual.path}` : null;
 	const manualName = tool && tool.manual ? tool.manual.originalName : null;
+
+	const photoURL = tool && tool.photo ? `/uploads/${tool.photo.path}` : null;
+	const photoName = tool && tool.photo ? tool.photo.originalName : null;
 
 	return (
 	<Box maxW={{ sm: '90%', md: '80%', lg: '50%' }} mx="auto" my='8'>
@@ -241,6 +268,11 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 					<FormLabel>Manual</FormLabel>
 					<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
 					{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
+				</FormControl>
+				<FormControl>
+					<FormLabel>Photo</FormLabel>
+					<Input padding="1" type="file" onChange={e => setPhotoFile(e.currentTarget.files[0])} />
+					{photoURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={photoURL}>{photoName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 				</FormControl>
 				<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 			</Stack>

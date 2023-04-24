@@ -475,6 +475,13 @@ const genModels = sequelize => {
 		},
 		as: 'manual'
 	});
+	Tool.belongsTo(FileUpload, {
+		foreignKey: {
+			name: 'photo_id',
+			allowNull: true
+		},
+		as: 'photo'
+	});
 	FileUpload.belongsTo(User, {
 		foreignKey: {
 			name: 'uploader_id',

@@ -167,6 +167,7 @@ module.exports = (app, models, sequelize) => {
 
 		const tool = await models.Tool.findByPk(tool_id, { include: [
 			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
 			{model: ToolCategory, as: 'category'},
 			{model: ToolMaker, as: 'maker'}
 		] });
@@ -216,7 +217,7 @@ module.exports = (app, models, sequelize) => {
 	}));
 
 	/* API: Create tools */
-	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/api/tools/new', app.upload.single('manual'), app.upload.single('photo'), asyncHandler(requiresAuth(async (req, res) => {
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
@@ -238,8 +239,23 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
+		const uploadedPhoto = req.file;
+		if (uploadedPhoto) {
+			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
+			const pu = await FileUpload.create({
+				originalName: uploadedPhoto.originalname,
+				mimeType: uploadedPhoto.mimetype,
+				size: uploadedPhoto.size,
+				path: relPathh,
+				uploader_id: req.user.id
+			});
+
+			await tool.setPhoto(pu);
+		}
+
 		await tool.reload({include: [
 			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
 			{model: ToolCategory, as: 'category'},
 			{model: ToolMaker, as: 'maker'}
 		]});
@@ -247,7 +263,7 @@ module.exports = (app, models, sequelize) => {
 	})));
 
 	/* API: Edit tool */
-	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+	app.patch('/api/tools/:tool_id', app.upload.single('manual'), app.upload.single('photo'), asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
@@ -285,8 +301,23 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
+		const uploadedPhoto = req.file;
+		if (uploadedPhoto) {
+			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
+			const pu = await FileUpload.create({
+				originalName: uploadedPhoto.originalname,
+				mimeType: uploadedPhoto.mimetype,
+				size: uploadedPhoto.size,
+				path: relPathh,
+				uploader_id: req.user.id
+			});
+
+			await tool.setPhoto(pu);
+		}
+
 		await tool.reload({include: [
 			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
 			{model: ToolCategory, as: 'category'},
 			{model: ToolMaker, as: 'maker'}
 		]});

@@ -24,7 +24,7 @@ const Review = ({ reviewer, reviewer_id, content, ratings, detailed = false }) =
 
         return (
             <div style={style}>
-                <h2>Reviewer: {reviewer.first_name} {reviewer_id}</h2>
+                <h2>Reviewer: {reviewer.first_name}</h2>
                 <p>{content}</p>
                 <p>ratings: {ratings}/5</p>
 		{ratings === 0 && <p style={warningStyle}>&#128295; &#128295; WARNING &#128295; &#128295;</p>}

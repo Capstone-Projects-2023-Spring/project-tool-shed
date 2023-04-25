@@ -497,26 +497,19 @@ const genModels = sequelize => {
 	});
 
 	//check if new listing made for watched tool and send notification
-	Tool.addHook('afterSave', async(tool) => {
-		const newListings = await Listing.findAll({
-			where: {
-				tool_id: tool.id
-			}
-		});
-		if(newListings){
-			const get_people_watching_tool = await Tool.findAll({
-				where: {
-					id: tool.id
-				},
-				include: [{
-					model: User,
-					through: {
-						where: watched_tool_id
+	Listing.addHook('afterSave', async listing => {
+		const get_people_watching_tool = await User.findAll({
+			include: [{
+				model: Tool,
+					as: 'watchedtool',
+					through: 'WatchTool',
+					where: {
+						id: listing.tool_id
 					},
-				}],
-			});
+			}],
+		});
+		console.log(get_people_watching_tool);
 			//send the notification
-		}	
 	});
 
 	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };

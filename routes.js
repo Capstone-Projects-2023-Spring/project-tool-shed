@@ -764,8 +764,7 @@ module.exports = (app, models, sequelize) => {
 			where: { reviewee_id: reviewee.id },
 			include: {
 				model: models.User,
-				as: 'reviewer',
-				attributes: ['email']
+				as: 'reviewer'
 			}
 		});
 		res.render('review_list.html', { reviews, user: reviewee });

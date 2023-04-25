@@ -104,8 +104,11 @@ module.exports = (app, models, sequelize) => {
 		}
 	}));
 
+	/*
+	*	User Logout
+	*/
 	app.post('/user/logout', asyncHandler(requiresAuth(async (req, res) => {
-		req.setUser(null);
+		res.setUser(null);
 		res.redirect('/');
 	})));
 

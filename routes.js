@@ -381,7 +381,7 @@ module.exports = (app, models, sequelize) => {
 			searchRadius, // kilometers
 			userLat, userLon, // degrees
 			useUserAddress, // boolean
-			selectedCategory, // string from dropdown menu // find out why this is undefined
+//			selectedCategory, // string from dropdown menu // find out why this is undefined
 			makerId, // integer
 			categoryId, // integer
 			userRating //integer

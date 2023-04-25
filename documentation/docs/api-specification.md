@@ -21,11 +21,15 @@ description: JSDoc-generated API docs
 * [boilerplate](#module_boilerplate)
     * [~settings](#module_boilerplate..settings) : <code>object</code>
     * [~databaseSettings](#module_boilerplate..databaseSettings) : <code>object</code>
+    * [~watchIgnoreFiles](#module_boilerplate..watchIgnoreFiles)
     * [~nunjucksMiddleware(app)](#module_boilerplate..nunjucksMiddleware) ⇒ <code>function</code>
     * [~sleep(ms)](#module_boilerplate..sleep)
+    * [~createDatabaseIfNotExists(dbname)](#module_boilerplate..createDatabaseIfNotExists)
+    * [~dropDatabaseIfExists(dbname)](#module_boilerplate..dropDatabaseIfExists)
     * [~initSequelize()](#module_boilerplate..initSequelize) ⇒ <code>Sequelize</code>
     * [~loadModels(sequelize)](#module_boilerplate..loadModels) ⇒ <code>object</code>
     * [~syncDatabase(sequelize)](#module_boilerplate..syncDatabase)
+    * [~buildExpressApp()](#module_boilerplate..buildExpressApp) ⇒ <code>object</code>
     * [~startServer()](#module_boilerplate..startServer)
     * [~startShell()](#module_boilerplate..startShell)
 
@@ -56,6 +60,12 @@ The connection parameters for connecting to the database.
 | password | <code>string</code> | Overridable via PGPASSWORD |
 | host | <code>string</code> | Overridable via PGHOST |
 
+<a name="module_boilerplate..watchIgnoreFiles"></a>
+
+### boilerplate~watchIgnoreFiles
+List of files to avoid watching.
+
+**Kind**: inner constant of [<code>boilerplate</code>](#module_boilerplate)  
 <a name="module_boilerplate..nunjucksMiddleware"></a>
 
 ### boilerplate~nunjucksMiddleware(app) ⇒ <code>function</code>
@@ -78,6 +88,28 @@ Sleeps.
 | Param | Type | Description |
 | --- | --- | --- |
 | ms | <code>integer</code> | How many milliseconds to sleep for. |
+
+<a name="module_boilerplate..createDatabaseIfNotExists"></a>
+
+### boilerplate~createDatabaseIfNotExists(dbname)
+Creates a database on the database server if it exists.
+
+**Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dbname | <code>string</code> | The name of the database to create |
+
+<a name="module_boilerplate..dropDatabaseIfExists"></a>
+
+### boilerplate~dropDatabaseIfExists(dbname)
+Drops a database from the database server if it exists.
+
+**Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dbname | <code>string</code> | The name of the database to drop |
 
 <a name="module_boilerplate..initSequelize"></a>
 
@@ -109,6 +141,13 @@ Ensures the database tables match the models.
 | --- | --- | --- |
 | sequelize | <code>Sequelize</code> | The Sequelize instance to use |
 
+<a name="module_boilerplate..buildExpressApp"></a>
+
+### boilerplate~buildExpressApp() ⇒ <code>object</code>
+Builds an expressjs app
+
+**Kind**: inner method of [<code>boilerplate</code>](#module_boilerplate)  
+**Returns**: <code>object</code> - An Express.js app  
 <a name="module_boilerplate..startServer"></a>
 
 ### boilerplate~startServer()
@@ -141,6 +180,9 @@ Model definitions.
     * [~ToolCategory](#module_models..ToolCategory) ⇐ <code>sequelize.Model</code>
     * [~Tool](#module_models..Tool) ⇐ <code>sequelize.Model</code>
     * [~Listing](#module_models..Listing) ⇐ <code>sequelize.Model</code>
+    * [~UserMessage](#module_models..UserMessage) ⇐ <code>sequelize.Model</code>
+    * [~UserReviews](#module_models..UserReviews) ⇐ <code>sequelize.Model</code>
+    * [~FileUpload](#module_models..FileUpload)
 
 <a name="module_models..User"></a>
 
@@ -253,6 +295,7 @@ Represents a manufacturer of tools, like Milwaukee or DeWalt.
 | Name | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The name of the manufacturer |
+| searchVector | <code>string</code> | TSVector, not to be used in JavaScript code (DB-side only) |
 
 <a name="module_models..ToolCategory"></a>
 
@@ -266,6 +309,7 @@ Represents a kind of tool - like hammer, saw, or drill.
 | Name | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The name of the category |
+| searchVector | <code>string</code> | TSVector, not to be used in JavaScript code (DB-side only) |
 
 <a name="module_models..Tool"></a>
 
@@ -284,6 +328,7 @@ Represents an individual tool, like the drill in your garage, or your neighbor's
 | owner_id | <code>integer</code> | The id of the User record that owns this tool |
 | tool_category_id | <code>integer</code> | The id the category related to this tool |
 | tool_maker_id | <code>integer</code> | The id of the maker of this tool. |
+| video | <code>string</code> | YouTube video attached to a tool |
 
 <a name="module_models..Listing"></a>
 
@@ -299,4 +344,50 @@ Represents a tool's being listed for sale.
 | price | <code>number</code> | The amount the listing costs per `billingInterval` |
 | billingInterval | <code>string</code> | The interval at which you're going to pay `price` |
 | maxBillingIntervals | <code>integer</code> | The maximum number of billing intervals the tool is available for. |
+
+<a name="module_models..UserMessage"></a>
+
+### models~UserMessage ⇐ <code>sequelize.Model</code>
+Represents a conversation between two users.
+
+**Kind**: inner class of [<code>models</code>](#module_models)  
+**Extends**: <code>sequelize.Model</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| content | <code>string</code> | Message content |
+| recipient_id | <code>int</code> | The ID of the recipient User model |
+| sender_id | <code>int</code> | The ID of the sending User model |
+| listing_id | <code>int</code> | The ID of the listing this message was sent about. |
+
+<a name="module_models..UserReviews"></a>
+
+### models~UserReviews ⇐ <code>sequelize.Model</code>
+**Kind**: inner class of [<code>models</code>](#module_models)  
+**Extends**: <code>sequelize.Model</code>  
+**Classdescription**: Represents reviews and ratings of other users  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| content | <code>text</code> | The contents of the review |
+| ratings | <code>integer</code> | The star ratings of another user |
+| reviewee_id | <code>integer</code> |  |
+| reviewer_id | <code>integer</code> |  |
+
+<a name="module_models..FileUpload"></a>
+
+### models~FileUpload
+**Kind**: inner class of [<code>models</code>](#module_models)  
+**Classdescription**: Represents a file that's uploaded.  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| path | <code>string</code> | Path of file, relative to uploads directory |
+| originalName | <code>string</code> | Original name of the file, as appearing on the uploader's computer |
+| size | <code>integer</code> | Size of the file in bytes |
+| mimeType | <code>string</code> | The mimetype of the file |
+| uploader_id | <code>integer</code> | The ID of the uploader |
 

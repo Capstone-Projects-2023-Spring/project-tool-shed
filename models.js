@@ -8,7 +8,8 @@ const path = require('path');
 const { DataTypes, QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const { billingIntervals } = require('./constants');
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+//const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+//const fetch = require('node-fetch');
 
 const genModels = sequelize => {
 	/**
@@ -137,7 +138,8 @@ const genModels = sequelize => {
 		let err = null;
 		try {
 			let host = process.env.GEOCODE_HOST ?? '0.0.0.0';
-			const {coordinates, error} = await fetch(`http://${host}:5001/?address=${encodeURIComponent(addressString)}`).then(r => r.json());		
+			const url = `http://${host}:5001/?address=${encodeURIComponent(addressString)}`;
+			const {coordinates, error} = await fetch(url).then(r => r.json());		
 			coord = coordinates;
 			err = error;
 		} catch (e) {

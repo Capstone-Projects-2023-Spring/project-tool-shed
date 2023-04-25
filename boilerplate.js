@@ -19,6 +19,8 @@ const asyncHandler = require('express-async-handler');
 const debounce = require('debounce');
 const dotenv = require('dotenv');
 
+dotenv.config();
+
 /*
 	TODO:
 	- code reloading for routes
@@ -125,6 +127,11 @@ async function sleep(ms) {
 	return new Promise(x => setTimeout(x, ms));
 }
 
+/**
+ * Creates a database on the database server if it exists.
+ * @param {string} dbname The name of the database to create
+ * @async
+ */
 async function createDatabaseIfNotExists(dbname) {
 	const {database, ...settings} = databaseSettings;
 	const s = new Sequelize({
@@ -143,6 +150,11 @@ async function createDatabaseIfNotExists(dbname) {
 	}
 }
 
+/**
+ * Drops a database from the database server if it exists.
+ * @param {string} dbname The name of the database to drop
+ * @async
+ */
 async function dropDatabaseIfExists(dbname) {
 	const {database, ...settings} = databaseSettings;
 	const s = new Sequelize({
@@ -260,8 +272,6 @@ function buildExpressApp(sequelize) {
  * @async
  */
 async function startServer() {
-	dotenv.config();
-
 	const uploadExists = await fs.access(settings.uploadPath).then(() => true, () => false);
 	if (!uploadExists) {
 		await fs.mkdir(settings.uploadPath, {recursive: true});

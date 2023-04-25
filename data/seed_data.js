@@ -33,7 +33,7 @@ let royobi = await models.ToolMaker.create({name: 'Royobi'});
 
 let t1 = await models.Tool.create({name: "100lb Propane Tank", description: 'You can store a lot of propane in this little beauty. I can feel it right now, barbecues all summer!', owner_id: u1.id, tool_category_id: tc1.id, tool_maker_id: strickland.id});
 let t2 = await models.Tool.create({name: "Cordless Drill Saw", description: 'I don\'t know what to do with 21st century technology!', owner_id: u2.id, tool_category_id: tc2.id, tool_maker_id: dewalt.id});
-let t3 = await models.Tool.create({name: "String Trimmer", description: `I don't know what this is supposed to do, but it's really effective at removing fingers.`, owner_id: u3.id, tool_category_id: tc3.id, tool_maker_id: mew.id});
+let t3 = await models.Tool.create({name: "String Trimmer", description: `I don't know what this is supposed to do, but it's really effective at removing fingers.`, owner_id: u3.id, tool_category_id: tc3.id, tool_maker_id: mwe.id});
 let t4 = await models.Tool.create({name: "Shovel", description: 'Lightly used in the early 1800s for digging trenches. Otherwise, like new.', owner_id: u4.id, tool_category_id: tc4.id, tool_maker_id: rigid.id});
 let t5 = await models.Tool.create({name: "Nail Gun", description: 'Shoots nails (and Habsburg leaders!)', owner_id: u5.id, tool_category_id: tc5.id, tool_maker_id: craftsman.id});
 let t6 = await models.Tool.create({name: "Chop Saw", description: 'Great for building stuff for the back yard!', owner_id: u6.id, tool_category_id: tc6.id, tool_maker_id: royobi.id});

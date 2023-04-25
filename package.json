@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "web": "node index.js",
     "db": "scripts/run-postgres.sh",
     "docs": "scripts/gen-docs.sh",
@@ -12,6 +12,16 @@
     "local": "scripts/parallel_cmds.sh \"npm run db\" \"npm run webpack-watch\" \"npm run web\"",
     "webpack": "node_modules/.bin/webpack",
     "webpack-watch": "node_modules/.bin/webpack -w"
+  },
+  "jest": {
+    "verbose": true,
+    "reporters": [
+      "default",
+      "./testing/markdown-reporter.js"
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "documentation/docs/testing/results/",
+    "coverageReporters": ["/home/nate/Code/school/project-tool-shed/testing/coverage-reporter.js"]
   },
   "author": "",
   "license": "MIT",
@@ -57,6 +67,7 @@
     "babel-loader": "^9.1.2",
     "jest": "^29.4.3",
     "jsdoc-to-markdown": "^8.0.0",
+    "mustache": "^4.2.0",
     "pg": "^8.10.0",
     "superagent": "^8.0.9",
     "supertest": "^6.3.3",

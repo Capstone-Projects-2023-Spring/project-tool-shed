@@ -165,11 +165,13 @@ module.exports = (app, models, sequelize) => {
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, { include: [
-			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: 'category'},
-			{model: ToolMaker, as: 'maker'}
-		] });
+		const tool = await models.Tool.findByPk(tool_id, {
+			include: [
+				{ model: FileUpload, as: 'manual' },
+				{ model: ToolCategory, as: 'category' },
+				{ model: ToolMaker, as: 'maker' }
+			]
+		});
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -238,11 +240,13 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		await tool.reload({include: [
-			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: 'category'},
-			{model: ToolMaker, as: 'maker'}
-		]});
+		await tool.reload({
+			include: [
+				{ model: FileUpload, as: 'manual' },
+				{ model: ToolCategory, as: 'category' },
+				{ model: ToolMaker, as: 'maker' }
+			]
+		});
 		res.json({ tool });
 	})));
 
@@ -285,11 +289,13 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		await tool.reload({include: [
-			{model: FileUpload, as: 'manual'},
-			{model: ToolCategory, as: 'category'},
-			{model: ToolMaker, as: 'maker'}
-		]});
+		await tool.reload({
+			include: [
+				{ model: FileUpload, as: 'manual' },
+				{ model: ToolCategory, as: 'category' },
+				{ model: ToolMaker, as: 'maker' }
+			]
+		});
 
 		res.json({ tool });
 	})));
@@ -427,7 +433,7 @@ module.exports = (app, models, sequelize) => {
 		let results = await models.Listing.findAll({
 			where: {
 				[Op.and]: [
-					{active: true},
+					{ active: true },
 					sequelize.literal(`${distanceKm} < ${searchRadius}`)
 				]
 			},
@@ -467,15 +473,15 @@ module.exports = (app, models, sequelize) => {
 		} else if (kind === 'category') {
 			model = ToolCategory;
 		}
-		
-		if (!model) return res.status(404).json({error: "Not found", results: null});
+
+		if (!model) return res.status(404).json({ error: "Not found", results: null });
 
 		const sq = (q ?? '').split(' ').filter(x => x.length > 2).map(x => `${x}:*`).join(' <-> ');
 
 		let where = {};
 
 		if (sq.length > 0) {
-			where.searchVector = {[Op.match]: sequelize.fn('to_tsquery', sq)};
+			where.searchVector = { [Op.match]: sequelize.fn('to_tsquery', sq) };
 		}
 
 		let results = await model.findAll({
@@ -484,7 +490,7 @@ module.exports = (app, models, sequelize) => {
 				["name", 'ASC']
 			]
 		});
-		res.json({results, error: null});
+		res.json({ results, error: null });
 	}));
 
 	app.post('/api/create/:kind', asyncHandler(requiresAuth(async (req, res) => {
@@ -498,7 +504,7 @@ module.exports = (app, models, sequelize) => {
 			model = ToolCategory;
 		}
 
-		let x = await model.create({name});
+		let x = await model.create({ name });
 		res.json(x);
 	})));
 
@@ -515,17 +521,25 @@ module.exports = (app, models, sequelize) => {
 				active: true
 			},
 			include: [
-				{model: Tool, as: 'tool', include: [
-					{model: ToolCategory, as: 'category'},
-					{model: ToolMaker, as: 'maker'},
-					{model: User, as: 'owner'}
-				]}
+				{
+					model: Tool, as: 'tool', include: [
+						{ model: ToolCategory, as: 'category' },
+						{ model: ToolMaker, as: 'maker' },
+						{ model: User, as: 'owner' }
+					]
+				}
 			]
 		});
 
 		if (!listings) {
 			return res.status(404).json({ error: "Listing not found." });
 		}
+
+		const subquery = (listings.tool.searchVector ?? '')
+			.split(' ')
+			.filter(x => x.length > 2)
+			.map(x => `${x.split(':')[0]}`)
+			.join(' & ');
 
 		// query all listings with the same tool category as the listing choosen by the user
 		const recommendations = await models.Listing.findAll({
@@ -534,46 +548,30 @@ module.exports = (app, models, sequelize) => {
 				id: {
 					[Op.ne]: listings.id
 				},
+				'$tool.tool_category_id$': listings.tool.category.id //filter out all listings with a tool with a different category
 			},
 			include: [
-				{model: Tool, as: 'tool', include: [
-					{model: ToolCategory, as: 'category', where: listings.category ? {
-						id: {[Op.ne]: listings.category.id}
-					} : {}},
-					{model: ToolMaker, as: 'maker'},
-					{model: User, as: 'owner'}
-				]}
+				{
+					model: Tool,
+					as: 'tool',
+					include: [
+						{ model: ToolCategory, as: 'category' },
+						{ model: ToolMaker, as: 'maker' },
+						{ model: User, as: 'owner' }
+					]
+				}
+			],
+			order: [
+				// sort by the number of matched search vectors in descending order
+				[sequelize.fn('ts_rank', 
+				sequelize.col('tool.searchVector'),
+				sequelize.fn('to_tsquery', subquery)), 
+				'DESC'
+				]
 			]
 		});
-/*
-		// filter out the recommendations that have a tool without the same category as the tool category 
-		// associated with the listing (listings.tool.category.id)
-		const filteredRecommendations = recommendations.filter(recommendation => {
-			return recommendation.tool && recommendation.tool.category && recommendation.tool.category.id === listings.tool.category.id;
-		});
 
-		// FIXME: see /api/listings/search.json for how to use TSVectors
-		// search vectors of the tool associated with the listing choosen by user
-		const searchVector = listings.tool.searchVector;
-		// sort filteredRecommendations
-		filteredRecommendations.sort((a, b) => {
-			const aSearchVector = a.tool.searchVector;
-			const bSearchVector = b.tool.searchVector;
-
-			// Split the search vectors into an array of terms
-			const aTerms = aSearchVector.split(' ');
-			const bTerms = bSearchVector.split(' ');
-			const searchTerms = searchVector.split(' ');
-
-			// Count the number of shared search terms between each recommendation and the listing
-			const aSharedTerms = aTerms.filter(term => searchTerms.includes(term)).length;
-			const bSharedTerms = bTerms.filter(term => searchTerms.includes(term)).length;
-
-			// Sort the recommendations by number of shared terms (descending)
-			return bSharedTerms - aSharedTerms;
-		});
-	*/	
-		res.render('listing_details.html', { listings, recommendations: [] });// filteredRecommendations });
+		res.render('listing_details.html', { listings, recommendations});
 	}));
 
 	/*
@@ -692,7 +690,7 @@ module.exports = (app, models, sequelize) => {
 				content, sender_id: req.user.id, recipient_id: user_id, listing_id: listingId
 			});
 			await message.reload({
-				include: {model: Listing, as: 'listing', include: {model: Tool, as: 'tool'}}
+				include: { model: Listing, as: 'listing', include: { model: Tool, as: 'tool' } }
 			});
 
 			res.json({ status: 'ok', error: null, message });
@@ -711,7 +709,7 @@ module.exports = (app, models, sequelize) => {
 	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
 		const handleData = userMessage => {
 			if (userMessage.recipient_id === req.user.id) {
-				userMessage.reload({include: {model: Listing, as: "listing", include: {model: Tool, as: 'tool'}}}).then(() => {
+				userMessage.reload({ include: { model: Listing, as: "listing", include: { model: Tool, as: 'tool' } } }).then(() => {
 					ws.send(JSON.stringify(userMessage));
 				});
 			}

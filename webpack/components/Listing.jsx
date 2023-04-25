@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Card, CardHeader, CardBody, CardFooter, Text, Heading, Flex, Link} from '@chakra-ui/react';
+import {Card, CardHeader, CardBody, CardFooter, Text, Heading, Flex, Link, Image} from '@chakra-ui/react';
 import {ExternalLinkIcon} from '@chakra-ui/icons'
 
 import LinkButton from './LinkButton';
@@ -21,6 +21,8 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 
 	const biNoun = (maxBillingIntervals === 1 ? billingIntervalNouns : billingIntervalPluralNouns)[billingInterval];
 	const isRental = billingInterval !== 'eternity';
+	const photoURL = tool && tool.photo ? `/uploads/${tool.photo.path}` : null;
+	const photoName = tool && tool.photo ? tool.photo.originalName : null;
 
 	return (
 		<Card>
@@ -30,9 +32,11 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 					{!isOwn && <LinkButton url={`/inbox/${tool.owner.id}/?listingId=${listingId}`}>Contact {tool.owner.first_name}</LinkButton>}
 					{isOwn && <LinkButton url={`/tools/${tool.id}/edit`}>Edit</LinkButton>}
 				</Flex>
+				<Image src={photoURL} alt={photoName}/>
 			</CardHeader>
 			<CardBody>
 				<Text>{tool.description}</Text>
+
 				{isPrimary && videoId && <Video url={`https://www.youtube.com/embed/${videoId}`} />}
 				{isPrimary && !videoId && tool.video && <Video url={tool.video} />}
 				{isPrimary && !videoId && !tool.video && <Link href={getSearchURL(tool)} isExternal>Videos on youtube <ExternalLinkIcon /></Link>}

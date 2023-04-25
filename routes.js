@@ -549,6 +549,7 @@ module.exports = (app, models, sequelize) => {
 			include: [
 				{model: Tool, as: 'tool', include: [
 					{model: ToolCategory, as: 'category'},
+					{model: FileUpload, as: 'photo'},
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}
 				]}
@@ -572,6 +573,7 @@ module.exports = (app, models, sequelize) => {
 					{model: ToolCategory, as: 'category', where: listings.category ? {
 						id: {[Op.ne]: listings.category.id}
 					} : {}},
+					{model: FileUpload, as: 'photo'},
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}
 				]}

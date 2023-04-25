@@ -84,7 +84,6 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 					credentials: "same-origin"
 				}).then(x => x.json());
 
-				setManualFile(null);
 				setListing(l);
 				resetForm(l);
 			} catch (error) {
@@ -202,7 +201,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 			}
 		}
 	});
-	const {values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting, setSubmitting, setErrors, resetForm} = formik;
+	const {values, errors, touched, setFieldValue, handleChange, handleSubmit, handleBlur, isSubmitting, setSubmitting, setErrors, resetForm} = formik;
 
 	return (
 		<Card>
@@ -236,7 +235,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 							<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
 							{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 						</FormControl>
-						<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
+						<Button onClick={handleSubmit} mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 					</Stack>
 				</FormikProvider>
 			</CardHeader>

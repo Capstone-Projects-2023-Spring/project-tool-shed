@@ -387,7 +387,7 @@ const genModels = sequelize => {
 
 	UserMessage.addHook('afterCreate', 'notify', async (msg, opts) => {
 		await msg.reload({include: {model: Listing, as: "listing", include: {model: Tool, as: 'tool'}}});
-		global.websocketManager.send(msg.recipient_id, "inbox", JSON.stringify(msg));
+		await global.websocketManager.send(msg.recipient_id, "inbox", JSON.stringify(msg));
 	});
 
 	/**

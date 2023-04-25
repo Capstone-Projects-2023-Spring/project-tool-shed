@@ -693,11 +693,18 @@ module.exports = (app, models, sequelize) => {
 				content, sender_id: req.user.id, recipient_id: user_id, listing_id: listingId
 			});
 			await message.reload({
-				include: { model: Listing, as: 'listing', include: { model: Tool, as: 'tool' } }
+				include: [
+					{
+					model: Listing,
+					as: 'listing',
+					include: [{ model: Tool, as: 'tool' }]
+					}
+				]
 			});
 
 			res.json({ status: 'ok', error: null, message });
 		} catch (error) {
+			console.error(error);
 			res.json({ status: 'failure', error, message: null });
 		}
 	})));
@@ -747,10 +754,10 @@ module.exports = (app, models, sequelize) => {
 
 
 	/* Websocket Endpoint */
-	app.ws('/websocket/:key', asyncHandler(requiresAuth(async (ws, req) => {
+	app.ws('/websocket/:key', asyncHandler(async (ws, req) => {
 		const {key} = req.params;
-		global.webSockets.add(req.user.id, key, ws);
-	})));
+		await global.websocketManager.add(req.user.id, key, ws);
+	}));
 	
 };
 

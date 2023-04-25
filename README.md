@@ -8,7 +8,7 @@
 </div>
 
 ## Running Production Website
-Simply visit this link:<a href="http://toolshed.symer.io:5000//"> Toolshed Website</a>. Happy tool hunting!
+Simply visit this link:<a href="http://toolshed.symer.io:5000"> Toolshed Website</a>. Happy tool hunting!
 
 ## Running Locally
 

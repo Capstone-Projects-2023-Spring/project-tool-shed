@@ -22,9 +22,6 @@ const Listing = ({ id: listingId, price, billingInterval, maxBillingIntervals, t
 	const biNoun = (maxBillingIntervals === 1 ? billingIntervalNouns : billingIntervalPluralNouns)[billingInterval];
 	const isRental = billingInterval !== 'eternity';
 	
-
-	//const [tool, setTool] = useState(); //is this necessary? 
-	//something's wrong in this function
 	const watchTool = async () => {
 		await fetch('/notification/tool', {
 			method: 'POST',

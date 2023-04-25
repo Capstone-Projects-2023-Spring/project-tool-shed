@@ -34,7 +34,8 @@ const settings = {
 	port: process.env.PORT ?? 5000, // port the webapp listens on
 	watchTemplates: false,
 	cacheTemplates: process.env.CACHE_TEMPLATES ? process.env.CACHE_TEMPLATES === 'true' : false,
-	reloadCode: process.env.RELOAD_CODE ? process.env.RELOAD_CODE === 'true' : true
+	reloadCode: process.env.RELOAD_CODE ? process.env.RELOAD_CODE === 'true' : true,
+	uploadPath: process.env.UPLOAD_PATH ?? path.join(__dirname, '.uploads')
 };
 
 /**
@@ -77,6 +78,15 @@ async function waitForCodeChange() {
 	});
 }
 
+function requireUncached(mod) {
+	if (typeof jest !== 'undefined') {
+		jest.resetModules();
+	} else {
+		decache(mod);
+	}
+	return require(mod);
+}
+
 /**
  * Create middleware to render nunjucks templates.
  * @param {Express} app The express app you're adding things to.
@@ -115,15 +125,52 @@ async function sleep(ms) {
 	return new Promise(x => setTimeout(x, ms));
 }
 
+async function createDatabaseIfNotExists(dbname) {
+	const {database, ...settings} = databaseSettings;
+	const s = new Sequelize({
+		dialect: 'postgres',
+		...settings,
+	});
+
+	try {
+		await s.getQueryInterface().createDatabase(dbname);
+	} catch (e) {
+		if (e.name !== 'SequelizeDatabaseError') {
+			throw e;
+		}
+	} finally {
+		await s.close();
+	}
+}
+
+async function dropDatabaseIfExists(dbname) {
+	const {database, ...settings} = databaseSettings;
+	const s = new Sequelize({
+		dialect: 'postgres',
+		...settings,
+	});
+
+	try {
+		await s.getQueryInterface().dropDatabase(dbname);
+	} catch (e) {
+		if (e.name !== 'SequelizeDatabaseError') {
+			throw e;
+		}
+	} finally {
+		await s.close();
+	}
+}
+
 /**
  * Initializes a sequelize instance. Loads models and syncs the database schema.
  * @return {Sequelize} An instance of Sequelize that's ready to use.
  * @async
  */
-async function initSequelize() {
+async function initSequelize(databaseName = null) {
 	const s = new Sequelize({
 		dialect: 'postgres',
-		...databaseSettings
+		...databaseSettings,
+		database: databaseName ?? databaseSettings.database
 	});
 
 	try {
@@ -147,8 +194,7 @@ async function initSequelize() {
  * @async
  */
 async function loadModels(sequelize) {
-	decache('./models');
-	return require('./models')(sequelize); 
+	return requireUncached('./models')(sequelize);
 }
 
 /**
@@ -164,22 +210,22 @@ async function syncDatabase(sequelize) {
 	await moldyMeat.updateSchema();
 }
 
+// middleware to respond to errors with page
+function handleError(err, req, res, next) {
+	console.error(err);
+	res.status(500);
+	res.render('error.html', {error: err});
+	next();
+}
+
 /**
- * Starts the Express.js HTTP server.
- * @async
+ * Builds an expressjs app
+ * @returns {object} An Express.js app
  */
-async function startServer() {
-	dotenv.config();
-	const uploadPath = path.join(__dirname, '.uploads');
-
-	const uploadExists = await fs.access(uploadPath).then(() => true, () => false);
-	if (!uploadExists) {
-		await fs.mkdir(uploadPath, {recursive: true});
-	}
-
+function buildExpressApp(sequelize) {
 	const uploadStorage = multer.diskStorage({
 		destination: (req, file, cb) => {
-			cb(null, uploadPath);
+			cb(null, settings.uploadPath);
 		},
 		filename: (req, file, cb) => {
 			const as = file.originalname.split('.');
@@ -189,37 +235,41 @@ async function startServer() {
 		}
 	});
 	const multerUpload = multer({storage: uploadStorage});
-	
-	// middleware to respond to errors with page
-	function handleError(err, req, res, next) {
-		console.error(err);
-		res.status(500);
-		res.render('error.html', {error: err});
-		next();
-	}
 
+	const app = express();
+	app.wsInstance = expressWs(app, undefined, {wsOptions: {clientTracking: true}});
+	app.upload = multerUpload;
+
+	app.use(handleError);
+	app.use(express.json());
+	app.use(express.urlencoded({extended: true}));
+	app.use(cookieParser());
+	app.use(authMiddleware(sequelize.models.User));
+	app.use(nunjucksMiddleware(app));
+
+	requireUncached('./routes')(app, sequelize.models, sequelize);
+
+	app.use('/uploads', express.static(settings.uploadPath)); // serve files
+	app.use('/public', express.static(path.join(__dirname, "public")));
+	app.use('/webpack', express.static(path.join(__dirname, "webpack/dist")));
+	return app;
+}
+
+/**
+ * Starts the Express.js HTTP server.
+ * @async
+ */
+async function startServer() {
+	dotenv.config();
+
+	const uploadExists = await fs.access(settings.uploadPath).then(() => true, () => false);
+	if (!uploadExists) {
+		await fs.mkdir(settings.uploadPath, {recursive: true});
+	}
+	
 	const sequelize = await initSequelize();
 	const runServer = async (mainSilent = false) => {
-		const app = express();
-		app.wsInstance = expressWs(app, undefined, {wsOptions: {clientTracking: true}});
-
-		app.upload = multerUpload;
-
-		app.use(handleError);
-		app.use(express.json());
-		app.use(express.urlencoded({extended: true}));
-		app.use(cookieParser());
-		app.use(authMiddleware(sequelize.models.User));
-		app.use(nunjucksMiddleware(app));
-
-		const routesModule = './routes';
-		decache(routesModule);
-		require(routesModule)(app, sequelize.models, sequelize);
-
-		app.use('/uploads', express.static(uploadPath)); // serve files
-		app.use('/public', express.static(path.join(__dirname, "public")));
-		app.use('/webpack', express.static(path.join(__dirname, "webpack/dist")));
-		app.use('/node_modules', express.static(path.join(__dirname, "node_modules"))); // dirty hack to allow serving JS from installed packages.
+		const app = buildExpressApp(sequelize);
 
 		// Starts the web server.
 		const server = await app.listen(settings.port);
@@ -266,6 +316,15 @@ async function startShell() {
 	const replServer = repl.start({prompt: "tool-shed> ", useGlobal: true});
 	replServer.context.models = sequelize.models;
 	replServer.context.sequelize = sequelize;
+	replServer.context.boilerplate = {
+		startShell,
+		startServer,
+		initSequelize,
+		databaseSettings,
+		settings,
+		buildExpressApp,
+		createDatabaseIfNotExists
+	};
 }
 
 module.exports = {
@@ -273,5 +332,8 @@ module.exports = {
 	startServer,
 	initSequelize,
 	databaseSettings,
-	settings
+	settings,
+	buildExpressApp,
+	createDatabaseIfNotExists,
+	dropDatabaseIfExists
 }

@@ -12,7 +12,7 @@ For users who are looking to sell or lend their tools out to other users, they c
 
 ## Functional Requirements 
 
-- The system shall require registration using a login system, this will be with a username and password or via a google/Facebook account 
+- The system shall require registration using a login system, this will be with a username and password
 
     - Login security will use a login system like Okta’s auth0 login security https://auth0.com/login-security 
 

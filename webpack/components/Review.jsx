@@ -17,14 +17,14 @@ const warningStyle = {
         borderRadius: "4px"
 };
 
-const Review = ({ email, reviewer_id, content, ratings, detailed = false }) => {
+const Review = ({ reviewer, reviewer_id, content, ratings, detailed = false }) => {
         if (detailed) {
             return "TODO";
         }
 
         return (
             <div style={style}>
-                <h2>Reviewer: {email} {reviewer_id}</h2>
+                <h2>Reviewer: {reviewer.first_name} {reviewer_id}</h2>
                 <p>{content}</p>
                 <p>ratings: {ratings}/5</p>
 		{ratings === 0 && <p style={warningStyle}>&#128295; &#128295; WARNING &#128295; &#128295;</p>}

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import renderComponent from './util/renderComponent';
 import { Box, Button, Flex, Input, Text, Textarea, VStack } from "@chakra-ui/react";
+import websocketURL from './util/websocketURL';
 
 function formatDate(dateString) {
 	const date = new Date(dateString);
 	return `${date.toLocaleTimeString()}`;
 }
-
-const WEBSOCKET_URL = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + `/websocket/inbox`;
 
 function UserMessaging({messages: _messages, recipientId, listingId, authUser}) {
 	const [messages, setMessages] = useState(_messages);
@@ -15,7 +14,7 @@ function UserMessaging({messages: _messages, recipientId, listingId, authUser}) 
 	const [useListingId, setUseListingId] = useState(!!listingId);
 	
 	useEffect(() => {
-		const s = new WebSocket(WEBSOCKET_URL);
+		const s = new WebSocket(websocketURL('inbox'));
 		s.addEventListener('message', ({data}) => {
 			setMessages(ms => [...ms, JSON.parse(data)]);
 			// TODO: scroll to bottom

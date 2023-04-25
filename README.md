@@ -61,7 +61,7 @@ With many employees working from home and setting up home offices, Do It Yoursel
 
 ## Required Resources
 
-This is a purely JavaScript web application project. To run locally (or ill-advisedly in production ;p), all you need is to install Docker and NodeJS >=v19. If you're running the server in production, you only need NodeJS should stop using the dockerized postgres and use a real postgres. You can configure how the server connects to the database via [PostgreSQL env vars](https://www.postgresql.org/docs/current/libpq-envars.html). This project also uses the Google Maps API to display search results on a map (which comes with free $200 credit, beyond which it's out of pocket). 
+This is a purely JavaScript web application project. To run locally (or ill-advisedly in production ;p), all you need is to install Docker and NodeJS >=v19. If you're running the server in production, you only need NodeJS should stop using the dockerized postgres and use a real postgres. You can configure how the server connects to the database via [PostgreSQL env vars](https://www.postgresql.org/docs/current/libpq-envars.html).. 
 
 To run this project, you'll also need to run [this geocoder](https://github.com/natesymer/gubmint).
 

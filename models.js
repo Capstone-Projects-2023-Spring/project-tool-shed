@@ -504,8 +504,19 @@ const genModels = sequelize => {
 			}
 		});
 		if(newListings){
-			
-		}
+			const get_people_watching_tool = await Tool.findAll({
+				where: {
+					id: tool.id
+				},
+				include: [{
+					model: User,
+					through: {
+						where: watched_tool_id
+					},
+				}],
+			});
+			//send the notification
+		}	
 	});
 
 	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };

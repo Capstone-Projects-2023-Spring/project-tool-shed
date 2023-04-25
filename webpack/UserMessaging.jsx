@@ -13,7 +13,7 @@ function UserMessaging({messages: _messages, recipientId, listingId, authUser}) 
     const [useListingId, setUseListingId] = useState(!!listingId);
 	
     useEffect(() => {
-	const url = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + `/websocket/inbox/${recipientId}`;
+	const url = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + `/websocket/inbox`;
         let s = new WebSocket(url);
 	s.addEventListener('message', ({data}) => {
 		const msg = JSON.parse(data);

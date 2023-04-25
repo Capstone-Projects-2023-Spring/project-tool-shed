@@ -382,19 +382,10 @@ const genModels = sequelize => {
 		as: 'listing'
 	});
 
-	UserMessage.addHook('afterCreate', 'call_socket', async (msg, opts) => {
-		if (UserMessage.messageCreated) {
-			UserMessage.messageCreated(msg); // UserMessage.messageCreated gets set in routes.js
-		}
+	UserMessage.addHook('afterCreate', 'notify', async (msg, opts) => {
+		await msg.reload({include: {model: Listing, as: "listing", include: {model: Tool, as: 'tool'}}});
+		global.websocketManager.send(msg.recipient_id, "inbox", JSON.stringify(msg));
 	});
-
-	UserMessage.addHook('afterCreate', 'notify', async (userId, key, sock) => {
-		if(UserMessage.messageNotification){
-			return {userId, key, sock};
-		}
-	});
-
-
 
 	/**
 	 * @class UserReviews

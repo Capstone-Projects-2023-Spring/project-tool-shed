@@ -3,6 +3,6 @@
   "position": 8,
   "link": {
     "type": "generated-index",
-    "description": "Please remove and replace examples where necessary."
+    "description": "The section of the documentation covers the acceptance testing, integration testing and unit testing that will be done for Tool Shed."
   }
 }

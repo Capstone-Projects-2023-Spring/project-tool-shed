@@ -508,8 +508,11 @@ const genModels = sequelize => {
 					},
 			}],
 		});
-		console.log(get_people_watching_tool);
-			//send the notification
+		//if current user is one of the people watching this tool send a message that listing is available
+		//console log it for now since websocket stuff not included
+		if(get_people_watching_tool){
+			console.log("New listing for the tool: " + listing.tool_id + " is now available");
+		}
 	});
 
 	return { User, Address, ToolCategory, ToolMaker, Tool, Listing, UserReview, UserMessage, FileUpload };

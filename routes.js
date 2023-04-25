@@ -217,7 +217,9 @@ module.exports = (app, models, sequelize) => {
 	}));
 
 	/* API: Create tools */
-	app.post('/api/tools/new', app.upload.single('manual'), app.upload.single('photo'), asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/api/tools/new', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
+     	let uploadedFile = req.files['manual'];
+     	let uploadedPhoto = req.files['photo'];
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
@@ -225,8 +227,8 @@ module.exports = (app, models, sequelize) => {
 			tool_maker_id, tool_category_id, video
 		});
 
-		const uploadedFile = req.file;
 		if (uploadedFile) {
+			uploadedFile = uploadedFile[0];
 			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
 			const fu = await FileUpload.create({
 				originalName: uploadedFile.originalname,
@@ -239,8 +241,8 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		const uploadedPhoto = req.file;
 		if (uploadedPhoto) {
+			uploadedPhoto = uploadedPhoto[0];
 			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
 			const pu = await FileUpload.create({
 				originalName: uploadedPhoto.originalname,
@@ -263,7 +265,9 @@ module.exports = (app, models, sequelize) => {
 	})));
 
 	/* API: Edit tool */
-	app.patch('/api/tools/:tool_id', app.upload.single('manual'), app.upload.single('photo'), asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/api/tools/new', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
+		let uploadedFile = req.files['manual'];
+		let uploadedPhoto = req.files['photo'];
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
@@ -287,8 +291,8 @@ module.exports = (app, models, sequelize) => {
 		await tool.setCategory(tool_category_id);
 		await tool.setMaker(tool_maker_id);
 
-		const uploadedFile = req.file;
 		if (uploadedFile) {
+			uploadedFile = uploadedFile[0];
 			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
 			const fu = await FileUpload.create({
 				originalName: uploadedFile.originalname,
@@ -301,8 +305,8 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		const uploadedPhoto = req.file;
 		if (uploadedPhoto) {
+			uploadedPhoto = uploadedPhoto[0];
 			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
 			const pu = await FileUpload.create({
 				originalName: uploadedPhoto.originalname,

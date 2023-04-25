@@ -174,25 +174,6 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 		if (manualFile) {
 			formData.append('manual', manualFile);
 		}
-		try {
-			const {tool: t} = await fetch(isEdit ? `/api/tools/${tool.id}` : '/api/tools/new', {
-				method: isEdit ? "PATCH" : 'POST',
-				body: formData,
-				credentials: "same-origin"
-			}).then(x => x.json());
-
-			if (!isEdit) {
-				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
-			}
-
-			setManualFile(null);
-			setSubmitting(false);
-			setTool(t);
-			resetForm({values: t});
-		} catch (error) {
-			setSubmitting(false);
-			setErrors({ submit: error.message });
-		}
 		if (photoFile) {
 			formData.append('photo', photoFile);
 		}
@@ -207,7 +188,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				window.history.pushState({}, undefined, `/tools/${t.id}/edit`);
 			}
 
-			setPhotoFile(null);
+			setManualFile(null);
 			setSubmitting(false);
 			setTool(t);
 			resetForm({values: t});

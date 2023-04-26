@@ -26,7 +26,7 @@ const warningStyle = {
   lineHeight: "1.5"
 };
 
-const Review = ({ email, reviewee_id, content, ratings, detailed = false }) => {
+const Review = ({ reviewer, reviewee_id, content, ratings, detailed = false }) => {
         if (detailed) {
             return "TODO";
         }
@@ -42,7 +42,7 @@ const Review = ({ email, reviewee_id, content, ratings, detailed = false }) => {
 
         return (
           <div style={style}>
-            <h2>Reviewer: {email} {reviewee_id}</h2>
+            <h2>Reviewer: {reviewer.first_name} </h2>
             <p>{content}</p>
             <p>{stars}</p>
               <div style={styleFlex}>

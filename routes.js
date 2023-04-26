@@ -856,9 +856,11 @@ module.exports = (app, models, sequelize) => {
 	app.ws('/websocket/:key', asyncHandler(async (ws, req) => {
 		const {user_id} = req.query;
 		const {key} = req.params;
+		console.log("hello im a websocket");
 		global.webSockets.add(user_id, key, ws, data => {
 			const {recipient, message} = JSON.parse(data);
 			global.webSockets.send(recipient, key, JSON.stringify({message, from: user_id}));
+			
 		});
 	}));
 	

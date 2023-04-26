@@ -25,9 +25,11 @@ const NavBar = ({ authUser }) => {
   const [notif, setNotifColor] = useState(false);
 
   useEffect(() => {
-    const url = `ws://localhost:5000/websocket/inbox/:user_id`;
+    const url = `ws://localhost:5000/websocket/notification`;
     let s = new WebSocket(url);
+    console.log("hello from useeffect");
     s.addEventListener('message', ({data}) => {
+      
       const msg = JSON.parse(data);
       console.log(msg);
       setNotifColor(true);
@@ -129,7 +131,7 @@ const NavBar = ({ authUser }) => {
                     variant="ghost"
                     icon={label}
                     fontSize="24px"
-                    color={url === "/inbox" && notif ? "red" : "white"}
+                    color={(url === "/inbox" && notif) ? "red" : "white"}
                     mr={2}
                     _hover={{ bg: "blue.400" }}
                     _focus={{ bg: "blue.600", boxShadow: "inner",  }}

@@ -20,7 +20,6 @@ Below are sequential tasks with story points below each epic. It should be noted
 
 3. Login Button 
 - User is able to log into their account
-- Usesrs can log in or create account using social media or google
 
 4. Home Page  
 - Once logged in a user will view the default homepage of looking for a tool
@@ -43,7 +42,7 @@ Below are sequential tasks with story points below each epic. It should be noted
 - Tool listing requires a description with information the renter/lister wants to showcase
 
 3. Publish to Public
-- Users can rent or sell tools to eachother
+- Users can rent tools to eachother
 - Users can choose to store their tool on the website but not have their tool be available
 
 4. Editing Capability
@@ -59,7 +58,6 @@ Below are sequential tasks with story points below each epic. It should be noted
 2. Notification for New Message
 - Users will be notified via the website if a new message has come in
 - Users can schedule to rent a tool in the future, updates will be sent through notification or message system
-- Users will be alerted when they have recieved a review from another user
 
 3. Infractions
 - User can view their infractions on their account through the messaging system

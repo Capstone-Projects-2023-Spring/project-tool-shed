@@ -15,10 +15,9 @@ function HomepageHeader() {
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
-            {/* TODO: Change me to your project's tutorial*/ }
           <Link
             className="button button--secondary button--lg"
-            to="http://sharemytoolshed.com:5000/">
+            to="http://toolshed.symer.io:5000/">
             Visit Toolshed 🔧🏠
           </Link>
         </div>

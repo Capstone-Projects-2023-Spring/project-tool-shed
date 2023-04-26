@@ -556,14 +556,12 @@ module.exports = (app, models, sequelize) => {
 				active: true
 			},
 			include: [
-
 				{model: Tool, as: 'tool', include: [
 					{model: ToolCategory, as: 'category'},
 					{model: FileUpload, as: 'photo'},
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}
 				]}
-
 			]
 		});
 
@@ -577,21 +575,23 @@ module.exports = (app, models, sequelize) => {
 			.map(x => `${x.split(':')[0]}`)
 			.join(' & ');
 
+		let where = {
+			active: true,
+			id: {
+				[Op.ne]: listings.id
+			}
+		};
+
+		if (listings.tool.category_id) {
+			// filter out all listings with a tool with a different category
+			where['$tool.tool_category_id$'] = listings.tool.category_id;
+		}
+
 		// query all listings with the same tool category as the listing choosen by the user
 		const recommendations = await models.Listing.findAll({
-			where: {
-				active: true,
-				id: {
-					[Op.ne]: listings.id
-				},
-				'$tool.tool_category_id$': listings.tool.category.id //filter out all listings with a tool with a different category
-			},
+			where,
 			include: [
-
 				{model: Tool, as: 'tool', include: [
-					{model: ToolCategory, as: 'category', where: listings.category ? {
-						id: {[Op.ne]: listings.category.id}
-					} : {}},
 					{model: FileUpload, as: 'photo'},
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}
@@ -604,7 +604,6 @@ module.exports = (app, models, sequelize) => {
 				sequelize.fn('to_tsquery', subquery)), 
 				'DESC'
 				]
-
 			]
 		});
 

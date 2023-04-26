@@ -3,6 +3,9 @@ const { loginUserSchema, searchListingsSchema, newReviewSchema,
 	userWithAddressSchema, toolSchema, messageSchema, listingSchema } = require('./validators');
 const path = require('path');
 const { Op } = require("sequelize");
+const WebsocketManager = require("./lib/WebsocketManager");
+
+global.websocketManager = new WebsocketManager();
 
 /*
 	Routes
@@ -593,7 +596,7 @@ module.exports = (app, models, sequelize) => {
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}
 				]}
-
+			],
 			order: [
 				// sort by the number of matched search vectors in descending order
 				[sequelize.fn('ts_rank', 
@@ -724,38 +727,21 @@ module.exports = (app, models, sequelize) => {
 				content, sender_id: req.user.id, recipient_id: user_id, listing_id: listingId
 			});
 			await message.reload({
-				include: { model: Listing, as: 'listing', include: { model: Tool, as: 'tool' } }
+				include: [
+					{
+					model: Listing,
+					as: 'listing',
+					include: [{ model: Tool, as: 'tool' }]
+					}
+				]
 			});
 
 			res.json({ status: 'ok', error: null, message });
 		} catch (error) {
+			console.error(error);
 			res.json({ status: 'failure', error, message: null });
 		}
 	})));
-
-	let unixListeners = [];
-	UserMessage.messageCreated = msg => {
-		for (const f of unixListeners) {
-			f(msg);
-		}
-	};
-
-	app.ws('/websocket/inbox/:user_id', asyncHandler(async (ws, req) => {
-		const handleData = userMessage => {
-			if (userMessage.recipient_id === req.user.id) {
-				userMessage.reload({ include: { model: Listing, as: "listing", include: { model: Tool, as: 'tool' } } }).then(() => {
-					ws.send(JSON.stringify(userMessage));
-				});
-			}
-		};
-		unixListeners.push(handleData);
-		ws.on('close', () => {
-			let idx = unixListeners.indexOf(handleData);
-			if (idx !== -1) {
-				unixListeners.splice(idx, 1);
-			}
-		});
-	}));
 
 	/*
 	 * User Reviews
@@ -798,6 +784,15 @@ module.exports = (app, models, sequelize) => {
 		});
 		res.render('review_list.html', { reviews, user: reviewee });
 	}));
+
+
+
+	/* Websocket Endpoint */
+	app.ws('/websocket/:key', asyncHandler(async (ws, req) => {
+		const {key} = req.params;
+		await global.websocketManager.add(req.user.id, key, ws);
+	}));
+	
 };
 
 

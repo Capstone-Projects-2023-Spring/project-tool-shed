@@ -52,7 +52,8 @@ const databaseSettings = {
 	database: process.env.PGDATABASE ?? 'postgres',
 	username: process.env.PGUSER ?? 'postgres',
 	password: process.env.PGPASSWORD ?? 'postgres',
-	host: process.env.PGHOST ?? 'localhost'
+	host: process.env.PGHOST ?? 'localhost',
+	logging: process.env.LOGGING === 'false' ? false : console.log,
 };
 
 /**

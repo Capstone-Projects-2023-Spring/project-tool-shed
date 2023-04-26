@@ -85,7 +85,7 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 				}).then(x => x.json());
 
 				setManualFile(null);
-        setPhotoFile(null);
+				setPhotoFile(null);
 				setListing(l);
 				resetForm(l);
 			} catch (error) {
@@ -165,20 +165,6 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				formData.append(k, v);
 			}
 
-
-		if (manualFile) {
-			formData.append('manual', manualFile);
-		}
-		if (photoFile) {
-			formData.append('photo', photoFile);
-		}
-		try {
-			const {tool: t} = await fetch(isEdit ? `/api/tools/${tool.id}` : '/api/tools/new', {
-				method: isEdit ? "PATCH" : 'POST',
-				body: formData,
-				credentials: "same-origin"
-			}).then(x => x.json());
-
 			let maker_id = maker ? maker.id : undefined;
 			if (maker && maker_id < 0) { // we have a new maker
 				const newMaker = await apiCreate('maker', maker.name);
@@ -199,6 +185,10 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				formData.append('manual', manualFile);
 			}
 
+			if (photoFile) {
+				formData.append('photo', photoFile);
+			}
+
 			try {
 				const {tool: t} = await fetch(isEdit ? `/api/tools/${tool.id}` : '/api/tools/new', {
 					method: isEdit ? "PATCH" : 'POST',
@@ -211,6 +201,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				}
 
 				setManualFile(null);
+				setPhotoFile(null);
 				setSubmitting(false);
 				setTool(t);
 				resetForm({values: t});
@@ -220,7 +211,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 			}
 		}
 	});
-	const {values, errors, touched, setFieldValue, handleChange, handleBlur, isSubmitting, setSubmitting, setErrors, resetForm} = formik;
+	const {values, errors, touched, setFieldValue, handleChange, handleSubmit, handleBlur, isSubmitting, setSubmitting, setErrors, resetForm} = formik;
 
 	const photoURL = tool && tool.photo ? `/uploads/${tool.photo.path}` : null;
 	const photoName = tool && tool.photo ? tool.photo.originalName : null;
@@ -257,12 +248,12 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 							<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
 							{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 						</FormControl>
-            <FormControl>
-					    <FormLabel>Photo</FormLabel>
-					    <Input padding="1" type="file" onChange={e => setPhotoFile(e.currentTarget.files[0])} />
-					    {photoURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={photoURL}>{photoName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
-				    </FormControl>
-						<Button mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
+						<FormControl>
+							<FormLabel>Photo</FormLabel>
+							<Input padding="1" type="file" onChange={e => setPhotoFile(e.currentTarget.files[0])} />
+							{photoURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={photoURL}>{photoName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
+						</FormControl>
+						<Button onClick={handleSubmit} mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
 					</Stack>
 				</FormikProvider>
 

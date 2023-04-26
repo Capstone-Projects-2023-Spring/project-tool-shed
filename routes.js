@@ -168,13 +168,13 @@ module.exports = (app, models, sequelize) => {
 	app.get('/tools/:tool_id/edit', asyncHandler(requiresAuth(async (req, res) => {
 		const { tool_id } = req.params;
 
-		const tool = await models.Tool.findByPk(tool_id, {
-			include: [
-				{ model: FileUpload, as: 'manual' },
-				{ model: ToolCategory, as: 'category' },
-				{ model: ToolMaker, as: 'maker' }
-			]
-		});
+		const tool = await models.Tool.findByPk(tool_id, { include: [
+			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		] });
+
 
 		if (!tool) {
 			return res.status(404).json({ error: "Tool not found." });
@@ -221,7 +221,9 @@ module.exports = (app, models, sequelize) => {
 	}));
 
 	/* API: Create tools */
-	app.post('/api/tools/new', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/api/tools/new', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
+     	let uploadedFile = req.files['manual'];
+     	let uploadedPhoto = req.files['photo'];
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
 		const tool = await models.Tool.create({
@@ -229,8 +231,8 @@ module.exports = (app, models, sequelize) => {
 			tool_maker_id, tool_category_id, video
 		});
 
-		const uploadedFile = req.file;
 		if (uploadedFile) {
+			uploadedFile = uploadedFile[0];
 			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
 			const fu = await FileUpload.create({
 				originalName: uploadedFile.originalname,
@@ -243,18 +245,34 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		await tool.reload({
-			include: [
-				{ model: FileUpload, as: 'manual' },
-				{ model: ToolCategory, as: 'category' },
-				{ model: ToolMaker, as: 'maker' }
-			]
-		});
+		if (uploadedPhoto) {
+			uploadedPhoto = uploadedPhoto[0];
+			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
+			const pu = await FileUpload.create({
+				originalName: uploadedPhoto.originalname,
+				mimeType: uploadedPhoto.mimetype,
+				size: uploadedPhoto.size,
+				path: relPathh,
+				uploader_id: req.user.id
+			});
+
+			await tool.setPhoto(pu);
+		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
+
 		res.json({ tool });
 	})));
 
 	/* API: Edit tool */
-	app.patch('/api/tools/:tool_id', app.upload.single('manual'), asyncHandler(requiresAuth(async (req, res) => {
+	app.post('/api/tools/new', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
+		let uploadedFile = req.files['manual'];
+		let uploadedPhoto = req.files['photo'];
 		const { tool_id } = req.params;
 		const { name, description, tool_category_id, tool_maker_id, video } = await toolSchema.validate(req.body);
 
@@ -278,8 +296,8 @@ module.exports = (app, models, sequelize) => {
 		await tool.setCategory(tool_category_id);
 		await tool.setMaker(tool_maker_id);
 
-		const uploadedFile = req.file;
 		if (uploadedFile) {
+			uploadedFile = uploadedFile[0];
 			const relPath = path.relative(uploadedFile.destination, uploadedFile.path);
 			const fu = await FileUpload.create({
 				originalName: uploadedFile.originalname,
@@ -292,13 +310,27 @@ module.exports = (app, models, sequelize) => {
 			await tool.setManual(fu);
 		}
 
-		await tool.reload({
-			include: [
-				{ model: FileUpload, as: 'manual' },
-				{ model: ToolCategory, as: 'category' },
-				{ model: ToolMaker, as: 'maker' }
-			]
-		});
+		if (uploadedPhoto) {
+			uploadedPhoto = uploadedPhoto[0];
+			const relPathh = path.relative(uploadedPhoto.destination, uploadedPhoto.path);
+			const pu = await FileUpload.create({
+				originalName: uploadedPhoto.originalname,
+				mimeType: uploadedPhoto.mimetype,
+				size: uploadedPhoto.size,
+				path: relPathh,
+				uploader_id: req.user.id
+			});
+
+			await tool.setPhoto(pu);
+		}
+
+		await tool.reload({include: [
+			{model: FileUpload, as: 'manual'},
+			{model: FileUpload, as: 'photo'},
+			{model: ToolCategory, as: 'category'},
+			{model: ToolMaker, as: 'maker'}
+		]});
+
 
 		res.json({ tool });
 	})));
@@ -524,13 +556,14 @@ module.exports = (app, models, sequelize) => {
 				active: true
 			},
 			include: [
-				{
-					model: Tool, as: 'tool', include: [
-						{ model: ToolCategory, as: 'category' },
-						{ model: ToolMaker, as: 'maker' },
-						{ model: User, as: 'owner' }
-					]
-				}
+
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category'},
+					{model: FileUpload, as: 'photo'},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
+
 			]
 		});
 
@@ -554,15 +587,15 @@ module.exports = (app, models, sequelize) => {
 				'$tool.tool_category_id$': listings.tool.category.id //filter out all listings with a tool with a different category
 			},
 			include: [
-				{
-					model: Tool,
-					as: 'tool',
-					include: [
-						{ model: ToolCategory, as: 'category' },
-						{ model: ToolMaker, as: 'maker' },
-						{ model: User, as: 'owner' }
-					]
-				}
+
+				{model: Tool, as: 'tool', include: [
+					{model: ToolCategory, as: 'category', where: listings.category ? {
+						id: {[Op.ne]: listings.category.id}
+					} : {}},
+					{model: FileUpload, as: 'photo'},
+					{model: ToolMaker, as: 'maker'},
+					{model: User, as: 'owner'}
+				]}
 			],
 			order: [
 				// sort by the number of matched search vectors in descending order
@@ -571,6 +604,7 @@ module.exports = (app, models, sequelize) => {
 				sequelize.fn('to_tsquery', subquery)), 
 				'DESC'
 				]
+
 			]
 		});
 

@@ -50,14 +50,14 @@ const Tool = ({
             <p>{description}</p>
         
             <a href={`/tools/${id}/edit`}>
-                <button>Edit Tool</button>
+                <button style={{ margin: "10px" }}>Edit Tool</button>
             </a>
 
             <a onClick={onDelete}>
-                <button>Delete Tool</button>
+                <button style={{ margin: "10px" }}>Delete Tool</button>
             </a>
 
-        <a href={realLink}target="_blank" rel="noopener noreferrer" ><button>Youtube Video</button></a>
+        <a href={realLink}target="_blank" rel="noopener noreferrer" ><button style={{ margin: "10px" }}>Youtube Video</button></a>
         </div>
 };
 

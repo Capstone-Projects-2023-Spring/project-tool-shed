@@ -84,8 +84,6 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 					credentials: "same-origin"
 				}).then(x => x.json());
 
-				setManualFile(null);
-				setPhotoFile(null);
 				setListing(l);
 				resetForm(l);
 			} catch (error) {
@@ -271,3 +269,4 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 };
 
 renderComponent("#root", <ToolForm {...window._toolFormProps} />);
+

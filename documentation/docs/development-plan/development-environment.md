@@ -4,12 +4,12 @@ sidebar_position: 4
 
 # Development Environment
 
-ToolShed is a JavaScript project that uses NPM to manage dependencies. It's IDE agnostic, so as long as your IDE can understand package.json, you're good to go. Projects shouldn't force developers to use a specific editor - that's dumb.
+ToolShed is a JavaScript-based project that effectively utilizes NPM to manage its dependencies. The project is designed to be IDE agnostic, thereby enabling seamless integration with any IDE that is capable of interpreting package.json files. Our objective is to ensure that developers are not constrained to use a specific editor or IDE, as we believe that such an approach is counterproductive.
 
-ToolShed’s JavaScript runs on NodeJS, in two different environments: the backend/server, and the frontend/browser (at least on Chrome). While the backend is a predictable environment, the frontend isn’t, so we’re using a tool called Babel to transpile modern JavaScript syntax into an older, least-common-denominator kind of syntax supported by more (and older) browsers. To test our code, we’re going to unit test with Jest. We plan to test core business logic, where appropriate.
+ToolShed is executed on NodeJS, with its functionality spanning across two distinct environments - the backend/server and the frontend/browser (primarily on Chrome). While the backend environment is predictable, the frontend environment is relatively volatile. As such, we rely on a tool called Babel to transpile modern JavaScript syntax into a backward-compatible format that can be supported by older browsers. We intend to validate our code by utilizing Jest for unit testing, primarily focusing on core business logic.
 
-On the backend, we’re using ExpressJS as our HTTP server, and Sequelize as our ORM (database access via JS). The frontend is being developed as a series of non-SPA react apps, but we might switch to single-page if it makes sense down the line.
+For the backend, we have opted to use ExpressJS as our HTTP server and Sequelize as our Object-Relational Mapping (ORM) tool for database access via JavaScript. On the frontend, we are developing non-single-page react apps that we may eventually transition into a single-page format if it makes sense down the line.
 
-We manually deploy our code to AWS, where we also use a managed PostgreSQL instance in RDS.
+We deploy our code manually to Amazon Web Services (AWS), where we also utilize a managed PostgreSQL instance in RDS.
 
-As far as documentation, we plan to use structured comments that can be read by tools like JSDoc and translated to markdown for insertion into this documentation site. 
+Regarding documentation, we intend to leverage structured comments that can be read by tools like JSDoc and can be converted into markdown for inclusion in our documentation site.

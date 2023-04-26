@@ -65,6 +65,13 @@ const NavBar = ({ authUser }) => {
                             _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
                             px="4"
                   >My Reviews</MenuItem>
+                  <MenuItem as="a" href="/user" 
+                            color="white"
+                            bg="blue.500"
+                            _hover={{ bg: "blue.400" }}
+                            _focus={{ bg: "blue.600", boxShadow: "inner", outline: "none" }}
+                            px="4"
+                  >Create Reviews</MenuItem>
 
                 </MenuList>
               </Menu>

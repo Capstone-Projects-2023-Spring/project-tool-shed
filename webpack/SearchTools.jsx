@@ -1,12 +1,12 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
-	ChakraProvider, Select, Box, Heading, Divider, Container, Flex,
+	Select, Box, Heading, Divider, Container, Flex,
 	FormControl, FormLabel, FormErrorMessage, FormHelperText,
 	Accordion, AccordionItem, AccordionButton, AccordionPanel,
 	Input, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb
 } from '@chakra-ui/react';
-import {AsyncSelect} from 'chakra-react-select';
+import { AsyncSelect } from 'chakra-react-select';
 import { debounce } from 'debounce';
 
 import getBrowserCoords from './util/getBrowserCoords';
@@ -36,7 +36,62 @@ const SelectorDropdown = ({name, collection, onChange, ...props}) => {
 			getOptionValue={e => e.__isNew__ ? undefined : e.id}
 			loadOptions={searchCollection} />
 	);
-}
+};
+
+const videoCategories = [
+	{
+		name: 'Cleaning & Tool Safety',
+		videos: [
+			"https://www.youtube.com/embed/DuU2mnJcxPM",
+			"https://www.youtube.com/embed/CHTHif55nSw",
+			"https://www.youtube.com/embed/y7mz191MkT0",
+		]
+	},
+	{
+		name: 'Picking the Right Brand For You',
+		videos: [
+			"https://www.youtube.com/embed/4sNsJEJS0x4",
+			"https://www.youtube.com/embed/Wr-UShXL0OA",
+			"https://www.youtube.com/embed/FT_qDGTwMfg",
+		]
+	},
+	{
+		name: 'Popular Tool Guides',
+		videos: [
+			"https://www.youtube.com/embed/usuXK9CL6Ns",
+			"https://www.youtube.com/embed/VXvzBPlAeDM",
+			"https://www.youtube.com/embed/puGg_UzpVo4",
+		]
+	}
+];
+
+const VideoLibrary = ({}) => {
+	return (
+		<Accordion allowMultiple>
+  			<AccordionItem>
+    				<AccordionButton>Video Library</AccordionButton>
+				<AccordionPanel>
+					<Accordion allowMultiple>
+					{videoCategories.map(({name, videos}) => <>
+					<AccordionItem>
+        	  				<AccordionButton>{name}</AccordionButton>
+          					<AccordionPanel>
+							<Flex>
+							{videos.map(v => <>
+								<Box mr={75}>
+                							<iframe src={v} width="560" height="315" title="Cleaning/Saftey Video 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+								</Box>
+							</>)}
+							</Flex>
+						</AccordionPanel>
+					</AccordionItem>
+					</>)}
+					</Accordion>
+				</AccordionPanel>
+			</AccordionItem>
+		</Accordion>
+	);
+};
 
 const SearchTools = ({ apiKey = defaultApiKey }) => {
 	const [results, setResults] = useState([]);
@@ -208,123 +263,58 @@ const SearchTools = ({ apiKey = defaultApiKey }) => {
 	const maxDist = 200;
 
 	return (
-		<React.Fragment>
+		<>
 			<Box className="SearchTools" w="100%" border="1px solid #E2E8F0" borderRadius="md" p={4}>
-			<FormControl mb={4} mr={4}>
-				<FormLabel>Search Query</FormLabel>
-				<Input placeholder='Enter search query here...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
-			</FormControl>
-	  
-			  <FormControl mb={4}>
-				<FormLabel>User Rating</FormLabel>
-				<Box>
-				  <Slider w='100%' defaultValue={defaultUserRating} max={5} step={1} onChange={x => setuserRating(x)}>
-					<SliderTrack>
-					  <SliderFilledTrack bg="blue.500" />
-					</SliderTrack>
-					<SliderThumb zIndex={0} bg="blue.500" />
-					<SliderMark value={1} {...labelStyles} pl={1.5}>1</SliderMark>
-					<SliderMark value={2} {...labelStyles} pl={1.5}>2</SliderMark>
-					<SliderMark value={3} {...labelStyles} pl={1.5}>3</SliderMark>
-					<SliderMark value={4} {...labelStyles} pl={1.5}>4</SliderMark>
-					<SliderMark value={5} {...labelStyles} pl={1.5}>5</SliderMark>
-					<SliderMark value={userRating} {...sliderValueStyle} w={50} ml={-6}>{userRating} Star</SliderMark>
-				  </Slider>
-				</Box>
-			  </FormControl>
-			<FormControl mb={4}>
-				<FormLabel>Tool Category</FormLabel>
-				<SelectorDropdown collection="category" placeholder="Select Category" onChange={x => setSelectedCategory(x)} />
-			</FormControl>
-			<FormControl mb={4}>
-				<FormLabel>Tool Maker</FormLabel>
-				<SelectorDropdown collection="maker" placeholder="Select Maker" onChange={x => setSelectedMaker(x)} />
-			</FormControl>
-			<Divider my={4} />
-			<FormControl mb={4}>
-				<FormLabel>Search Radius</FormLabel>
-				<Box mt={10} mb={10}>
-					<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
-						<SliderTrack>
-							<SliderFilledTrack bg="blue.500" />
-						</SliderTrack>
-						<SliderThumb zIndex={0} bg="blue.500" />
-						<SliderMark value={50} {...labelStyles}>50km</SliderMark>
-						<SliderMark value={100} {...labelStyles}>100km</SliderMark>
-						<SliderMark value={150} {...labelStyles}>150km</SliderMark>
-						<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
-					</Slider>
-				</Box>
-			</FormControl>
-
-			<Divider my={4} />
-			<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
-		</Box>
-			
-		<Accordion allowMultiple>
-  			<AccordionItem>
-    			<AccordionButton>Video Library</AccordionButton>
-    		<AccordionPanel>
-      			<Accordion allowMultiple>
-        			<AccordionItem>
-          				<AccordionButton>
-            				Cleaning & Tool Safety
-          				</AccordionButton>
-          			<AccordionPanel>
-            		<Flex>
-              			<Box mr={75}>
-                			<iframe src={`https://www.youtube.com/embed/DuU2mnJcxPM`} width="560" height="315" title="Cleaning/Saftey Video 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-              			<Box mr={75}>
-                			<iframe src={`https://www.youtube.com/embed/CHTHif55nSw`} width="560" height="315" title="Cleaning/Saftey Video 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-              			<Box mr={75}>
-                			<iframe src={`https://www.youtube.com/embed/y7mz191MkT0`} width="560" height="315" title="Cleaning/Saftey Video 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-            		</Flex>
-          			</AccordionPanel>
-       				</AccordionItem>
-       	 			<AccordionItem>
-          				<AccordionButton>
-            				Picking the Right Brand For You
-          				</AccordionButton>
-          			<AccordionPanel>
-            		<Flex>
-              			<Box mr={75}>
-                			<iframe src={`https://www.youtube.com/embed/4sNsJEJS0x4`} width="560" height="315" title="Manufacturer Video 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-              			<Box mr={75}>
-                			<iframe src={`https://www.youtube.com/embed/Wr-UShXL0OA`} width="560" height="315" title="Manufacturer Video 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-              			<Box mr={75}>
-               			 <iframe src={`https://www.youtube.com/embed/FT_qDGTwMfg`} width="560" height="315" title="Manufacturer Video 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-              			</Box>
-            		</Flex>
-          			</AccordionPanel>
-        			</AccordionItem>
-        			<AccordionItem>
-          				<AccordionButton>
-            				Popular Tool Guides
-         				 </AccordionButton>
-          			<AccordionPanel>
-		  			<Flex>
-        				<Box mr={75}>
-          					<iframe src={`https://www.youtube.com/embed/usuXK9CL6Ns`} width="560" height="315" title="Popular Tool Video 1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-        				</Box>
-        				<Box mr={75}>
-         					<iframe src={`https://www.youtube.com/embed/VXvzBPlAeDM`} width="560" height="315" title="Popular Tool Video 2" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-        				</Box>
-        				<Box mr={75}>
-          					<iframe src={`https://www.youtube.com/embed/puGg_UzpVo4`} width="560" height="315" title="Popular Tool Video 3" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-        				</Box>
-      				</Flex>
-          			</AccordionPanel>
-        			</AccordionItem>
-      			</Accordion>
-    		</AccordionPanel>
-  			</AccordionItem>
-		</Accordion>
-	</React.Fragment>
+				<FormControl mb={4} mr={4}>
+					<FormLabel>Search Query</FormLabel>
+					<Input placeholder='Enter search query here...' value={searchQuery} onChange={x => setSearchQuery(x.target.value)} />
+				</FormControl>
+				<FormControl mb={4}>
+					<FormLabel>User Rating</FormLabel>
+					<Box mt={10} mb={10}>
+						<Slider w='100%' defaultValue={defaultUserRating} max={5} step={1} onChange={x => setuserRating(x)}>
+							<SliderTrack>
+								<SliderFilledTrack bg="blue.500" />
+							</SliderTrack>
+							<SliderThumb zIndex={0} bg="blue.500" />
+							<SliderMark value={1} {...labelStyles} pl={1.5}>1</SliderMark>
+							<SliderMark value={2} {...labelStyles} pl={1.5}>2</SliderMark>
+							<SliderMark value={3} {...labelStyles} pl={1.5}>3</SliderMark>
+							<SliderMark value={4} {...labelStyles} pl={1.5}>4</SliderMark>
+							<SliderMark value={5} {...labelStyles} pl={1.5}>5</SliderMark>
+							<SliderMark value={userRating} {...sliderValueStyle} w={50} ml={-6}>{userRating} Star</SliderMark>
+						</Slider>
+					</Box>
+				</FormControl>
+				<FormControl mb={4}>
+					<FormLabel>Tool Category</FormLabel>
+					<SelectorDropdown collection="category" placeholder="Select Category" onChange={x => setSelectedCategory(x)} />
+				</FormControl>
+				<FormControl mb={4}>
+					<FormLabel>Tool Maker</FormLabel>
+					<SelectorDropdown collection="maker" placeholder="Select Maker" onChange={x => setSelectedMaker(x)} />
+				</FormControl>
+				<Divider my={4} />
+				<FormControl mb={4}>
+					<FormLabel>Search Radius</FormLabel>
+					<Box mt={10} mb={10}>
+						<Slider w='100%' defaultValue={defaultSearchRadius} max={200} onChange={x => setSearchRadius(x)}>
+							<SliderTrack>
+								<SliderFilledTrack bg="blue.500" />
+							</SliderTrack>
+							<SliderThumb zIndex={0} bg="blue.500" />
+							<SliderMark value={50} {...labelStyles}>50km</SliderMark>
+							<SliderMark value={100} {...labelStyles}>100km</SliderMark>
+							<SliderMark value={150} {...labelStyles}>150km</SliderMark>
+							<SliderMark value={searchRadius} {...sliderValueStyle}>{searchRadius}km</SliderMark>
+						</Slider>
+					</Box>
+				</FormControl>
+				<Divider my={4} />
+				<Box h={500} w='100%' className="SearchTools__Map" ref={mapRef} border="1px solid #E2E8F0" borderRadius="md" />
+			</Box>
+			<VideoLibrary />
+		</>
 	);
 };
 

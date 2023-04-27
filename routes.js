@@ -580,7 +580,7 @@ module.exports = (app, models, sequelize) => {
 			active: true,
 			id: {
 				[Op.ne]: listings.id
-			}
+			},
 		};
 
 		if (listings.tool.category_id) {
@@ -592,7 +592,7 @@ module.exports = (app, models, sequelize) => {
 		const recommendations = await models.Listing.findAll({
 			where,
 			include: [
-				{model: Tool, as: 'tool', include: [
+				{model: Tool, as: 'tool', where: {id: {[Op.ne]: null}}, include: [
 					{model: FileUpload, as: 'photo'},
 					{model: ToolMaker, as: 'maker'},
 					{model: User, as: 'owner'}

@@ -106,5 +106,4 @@ Schedule | Project Tool Shed
     - R3. Tools should have associated YouTube videos uploaded by tool owners. 
     - R4. User can be redirected to a Youtube video appropriate to their search
 - F8. Notifications
-    - R1. User can receive notification when a tool they require is listed
-    - R2. Notification will show the tool and availability status 
+    - R1. User can receive notification when they receive a message

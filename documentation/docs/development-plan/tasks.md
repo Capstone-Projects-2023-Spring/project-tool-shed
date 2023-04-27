@@ -42,7 +42,7 @@ Below are sequential tasks with story points below each epic. It should be noted
 - Tool listing requires a description with information the renter/lister wants to showcase
 
 3. Publish to Public
-- Users can rent tools to eachother
+- Users can rent tools to each other
 - Users can choose to store their tool on the website but not have their tool be available
 
 4. Editing Capability

@@ -6,7 +6,7 @@ sidebar_position: 4
 
 ## High Level Requirements Overview
 
-To begin using the platform, users will need to register online accounts through the "Create Account" option. Once the account creation process is complete, users can manage their tools and determine their availability and daily rates for public use. To facilitate tool searches, users can employ specific keywords such as "Table saw" or "Miter Saw" to browse available low-cost, locally owned tools. Furthermore, search results can be filtered by tool type and mile radius to refine the search. If a desired tool is currently unavailable, users can request notifications when the tool becomes available.
+To begin using the platform, users will need to register online accounts through the "Create Account" option. Once the account creation process is complete, users can manage their tools and determine their availability and daily rates for public use. To facilitate tool searches, users can employ specific keywords such as "Table saw" or "Miter Saw" to browse available low-cost, locally owned tools. Furthermore, search results can be filtered by tool type and mile radius to refine the search. 
 
 When a user selects a tool for purchase or rental, they can communicate with the owner to agree on a date and price. The platform will facilitate the return process by setting an agreed-upon window for tool return.
 
@@ -24,11 +24,9 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
 - The system shall require a home page which will contain many functional components which allow a user to interact with the site
 
-    - Contains a notification system where the user see’s any updates on listings they opted to be notified for 
-
     - Contains ability to upload a new listing of a tool 
 
-    - Contains a user’s profile which has a drop-down menu for settings, logout option, and view profile 
+    - Contains a user’s profile which has a menu for settings, logout option, and view profile 
 
     - The home page mainly consists of a list of tools available to rent within the default parameters. These parameters can be changed, and a map will reflect where the available tools are located 
 
@@ -92,8 +90,6 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
     - Saved Listings Seller/Sheds section will contain details for any Seller/Shed that the log in user has selected to be a favorite. Details will include (Name, Zip Code, Number of tools listed) Clicking on this section will bring the user to the seller's Tool Shed. 
 
-    - Saved Listings page will also display specific listings that the log in user has chosen to select as favorites. Details will include (Tool Name, Type, Description, Cost, Availability, Owner) 
-
  
 
 - The system shall have a “Your Listings” page which will be accessible through the navigation bar after the user signs in and is also located in the navigation bar. 
@@ -119,8 +115,6 @@ For users seeking to sell or lend their tools to others, the listing process inv
     - A rating of 5 stars would imply the reviewer of the tool (or user) did have a positive experience and would recommend the tool (or user) to a friend 
 
  - The system shall allow users will have access to contact information of other users
-    
-    - A notification that alerts the user of the contact information for a tool they recently rented (TO BE EDITED)
 
     - A notification will consist of the meeting address and the instructions from the seller/renter (TO BE EDITED)
  
@@ -150,8 +144,6 @@ For users seeking to sell or lend their tools to others, the listing process inv
 - User login information will be secure via Okta’s auth0 login security
 
 - The Video Library will be moderated so that there will only be relevant videos
-
-- User Reviews will be moderated to prevent actions such as review bombing
 
 - Will use a PostgreSQL server to store information
 

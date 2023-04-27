@@ -57,10 +57,9 @@ Below are sequential tasks with story points below each epic. It should be noted
 
 2. Notification for New Message
 - Users will be notified via the website if a new message has come in
-- Users can schedule to rent a tool in the future, updates will be sent through notification or message system
 
 3. Infractions
-- User can view their infractions on their account through the messaging system
+- User can view their infractions on their account
 
 ## Community Engagement 
 

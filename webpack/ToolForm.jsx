@@ -107,7 +107,7 @@ const ListingForm = ({listing: _listing, toolId, onDelete}) => {
 				<Stack spacing={3}>
 					<FormControl isInvalid={errors.active}>
 						<FormLabel>Active</FormLabel>
-						<Switch name="active" isChecked={values.active} onChange={handleChange} />
+						<Switch name="active" isChecked={values.active ?? true} onChange={handleChange} />
 					</FormControl>
 					<FormControl isInvalid={errors.price}>
 						<FormLabel>Price</FormLabel>
@@ -157,10 +157,10 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 			setSubmitting(true);
 			let formData = new FormData();
 
-			const {maker, category, ...values} = _values;
+			const {maker, category, tool_maker_id, tool_category_id, ...values} = _values;
 
 			for (const [k, v] of Object.entries(values)) {
-				formData.append(k, v ?? '');
+				formData.set(k, v ?? '');
 			}
 
 			let maker_id = maker ? maker.id : undefined;
@@ -176,15 +176,15 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				cat_id = newCat.id;
 			}
 
-			formData.append('tool_maker_id', maker_id ?? '');
-			formData.append('tool_category_id', cat_id ?? '');
+			formData.set('tool_maker_id', maker_id ?? '');
+			formData.set('tool_category_id', cat_id ?? '');
 
 			if (manualFile) {
-				formData.append('manual', manualFile);
+				formData.set('manual', manualFile);
 			}
 
 			if (photoFile) {
-				formData.append('photo', photoFile);
+				formData.set('photo', photoFile);
 			}
 
 			try {
@@ -243,12 +243,12 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 						</FormControl>
 						<FormControl>
 							<FormLabel>Manual</FormLabel>
-							<Input padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
+							<Input border={0} pb={0} mb={0} height="auto" padding="1" type="file" onChange={e => setManualFile(e.currentTarget.files[0])} />
 							{manualURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={manualURL}>{manualName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 						</FormControl>
 						<FormControl>
 							<FormLabel>Photo</FormLabel>
-							<Input padding="1" type="file" onChange={e => setPhotoFile(e.currentTarget.files[0])} />
+							<Input border={0} pb={0} mb={0} height="auto" padding="1" type="file" onChange={e => setPhotoFile(e.currentTarget.files[0])} />
 							{photoURL && <FormHelperText>Currently uploaded: <Link color='teal.500' isExternal href={photoURL}>{photoName} <ExternalLinkIcon mx='2px' /></Link></FormHelperText>}
 						</FormControl>
 						<Button onClick={handleSubmit} mt={4} colorScheme="blue" isLoading={isSubmitting} type="submit">{isEdit ? "Save" : "Create"}</Button>
@@ -261,6 +261,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 				<Stack divider={<StackDivider />} spacing={3}>
 					<Heading size='md'>Listings</Heading>
 					{listings.map(l => <ListingForm toolId={tool.id} key={l.id} listing={l} onDelete={onListingDelete} />)}
+					{listings.length == 0 && <Text>You need to create a listing for your tool to be visible to the public.</Text>}
 					<Button mt={4} colorScheme="blue" onClick={onNewListing}>+ New Listing</Button>
 				</Stack>
 			</CardBody>}

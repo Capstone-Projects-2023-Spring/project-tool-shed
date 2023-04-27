@@ -3,8 +3,8 @@ sidebar_position: 5
 ---
 
 # Version Control
-- GitHub will be used as the version control system for Tool Shed. 
-- Branch protection will be utilized to prevent direct pushes to the main branch (at least two reviews required). This ensures that the main branch always remains a safe, reliable, and deployable codebase.  
-- Each task/feature will have its own branch for a group member to work on. A consistent naming scheme utilizing Jira’s Issue Tags will be implemented to facilitate tracking. 
-- Branches will be kept up-to-date and merged regularly with the staging branch to minimize the occurrence of merge conflicts. 
-- Each feature will be pushed to a staging branch upon completion. Weekly code reviews will be performed on the staging branch before pushed to main for production.  
+- GitHub will serve as the version control system for Tool Shed, providing a reliable and widely-used platform for managing source code.
+- Branch protection will be implemented to require at least two code reviews before any changes can be merged to the main branch. This will maintain the quality and stability of the main branch, ensuring it is always in a deployable state. 
+- Each task or feature will be assigned its own branch and named using Jira's Issue Tags to facilitate tracking and organization. 
+- Regular merging with the staging branch will be conducted to minimize the occurrence of merge conflicts.
+- Completed features will be pushed to a staging branch for review, with weekly code reviews conducted before any changes are pushed to the main branch for production. This will ensure that all code changes are thoroughly reviewed and tested prior to release.  

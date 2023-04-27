@@ -160,7 +160,7 @@ const ToolForm = ({tool: _tool, listings: _listings=[], toolCategories, toolMake
 			const {maker, category, ...values} = _values;
 
 			for (const [k, v] of Object.entries(values)) {
-				formData.append(k, v);
+				formData.append(k, v ?? '');
 			}
 
 			let maker_id = maker ? maker.id : undefined;

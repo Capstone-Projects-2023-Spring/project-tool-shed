@@ -271,7 +271,7 @@ module.exports = (app, models, sequelize) => {
 	})));
 
 	/* API: Edit tool */
-	app.post('/api/tools/:tool_id', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
+	app.patch('/api/tools/:tool_id', app.upload.fields([{name: 'manual', maxCount: 1}, {name: 'photo', maxCount: 1}]), asyncHandler(requiresAuth(async (req, res) => {
 		let uploadedFile = req.files['manual'];
 		let uploadedPhoto = req.files['photo'];
 		const { tool_id } = req.params;

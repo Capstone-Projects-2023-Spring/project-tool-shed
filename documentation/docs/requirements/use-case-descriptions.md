@@ -3,7 +3,7 @@ sidebar_position: 5
 ---
 
 # Use-case descriptions
-## Use Case #1  
+## Use Case #1  - Searching for Tools
 
 A user wants to search their local neighborhood for a hedge trimmer. They use tool shed to find the tool so that they get the job done today and do not go over their budget to purchase a brand-new one. 
 
@@ -39,37 +39,33 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 
  
 
-## Use Case #2  
+## Use Case #2 - Editing Tool Details
 
-A user wants to list a tool to sell it as they no longer need it anymore so that other users to be able to purchase it. 
+A user wants to edit the details of a tool that they have already added to their account. 
 
-1. The user navigates to sharemytoolshed.com/, and logs in like in use case #1. The user ends up on the home page, logged in. 
+1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
 
-2. The user clicks on the (button: LIST_TOOL) and completes the following fields. 
+2. The user clicks on the "General" dropdown menu and clicks on "Tools". 
 
-    - Name of tool 
+3. The user sees all the tools they've added to the site.
 
-    - Type of tool (Electric, Battery, Wireless, etc.) 
+4. The user clicks on the "Edit Tool" button of the tool they want to edit.
 
-    - Type of Listing (Sell or For Rent) 
+5. The user sees all the current information on the tool. 
 
-6. The user clicks on the (button: INSERT_IMAGE) to upload an image of the tool. 
+6. The user clicks on the textbox under description.
 
-7. The user then clicks the (button: SUBMIT) to add tool to a listing. 
+7. The user deletes the current text under description and enters new information. 
 
-8. The user sees a list of tools being sold after clicking submit. 
+8. The user then clicks the "Save" button.
 
-9. The user can click the (button: LIST_TOOL) to list another tool if they want to. 
+9. The user clicks on the "General" dropdown menu and clicks on "Tools" where the user will see that the tool description has changed.
 
-10. The user clicks on the (button: LOG_OFF) to log off account. 
+10. The user exits the site.
 
-11. The user exits the website. 
 
- 
 
- 
-
-## Use Case #3  
+## Use Case #3 - 
 
 A user would like to rent out tools that they are not currently using to earn some extra money. 
 
@@ -99,7 +95,7 @@ A user would like to rent out tools that they are not currently using to earn so
 
  
 
-## Use Case #4  
+## Use Case #4  - Finding Nearby Tools
 
 A user has an unexpected afternoon off from work and wants to see what tools are available now to see what projects they can complete around the house. 
 
@@ -119,7 +115,7 @@ A user has an unexpected afternoon off from work and wants to see what tools are
 
  
 
-## Use Case #5  
+## Use Case #5 - 
 
 A user wants to be notified when a nearby Air Blower will be available to be rented so that they can quickly recieve more information of the product being rented.
 
@@ -165,7 +161,7 @@ A user wants to be notified when a nearby Air Blower will be available to be ren
 
  
 
-## Use Case #6  
+## Use Case #6 - Removing a Listing
 
 As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use. 
 

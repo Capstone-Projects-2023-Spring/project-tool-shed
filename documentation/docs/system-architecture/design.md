@@ -181,84 +181,77 @@ The user wants to search their local neighborhood for a hedge trimmer. They woul
 
 [![](https://mermaid.ink/img/pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38?type=png)](https://mermaid.live/edit#pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38)
 
-## Sequence Diagram - Selling a Tool
+## Sequence Diagram - Editing Tool Details
 
-<details><summary>Use Case Selling a Tool</summary>
-A homeowner wants to list a tool to sell it as they no longer need it anymore and for other users to be able to purchase it.
+<details><summary>Use Case Editing Tool Details</summary>
+A user wants to edit the details of a tool that they have already added to their account. 
 
-1. The user enters the URL.
+1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
 
-2. The user enters their username and password.
+2. The user clicks on the "General" dropdown menu and clicks on "Tools". 
 
-3. The user clicks on the (button: LOGIN).
+3. The user sees all the tools they've added to the site.
 
-4. The user is brought to the homepage.
+4. The user clicks on the "Edit Tool" button of the tool they want to edit.
 
-5. The user clicks on the (button: LIST_TOOL) and completes the following fields.
+5. The user sees all the current information on the tool. 
 
-Name of tool
+6. The user clicks on the textbox under description.
 
-Zip Code: #####
+7. The user deletes the current text under description and enters new information. 
 
-Type of tool (Electric, Battery, Wireless, etc.)
+8. The user then clicks the "Save" button.
 
-Type of Listing (Sell or For Rent)
+9. The user clicks on the "General" dropdown menu and clicks on "Tools" where the user will see that the tool description has changed.
 
-6. The user clicks on the (button: INSERT_IMAGE) to upload an image of the tool.
-
-7. The user then clicks the (button: SUBMIT) to add tool to a listing.
-
-8. The user sees a list of tools being sold after clicking submit.
-
-9. The user can click the (button: LIST_TOOL) to list another tool if they want to.
-
-10. The user clicks on the (button: LOG_OFF) to log off account.
-
-11. The user exits the website.
+10. The user exits the site.
 
 
 </details>  
 
 ```mermaid
     sequenceDiagram
-    title Selling a Tool
-    actor u as User
+    title Editing Tool Details
+    actor u as Tool Owner
     participant b as browser
     participant s as server
     participant d as database
     activate u
-    u ->> b: Enter URL
+    u ->> b: Clicks button "Tools" from dropdown menu
     activate b
-    b ->> s: Enter login information
+    b ->> s: Requests for Tools page
     activate s
-    s ->> d: Check if user exists
+    s ->> d: Queries for Tool Owner's tools
     activate d
-    alt is a User
-    d -->> s: User exists
-    s -->> b: User logins in successfully
-    else
-    d -->> s: User doesn't exist
-    s -->> b: Error message
-    b -->> u: Try again
-    end
-    u ->> b: Clicks button (LIST_TOOL)
-    b ->> s: Requests for LIST_TOOL page
-    s -->> b: returns LIST_TOOL page
-    b -->> u: Displays LIST_TOOL page
-    u ->> b: Selects selling as type of listing
-    b ->> s: Requests for sell form
-    s -->> b: Returns form 
-    b -->> u: Displays form
-    u -->> b: Fills out form
-    b ->> s: Sends form 
-    s ->> d: Sends data from form to be stored
-    d -->> s: Tool is added to listings
+    d -->> s: Returns Tool Owner's tools
     deactivate d
-    s -->> b: returns newly updated LIST_TOOL page
-    b -->> u: displays updated LIST_TOOL page
-    u ->> b: Clicks LOG_OFF button
-    b -->> u: User is logged off
+    s -->> b: renders Tools page
     deactivate s
+    b -->> u: Displays Tools page
+    deactivate b
+    u ->> b: Clicks button "Edit Tool"
+    activate b
+    b ->> s: Requests for Tool Information 
+    activate s
+    s ->> d: Queries for Tool Information
+    activate d
+    d -->> s: Returns Tool Information
+    deactivate d
+    s -->> b: Renders Tool Information 
+    deactivate s
+    b -->> u: Displays Tool Information form
+    deactivate b
+    u -->> b: Enters new information and clicks save button
+    activate b
+    b ->> s: POST form
+    activate s
+    s ->> d: Update query to change information stored about tool
+    activate d
+    d -->> s: Returns Tool
+    deactivate d
+    s -->> b: Renders Tool
+    deactivate s
+    b -->> u: Displays Tool with updated details
     deactivate b
     deactivate u
 ```

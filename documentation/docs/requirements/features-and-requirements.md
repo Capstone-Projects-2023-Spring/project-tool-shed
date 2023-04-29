@@ -48,7 +48,7 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
     - The search/filter function applies to the map and list of tools to rent/purchase by different criteria 
 
-    - Search filters include: within # miles, availability status, type of job, rating, and time posted 
+    - Search filters include: within # miles, tool category, tool maker, and user rating
 
 - The system shall have a menu of properties/settings
 
@@ -56,19 +56,21 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
       - Personal details 
 
-      - Payment information 
-
-      - Privacy settings 
-
       - Delete Account 
 
-- The system shall contain a sidebar on the left with the following menus 
+- The system shall contain a bar at the top with the following menus 
 
     - Home 
 
-    - Saved Listings 
+    - Profile
+
+    - Your Tools
 
     - Your Listings 
+
+    - Your Reviews
+
+    - Messages
 
  
 
@@ -78,19 +80,7 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
     - The user will receive recommended tools that are similar to the filter criteria but may not 100% match being based on location and previous searches
 
- 
 
-- The system shall have a “Saved Listings” page which will be accessible through the navigation bar after the user signs in and is also located in the navigation bar. 
-
-    - Saved Listings page will contain two sections. 
-
-      - Saved Sellers/Sheds 
-
-      - Saved Listings 
-
-    - Saved Listings Seller/Sheds section will contain details for any Seller/Shed that the log in user has selected to be a favorite. Details will include (Name, Zip Code, Number of tools listed) Clicking on this section will bring the user to the seller's Tool Shed. 
-
- 
 
 - The system shall have a “Your Listings” page which will be accessible through the navigation bar after the user signs in and is also located in the navigation bar. 
 
@@ -108,7 +98,7 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
  
 
-- The system shall allow users to rate tools (or users) with a star system ranging from 1 to 5 which will become available once a tool has been returned to the owner or a tool has been sold. 
+- The system shall allow users to rate users with a star system ranging from 1 to 5 
 
     - A rating of 1 star would imply the reviewer of the tool (or user) did not have a positive experience and would not recommend it to a friend 
 

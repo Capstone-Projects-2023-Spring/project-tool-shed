@@ -67,7 +67,7 @@ A user wants to edit the details of a tool that they have already added to their
 
 
 
-## Use Case #3 - Creating a Tool Listing
+## Use Case #3 - Listing a Tool
 
 A user would like to rent out tools that they are not currently using to earn some extra money. 
 

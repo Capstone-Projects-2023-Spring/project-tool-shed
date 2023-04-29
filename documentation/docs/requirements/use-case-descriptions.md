@@ -37,6 +37,7 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 
 10. The user clicks the (button: LOG_OFF) and closes the website. 
 
+
  
 
 ## Use Case #2 - Editing Tool Details
@@ -62,6 +63,7 @@ A user wants to edit the details of a tool that they have already added to their
 9. The user clicks on the "General" dropdown menu and clicks on "Tools" where the user will see that the tool description has changed.
 
 10. The user exits the site.
+
 
 
 
@@ -111,55 +113,29 @@ A user has an unexpected afternoon off from work and wants to see what tools are
 
 6. The homeowner can optionally close the website or log out afterwards. 
 
- 
 
  
 
-## Use Case #5 - 
+## Use Case #5 - Review Tool Owner
 
-A user wants to be notified when a nearby Air Blower will be available to be rented so that they can quickly recieve more information of the product being rented.
+A user wants to review their experience with the rented tool and the tool owner.
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the (button: LOGIN).  
+1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
 
-2. The user enters the name of the tool (Air Blower) in the search bar.  
+2. The user clicks on the "General" dropdown menu and clicks on "Create Review". 
 
-3. The user enters the filters to narrow search results 
+3. The user sees a list of users.
 
-    - Zip code #####  
+4. The user finds the user they want to review and clicks the button "Review User".
 
-    - Search Radius: 15 miles 
+5. The user writes a review in the text box and selects a star rating. 
 
-4. The user clicks (button: SEARCH_TOOL) which will complete the request and execute the database query. 
+6. The user clicks submit. 
 
-5. The user is presented with this result 
-
-    - There are no Air Blowers within 15 miles 
-
-    - Show rented out tools 
-
-6. The user clicks (Show Rented Out Tools) which will show if that tool is being rented out in the area. 
-
-7. The user is presented with the following results 
-
-    - <i>Gas Air Blower (NAME) (CONTACT)</i> 
-
-    - <i>Electric (Battery) Air Blower (NAME) (CONTACT)</i> 
-
-    - <i>Electric (Wireless) Air Blower (NAME) (CONTACT)</i> 
-
-8. The user clicks the desired item and receives a prompt. 
-
-    - You will be notified when this item is listed. 
-
-9. The user is notified of desired item and receives a prompt containing the address and additional comments. 
-
-    - You will be notified when this item is currently available and the details to schedule a meet-up with the owner. 
-
-10. The homeowner can close the website or click (button: LOG_OFF). 
+7. The user exits the site.
 
  
 
- 
 
 ## Use Case #6 - Removing a Listing
 

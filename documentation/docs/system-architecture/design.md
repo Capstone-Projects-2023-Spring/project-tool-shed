@@ -141,45 +141,70 @@ The user wants to search their local neighborhood for a hedge trimmer. They woul
 
 [![](https://mermaid.ink/img/pako:eNrVU8lOwzAQ_ZWRT6AuF245VEIqt0DpdkGRkGtPEgvHDl4kqqr_zmRpS6HlDDlZM29zPLNjwkpkCfP4HtEInCpeOF5l5l4E62Dt0WUG6GtOo8lkoG2hzLgMlU5gGTeVCh7aGggXJZqguPZgDays1bAsUcJ6kXYaJ-6IpEaNZAKpLRo2NcbjcytlJH70Vk0NhFbizcPNJoZgTQKLh6fV62o2S2874onQ6A86fal8rfkWHGVrMrX9X72ebR01Dwi5dRVwIztj8O11L1pNeeAb7pH-yTyFeUS3PVoceu2dv_o00AX62hqPR_S58FksXiDhc4e-vB6-zRxrSfnlj-xXXP5Q_PadPWoUNFe2Doom6e6fxO7HkwYaZnl-Sfsbq0dCZtiQVegqriTt4q7hZSyUWGHGEjpKzHnUIWOZ2ROUx2CXWyNYElzEIeueu19dluS0gVRFqWiFH7v9btd8yGpuXqw9YPafkGpRvQ?type=png)](https://mermaid.live/edit#pako:eNrVU8lOwzAQ_ZWRT6AuF245VEIqt0DpdkGRkGtPEgvHDl4kqqr_zmRpS6HlDDlZM29zPLNjwkpkCfP4HtEInCpeOF5l5l4E62Dt0WUG6GtOo8lkoG2hzLgMlU5gGTeVCh7aGggXJZqguPZgDays1bAsUcJ6kXYaJ-6IpEaNZAKpLRo2NcbjcytlJH70Vk0NhFbizcPNJoZgTQKLh6fV62o2S2874onQ6A86fal8rfkWHGVrMrX9X72ebR01Dwi5dRVwIztj8O11L1pNeeAb7pH-yTyFeUS3PVoceu2dv_o00AX62hqPR_S58FksXiDhc4e-vB6-zRxrSfnlj-xXXP5Q_PadPWoUNFe2Doom6e6fxO7HkwYaZnl-Sfsbq0dCZtiQVegqriTt4q7hZSyUWGHGEjpKzHnUIWOZ2ROUx2CXWyNYElzEIeueu19dluS0gVRFqWiFH7v9btd8yGpuXqw9YPafkGpRvQ)
 
-## Sequence Diagram - Notify User when Tool is Available
+## Sequence Diagram - Review Tool Owner
 
-<details><summary>Use Case Notify When Available</summary>
+<details><summary>Use Case Review Tool Owner</summary>
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the ‘Login’ button.  
+A user wants to review their experience with the rented tool and the tool owner.
 
-2. The user clicks on the (button: RENT_TOOL) and completes the following fields. 
+1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
 
-    -Name of Tool: Air Blower 
+2. The user clicks on the "General" dropdown menu and clicks on "Create Review". 
 
-    -Zip Code: ##### 
+3. The user sees a list of users.
 
-    -Search Radius: 15 miles 
+4. The user finds the user they want to review and clicks the button "Review User".
 
-3. The user clicks (button: SEARCH_TOOL) which will complete the request and execute the database query. 
+5. The user writes a review in the text box and selects a star rating. 
 
-4. The user is presented with this result 
+6. The user clicks submit. 
 
-    -There are no Air Blowers within 15 miles 
-
-    -Show rented out tools 
-
-5. The user clicks (Show Rented Out Tools) which will show if that tool is being rented out in the area. 
-
-6. The user is presented with the following results 
-
-    -Gas Air Blower (NAME) (CONTACT) 
-
-    -Electric (Battery) Air Blower (NAME) (CONTACT) 
-
-    -Electric (Wireless) Air Blower (NAME) (CONTACT) 
-
-7. The user clicks the desired item and receives a prompt. 
-
-    -You will be notified when this item is listed. 
+7. The user exits the site.
     
 </details>  
 
-[![](https://mermaid.ink/img/pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38?type=png)](https://mermaid.live/edit#pako:eNq1VD1v2zAQ_SsXTjYaD101ZGiy1S0aKx4KGChO5EkiTJEqP2wIaf57T5Rs2HULdGg1CJR4fO_du-O9CukUiUIE-p7ISnrS2Hjsdhb4QRmdh20gP3336KOWukcbwQAGWLtGWyilJ7K3IWoMecKIFQa63a7G7Q_eHc_403vkg9XDwzswBZSp6nQMYDITEymyUaMJ4Cy8OGegbEnBdrM-S9YHjHSh2sAqoylGe17DcyI_wOKxJbkPHC-TRzmAq285lhNA5Qn3oOs53ccLEegJtJXOe5IRFp6i13RAAzpAsiFJSSHUycxIZzlZXjED1qgN5_ADXlgYNqhnL8mqaaFyBqvsB2ewodA7GwgWm4mPD5dnKjMsL_NezVTZVZ1L1nD8iePacqjmQGn06M6iSjE6WzCljd9Gu0-WZOwZWunQGxzCVI8xlA34gg39Cb13fTJcpAC18x2gVSfCkMt9yXFdt2s_qms__jKXsnVH2Fo8sO1YGcqyw_LfkgYy3BGzJe__b0KfXdT1AB39rjj5BHfn2CYBeu-6nhv1I1HPvgMNBC7FO_jqEhy1MVAR2BFPc5McW7IQW-4ao0PUtslt3Ssunbpjslk8_XLpxL3oyHeoFQ-W1zFoJ2JLHe1EwUuFfr8TO_vGcZiiKwcrRRF9onsxgc9DSBQ13zH-S0rzIPo0Tao8sN5-AiiKg38)
+```mermaid
+    sequenceDiagram
+    title Editing Tool Details
+    actor u as Renter
+    participant b as browser
+    participant s as server
+    participant d as database
+    activate u
+    u ->> b: Clicks button "Create Review" from dropdown menu
+    activate b
+    b ->> s: Requests for users page
+    activate s
+    s ->> d: Queries for users
+    activate d
+    d -->> s: Returns users
+    deactivate d
+    s -->> b: renders user page
+    deactivate s
+    b -->> u: Displays user page
+    deactivate b
+    u ->> b: Clicks button "Review User"
+    activate b
+    b ->> s: Requests for Review user page 
+    activate s
+    s -->> b: Renders Review user page 
+    deactivate s
+    b -->> u: Displays Review user page
+    deactivate b
+    u -->> b: Enters review and star rating and clicks submit
+    activate b
+    b ->> s: POST form
+    activate s
+    s ->> d: Loads data to correct fields
+    activate d
+    d -->> s: Sends accepted data signal
+    deactivate d
+    s -->> b: Renders profile page
+    deactivate s
+    b -->> u: Displays profile page
+    deactivate b
+    deactivate u
+```
 
 ## Sequence Diagram - Editing Tool Details
 
@@ -360,5 +385,4 @@ sequenceDiagram
 ## Algorithms
 Tool Shed will constantly run and execute database queries to determine similar patterns and form submissions through known categories. Once jobs have been completed, Tool Shed will be able to recommend tools and supplies that are known to have successfully completed similar jobs in the past. Using Google YouTube API, search queries will be returned with instructional videos that are highly recommended in the how-to field. 
 
-More TBD 
 

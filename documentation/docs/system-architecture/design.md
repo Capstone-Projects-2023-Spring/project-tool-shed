@@ -27,7 +27,6 @@ classDiagram
         +String first_name;
         +String last_name;
         +Address address;
-        +List~PaymentMethod~ payment_methods;
         +setPassword(String password);
         +passwordMatches(String aPassword) bool;
     }

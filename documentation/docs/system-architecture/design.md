@@ -165,7 +165,6 @@ A user wants to review their experience with the rented tool and the tool owner.
 
 ```mermaid
     sequenceDiagram
-    title Editing Tool Details
     actor u as Renter
     participant b as browser
     participant s as server
@@ -236,7 +235,6 @@ A user wants to edit the details of a tool that they have already added to their
 
 ```mermaid
     sequenceDiagram
-    title Editing Tool Details
     actor u as Tool Owner
     participant b as browser
     participant s as server

@@ -146,7 +146,7 @@ The user wants to search their local neighborhood for a hedge trimmer. They woul
 
 A user wants to review their experience with the rented tool and the tool owner.
 
-1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website. 
 
 2. The user clicks on the "General" dropdown menu and clicks on "Create Review". 
 
@@ -209,7 +209,7 @@ A user wants to review their experience with the rented tool and the tool owner.
 <details><summary>Use Case Editing Tool Details</summary>
 A user wants to edit the details of a tool that they have already added to their account. 
 
-1. The user navigates to the website, logs in to their account, and ends up at the homepage of the website. 
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website. 
 
 2. The user clicks on the "General" dropdown menu and clicks on "Tools". 
 
@@ -280,31 +280,33 @@ A user wants to edit the details of a tool that they have already added to their
 
 ## Sequence Diagram - Listing a Tool
 <details><summary>Use Case Listing a Tool</summary>
-The user would like to rent out tools that they are not currently using to earn some extra money.
+A user would like to rent out tools that they are not currently using to earn some extra money. 
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the (button: LOGIN).
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website. 
 
-2. The user clicks on the (button: LIST_TOOL) and completes the following fields.
+2. The user clicks on the "General" dropdown menu and clicks on "Add Tool". 
 
-    - Name of Tool
+3. The user fills out the form
 
-    - Zip Code: #####
+    - Name of Tool 
 
-    - Type of Tool (Electric, Battery, Wireless, etc.)
+    - Description 
 
-    - Type of Listing (For Rent)
+    - Category
 
-    - Price (Price per hour/day/week)
+    - Maker
 
-3. The user clicks on the (button: INSERT_IMAGE) to upload images of the tool.
+3. The user adds a YouTube video on how to use tool, photo and/or manual.
 
-4. The user clicks the (button: SUBMIT) to add tool to the list of tools for rent.
+4. The user clicks the button "Create".
 
-5. The user is brought to the local listings menu once submission is successful.
+5. The user scrolls down to Listings and clicks "+ New Listings".
 
-6. The user clicks on the (button: LIST_TOOL) to repeat the process for as many tools as they would like to list for rent.
+6. The user clicks "Active" and fills out price, max # of billing intervals and billing interval.
 
-7. The user can then close the website or click the (button: LOG_OFF).
+7. The user clicks "Create" to create a new listing.
+
+5. The user can scroll down to Listings and click "+ New Listings" to create more listings of the same tool or exits the site.
 
 
 </details>  

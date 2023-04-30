@@ -5,37 +5,17 @@ sidebar_position: 5
 # Use-case descriptions
 ## Use Case #1  - Search for Tool Listings
 
-A user wants to search their local neighborhood for a hedge trimmer. They use tool shed to find the tool so that they get the job done today and do not go over their budget to purchase a brand-new one. 
+A user wants to search their local neighborhood for a hedge trimmer. They use Tool Shed to find a tool so that they can get the job done today and not go over their budget to purchase a brand-new one. 
 
-1. The user navigates to sharemytoolshed.com/
+1. The user navigates to http://toolshed.symer.io:5000/ and clicks on "Log In" to sign in to their account.
 
-2. The user clicks the (LOGIN) button in the nav bar
+2. The user enters a tool (eg. hedge trimmer) into the Search Query
 
-3. The user enters their email and password. 
+4. The user adjusts some of the filters (eg. Tool Category, Tool Maker, User Rating, Search Radius) to narrow down their search.
 
-4. The user clicks the (LOGIN) button. They're redirected back to sharemytooshed.com/.
+5. The user is presented with red pins on the map if there are any active tool listings that fit the search query.
 
-5. The user adjusts the search parameters in the search form to: 
-
-    - Search Radius: 15 kilometers
-
-    - Maker: Rigid
-
-6. The user clicks the (button: SEARCH_TOOL) which will complete the request and execute the database query. 
-
-7. The user is presented with 3 search results 
-
-    - AVAILABLE: <i>Gas Hedge Trimmer (NAME) (CONTACT)</i> 
-
-    - AVAILABLE: <i>Electric (Battery) Hedge Trimmer (NAME) (CONTACT)</i> 
-
-    - AVAILABLE: <i>Electric (Wireless) Hedge Trimmer (NAME) (CONTACT)</i> 
-
-8. The user clicks option 3, which is within their budget so they can afford the tool, and clicks the (button: CONTACT) and is presented with the contact information for Electric (Wireless) Hedge Trimmer. 
-
-9. The user contacts the person responsible for Electric (Wireless) Hedge Trimmer. 
-
-10. The user clicks the (button: LOG_OFF) and closes the website. 
+6. The user can either click on the red pin to get the tool listing details or they can exit the website.
 
 
 

@@ -152,7 +152,7 @@ A user wants to edit the details of a tool that they have already added to their
 
 9. The user clicks on the "General" dropdown menu and clicks on "Tools" where the user will see that the tool description has changed.
 
-10. The user exits the site.
+10. The user exits the website.
 
 
 </details>  
@@ -231,7 +231,7 @@ A user would like to rent out tools that they are not currently using to earn so
 
 7. The user clicks "Create" to create a new listing.
 
-5. The user can scroll down to Listings and click "+ New Listings" to create more listings of the same tool or exits the site.
+5. The user can scroll down to Listings and click "+ New Listings" to create more listings of the same tool or exits the website.
 
 
 </details>  
@@ -260,7 +260,7 @@ As someone who uses this site to rent tools to make extra money, the user wants 
 
 6. The user clicks on "Save".
 
-7. The user exits the site.
+7. The user exits the website.
     
 </details>
 
@@ -329,7 +329,7 @@ A user wants to review their experience with the rented tool and the tool owner.
 
 6. The user clicks submit. 
 
-7. The user exits the site.
+7. The user exits the website.
     
 </details>  
 

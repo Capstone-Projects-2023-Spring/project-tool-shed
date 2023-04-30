@@ -89,42 +89,57 @@ A user wants to search their local neighborhood for a hedge trimmer. They use To
 [![](https://mermaid.ink/img/pako:eNrVU8lOwzAQ_ZWRT6AuF245VEIqt0DpdkGRkGtPEgvHDl4kqqr_zmRpS6HlDDlZM29zPLNjwkpkCfP4HtEInCpeOF5l5l4E62Dt0WUG6GtOo8lkoG2hzLgMlU5gGTeVCh7aGggXJZqguPZgDays1bAsUcJ6kXYaJ-6IpEaNZAKpLRo2NcbjcytlJH70Vk0NhFbizcPNJoZgTQKLh6fV62o2S2874onQ6A86fal8rfkWHGVrMrX9X72ebR01Dwi5dRVwIztj8O11L1pNeeAb7pH-yTyFeUS3PVoceu2dv_o00AX62hqPR_S58FksXiDhc4e-vB6-zRxrSfnlj-xXXP5Q_PadPWoUNFe2Doom6e6fxO7HkwYaZnl-Sfsbq0dCZtiQVegqriTt4q7hZSyUWGHGEjpKzHnUIWOZ2ROUx2CXWyNYElzEIeueu19dluS0gVRFqWiFH7v9btd8yGpuXqw9YPafkGpRvQ?type=png)](https://mermaid.live/edit#pako:eNrVU8lOwzAQ_ZWRT6AuF245VEIqt0DpdkGRkGtPEgvHDl4kqqr_zmRpS6HlDDlZM29zPLNjwkpkCfP4HtEInCpeOF5l5l4E62Dt0WUG6GtOo8lkoG2hzLgMlU5gGTeVCh7aGggXJZqguPZgDays1bAsUcJ6kXYaJ-6IpEaNZAKpLRo2NcbjcytlJH70Vk0NhFbizcPNJoZgTQKLh6fV62o2S2874onQ6A86fal8rfkWHGVrMrX9X72ebR01Dwi5dRVwIztj8O11L1pNeeAb7pH-yTyFeUS3PVoceu2dv_o00AX62hqPR_S58FksXiDhc4e-vB6-zRxrSfnlj-xXXP5Q_PadPWoUNFe2Doom6e6fxO7HkwYaZnl-Sfsbq0dCZtiQVegqriTt4q7hZSyUWGHGEjpKzHnUIWOZ2ROUx2CXWyNYElzEIeueu19dluS0gVRFqWiFH7v9btd8yGpuXqw9YPafkGpRvQ)
 
 
-## Sequence Diagram 2 - Remove a Tool Listing
+## Sequence Diagram 2 - Find Nearby Tool Listings
 
-<details><summary>Use Case Remove a Tool Listing</summary>
+<details><summary>Use Case Find Nearby Tool Listings</summary>
 
+A user has an unexpected afternoon off from work and wants to see what tools are available now to see what projects they can complete around the house. 
 
-As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use. 
+1. The homeowner visits the website, logs in to their account, and ends up on the homepage of the website.
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the ‘Login’ button. 
+2. The homeowner scrolls down to the map.
 
-2. The user clicks on the (button: ACTIVE_LISTINGS) and is presented with their active listings 
+4. The homeowner is able to adjust the Search Radius.
 
-    - AVAILABLE: <i>Gas Hedge Trimmer (NAME) (CONTACT) (EDIT)</i> 
+5. The homeowner is presented with red pins on the map if there are any nearby listings.
 
-    - AVAILABLE: <i>Circular Saw (NAME) (CONTACT) (EDIT)</i> 
-
-    - AVAILABLE: <i>20-Gal Electric Air Compressor (NAME) (CONTACT) (EDIT)</i> 
-
-3. The user clicks on the (button: EDIT) associated with the listing they would like to change 
-
-4. The user is presented with the following choices 
-
-    - Header: AVAILABLE: <i>20-Gal Electric Air Compressor (NAME) (CONTACT)</i> 
-
-      - Change Availability (button: AVAILABLE) (button: NOT_AVAILABLE) 
-
-      - Change Contact Information (button: CHANGE_CONTACT_INFO) 
-
-      - Change Description (button: MODIFY_DESCRIPTION) 
-
-5. The user will select the (button: NOT_AVAILABLE) to remove the listing from the public eye. Now this tool cannot be rented, and it is only for personal use by the original lister 
-
-6. If the user wishes to list the same tool again, they click the Change Availability (button: AVAILABLE) to re-list the tool 
+6. The homeowner can click on any of the red pins to view the tool listing details or exit the website.
 
 </details> 
 
-[![](https://mermaid.ink/img/pako:eNptksFOGzEQhl9l5BMVJA-wB6QUeqgUqMSGnixVE3vYteIdB8-YKkK8e-2waQPqzfI_3_if3_NqXPJkOiP0XIgd3QYcMk6W0WnKUAAFHoWy5T1mDS7skRViavfrNASG3mUi_qj7Jt-i4haFPqFHMogGHuCOuHyUpck9aZNl1quV8IJKUM9lcX19GVMHfdlOQaVaaSaqB0-sAaNAYtikFKEfycPjw9pyTI3yHdyM5HYCmkCIIDxBqaNBEKgt_F-7GNWyr8iiPfRAmgO91F5SnCORpxLjYW66KF2LYWjDBF4ul5Ypth4Nb_R90nNuxiq1yQfAAUNNjtifButgW1QT38TgduQvvlRgfkbG9HvVkqA5PWnqEZP_YHKGnfI8B9yIPFCvqEUu7n9sfq1-rr6vV1_X387gd3mu_RyAp38fY67MRHnC4OsuvVoGsEZHmsiarh495p01lt9qHRZN_YGd6TQXujJlX5M_7d3pknyo63f3vpvHFX37A8Pq8ZU?type=png)](https://mermaid.live/edit#pako:eNptksFOGzEQhl9l5BMVJA-wB6QUeqgUqMSGnixVE3vYteIdB8-YKkK8e-2waQPqzfI_3_if3_NqXPJkOiP0XIgd3QYcMk6W0WnKUAAFHoWy5T1mDS7skRViavfrNASG3mUi_qj7Jt-i4haFPqFHMogGHuCOuHyUpck9aZNl1quV8IJKUM9lcX19GVMHfdlOQaVaaSaqB0-sAaNAYtikFKEfycPjw9pyTI3yHdyM5HYCmkCIIDxBqaNBEKgt_F-7GNWyr8iiPfRAmgO91F5SnCORpxLjYW66KF2LYWjDBF4ul5Ypth4Nb_R90nNuxiq1yQfAAUNNjtifButgW1QT38TgduQvvlRgfkbG9HvVkqA5PWnqEZP_YHKGnfI8B9yIPFCvqEUu7n9sfq1-rr6vV1_X387gd3mu_RyAp38fY67MRHnC4OsuvVoGsEZHmsiarh495p01lt9qHRZN_YGd6TQXujJlX5M_7d3pknyo63f3vpvHFX37A8Pq8ZU)
+```mermaid
+    sequenceDiagram
+    actor u as Renter
+    participant b as browser
+    participant s as server
+    participant d as database
+    activate u
+    u ->> b: Adjusts the Search Radius 
+    activate b
+    b ->> s: Requests for Tool Listings that fit within the search radius
+    activate s
+    s ->> d: Queries for Tool Listings that fit within the search radius
+    activate d
+    d -->> s: Returns Tool Listings that fit within the search radius
+    deactivate d
+    s -->> b: renders Tool Listings that fit within the search radius
+    deactivate s
+    b -->> u: Displays Tool Listings that fit within the search radius
+    deactivate b
+    u ->> b: Clicks on a red pin that represents a listing
+    activate b
+    b ->> s: Requests for Tool Listing Details page of a specific listing
+    activate s
+    s ->> d: Queries for Tool Listing Details page of a specific listing
+    activate d
+    d -->> s: Returns Tool Listing Details page of a specific listing
+    deactivate d
+    s -->> b: Renders Tool Listing Details page of a specific listing
+    deactivate s
+    b -->> u: Displays Tool Listing Details page of a specific listing
+    deactivate b
+    deactivate u
+```
 
 
 

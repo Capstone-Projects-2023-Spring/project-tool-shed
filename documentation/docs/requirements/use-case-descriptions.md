@@ -3,7 +3,7 @@ sidebar_position: 5
 ---
 
 # Use-case descriptions
-## Use Case #1  - Searching for Tools
+## Use Case #1  - Search for Tool Listings
 
 A user wants to search their local neighborhood for a hedge trimmer. They use tool shed to find the tool so that they get the job done today and do not go over their budget to purchase a brand-new one. 
 
@@ -38,9 +38,28 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 10. The user clicks the (button: LOG_OFF) and closes the website. 
 
 
+
+
+## Use Case #2  - Find Nearby Tool Listings
+
+A user has an unexpected afternoon off from work and wants to see what tools are available now to see what projects they can complete around the house. 
+
+1. The homeowner visits the base URL of the website (apex hostname and root path) 
+
+2. If the homeowner isn’t logged in, they are presented with controls to do so 
+
+3. The homeowner is brought to their user homescreen/dashboard 
+
+4. The homeowner clicks the button “Nearby Now”, which takes them to a screen where they can browse the tools that are available to borrow and are within a search radius that is adjustable via scrubber bar control. 
+
+5. The homeowner selects a tool and is presented with contact information for the owner of the tool. 
+
+6. The homeowner can optionally close the website or log out afterwards. 
+
+
  
 
-## Use Case #2 - Editing Tool Details
+## Use Case #3 - Edit Tool Details
 
 A user wants to edit the details of a tool that they have already added to their account. 
 
@@ -67,7 +86,7 @@ A user wants to edit the details of a tool that they have already added to their
 
 
 
-## Use Case #3 - Listing a Tool
+## Use Case #4 - List a Tool
 
 A user would like to rent out tools that they are not currently using to earn some extra money. 
 
@@ -99,49 +118,8 @@ A user would like to rent out tools that they are not currently using to earn so
 
  
 
- 
 
-## Use Case #4  - Finding Nearby Tools
-
-A user has an unexpected afternoon off from work and wants to see what tools are available now to see what projects they can complete around the house. 
-
-1. The homeowner visits the base URL of the website (apex hostname and root path) 
-
-2. If the homeowner isn’t logged in, they are presented with controls to do so 
-
-3. The homeowner is brought to their user homescreen/dashboard 
-
-4. The homeowner clicks the button “Nearby Now”, which takes them to a screen where they can browse the tools that are available to borrow and are within a search radius that is adjustable via scrubber bar control. 
-
-5. The homeowner selects a tool and is presented with contact information for the owner of the tool. 
-
-6. The homeowner can optionally close the website or log out afterwards. 
-
-
- 
-
-## Use Case #5 - Review Tool Owner
-
-A user wants to review their experience with the rented tool and the tool owner.
-
-1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website. 
-
-2. The user clicks on the "General" dropdown menu and clicks on "Create Review". 
-
-3. The user sees a list of users.
-
-4. The user finds the user they want to review and clicks the button "Review User".
-
-5. The user writes a review in the text box and selects a star rating. 
-
-6. The user clicks submit. 
-
-7. The user exits the site.
-
- 
-
-
-## Use Case #6 - Removing a Listing
+ ## Use Case #5 - Remove a Tool Listing
 
 As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use. 
 
@@ -170,3 +148,26 @@ As someone who uses this site to rent tools to make extra money, the user wants 
 5. The user will select the (button: NOT_AVAILABLE) to remove the listing from the public eye. Now this tool cannot be rented, and it is only for personal use by the original lister 
 
 6. If the user wishes to list the same tool again, they click the Change Availability (button: AVAILABLE) to re-list the tool 
+ 
+
+
+
+## Use Case #6 - Review Tool Owner
+
+A user wants to review their experience with the rented tool and the tool owner.
+
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website. 
+
+2. The user clicks on the "General" dropdown menu and clicks on "Create Review". 
+
+3. The user sees a list of users.
+
+4. The user finds the user they want to review and clicks the button "Review User".
+
+5. The user writes a review in the text box and selects a star rating. 
+
+6. The user clicks submit. 
+
+7. The user exits the site.
+
+

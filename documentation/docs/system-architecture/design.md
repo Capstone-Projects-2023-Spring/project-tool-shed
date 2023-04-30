@@ -259,21 +259,23 @@ A user would like to rent out tools that they are not currently using to earn so
 ## Sequence Diagram 5 - Remove a Tool Listing
 
 <details>
-    <summary>As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use.</summary>
+    <summary>Use Case Remove a Tool Listing</summary>
     
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the ‘Login’ button.
-2. The user clicks on the (button: ACTIVE_LISTINGS) and is presented with their active listings
-    - AVAILABLE: Gas Hedge Trimmer (NAME) (CONTACT) (EDIT)
-    - AVAILABLE: Circular Saw (NAME) (CONTACT) (EDIT)
-    - AVAILABLE: 20-Gal Electric Air Compressor (NAME) (CONTACT) (EDIT)
-3. The user clicks on the (button: EDIT) associated with the listing they would like to change
-4. The user is presented with the following choices
-    - Header: AVAILABLE: 20-Gal Electric Air Compressor (NAME) (CONTACT)
-    - Change Availability (button: AVAILABLE) (button: NOT_AVAILABLE)
-    - Change Contact Information (button: CHANGE_CONTACT_INFO)
-    - Change Description (button: MODIFY_DESCRIPTION)
-5. The user will select the (button: NOT_AVAILABLE) to remove the listing from the public eye. Now this tool cannot be rented, and it is only for personal use by the original lister
-6. If the user wishes to list the same tool again, they click the Change Availability (button: AVAILABLE) to re-list the tool
+As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use. 
+
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website.  
+
+2. The user clicks on the "General" dropdown menu and clicks on "Listings" to view their current listings. 
+
+3. The user selects a listing that they want to remove and clicks on "Edit".
+
+4. The user scrolls down to "Listings" and sees the "Active" button which is blue to show it's active.
+
+5. The user clicks on the "Active" button and it turns grey, which shows it's inactive now.
+
+6. The user clicks on "Save".
+
+7. The user exits the site.
     
 </details>
 

@@ -44,17 +44,15 @@ A user wants to search their local neighborhood for a hedge trimmer. They use to
 
 A user has an unexpected afternoon off from work and wants to see what tools are available now to see what projects they can complete around the house. 
 
-1. The homeowner visits the base URL of the website (apex hostname and root path) 
+1. The homeowner visits the website, logs in to their account, and ends up on the homepage of the website.
 
-2. If the homeowner isn’t logged in, they are presented with controls to do so 
+2. The homeowner scrolls down to the map.
 
-3. The homeowner is brought to their user homescreen/dashboard 
+4. The homeowner is able to adjust the Search Radius.
 
-4. The homeowner clicks the button “Nearby Now”, which takes them to a screen where they can browse the tools that are available to borrow and are within a search radius that is adjustable via scrubber bar control. 
+5. The homeowner is presented with red pins on the map if there are any nearby listings.
 
-5. The homeowner selects a tool and is presented with contact information for the owner of the tool. 
-
-6. The homeowner can optionally close the website or log out afterwards. 
+6. The homeowner can click on any of the red pins to view the tool listing details or exit the website.
 
 
  
@@ -123,34 +121,22 @@ A user would like to rent out tools that they are not currently using to earn so
 
 As someone who uses this site to rent tools to make extra money, the user wants to be able to remove a tool listing to make sure it is available for their personal use. 
 
-1. The user navigates to (URL:TBD) and enters their username and password followed by clicking the ‘Login’ button. 
+1. The user navigates to the website, logs in to their account, and ends up on the homepage of the website.  
 
-2. The user clicks on the (button: ACTIVE_LISTINGS) and is presented with their active listings 
+2. The user clicks on the "General" dropdown menu and clicks on "Listings" to view their current listings. 
 
-    - AVAILABLE: <i>Gas Hedge Trimmer (NAME) (CONTACT) (EDIT)</i> 
+3. The user selects a listing that they want to remove and clicks on "Edit".
 
-    - AVAILABLE: <i>Circular Saw (NAME) (CONTACT) (EDIT)</i> 
+4. The user scrolls down to "Listings" and sees the "Active" button which is blue to show it's active.
 
-    - AVAILABLE: <i>20-Gal Electric Air Compressor (NAME) (CONTACT) (EDIT)</i> 
+5. The user clicks on the "Active" button and it turns grey, which shows it's inactive now.
 
-3. The user clicks on the (button: EDIT) associated with the listing they would like to change 
+6. The user clicks on "Save".
 
-4. The user is presented with the following choices 
+7. The user exits the site.
 
-    - Header: AVAILABLE: <i>20-Gal Electric Air Compressor (NAME) (CONTACT)</i> 
 
-      - Change Availability (button: AVAILABLE) (button: NOT_AVAILABLE) 
-
-      - Change Contact Information (button: CHANGE_CONTACT_INFO) 
-
-      - Change Description (button: MODIFY_DESCRIPTION) 
-
-5. The user will select the (button: NOT_AVAILABLE) to remove the listing from the public eye. Now this tool cannot be rented, and it is only for personal use by the original lister 
-
-6. If the user wishes to list the same tool again, they click the Change Availability (button: AVAILABLE) to re-list the tool 
  
-
-
 
 ## Use Case #6 - Review Tool Owner
 

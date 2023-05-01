@@ -98,14 +98,13 @@ classDiagram
 
 ## Components & Interfaces
 
-Toolshed is a thin-client webapp that loads/stores data from/in PostgreSQL.
+Toolshed is a webapp that primarily uses ExpressJS, Sequelize, ReactJS, and PostgreSQL.
 
 The primary component of Toolshed is the backend webserver. The backend server implements the data model in the previous section via the Sequelize ORM, which manages migrations (table creation/updates based on data model changes) & query generation. Each endpoint on the backend server serves an HTML page based on data it loads from the database.
 
 The database is PostgreSQL, which uses a TCP protocol (not too dissimilar to a binary version of HTTP) to transmit queries and result sets. As mentioned before, Sequelize will manage the schema of the database.
 
-The client/frontend is currently a basic form-driven static HTML affair, with the expectation that as interactivity increases, the "thickness" of the client increases to the point where there is no more UI logic on the backend. This is made easier by the fact that the backend and frontend are both JavaScript.
-
+The client/frontend is a non-single-page React app. About half of the frontend code is ready to be ported to single page, while some of it still uses HTTP forms.
 
 ## Sequence Diagram 1 - Search for Tool Listings
 

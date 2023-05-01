@@ -17,12 +17,6 @@ classDiagram
         +double geocoded_lat;
         +double geocoded_lon;
     }
-    class PaymentMethod {
-        +int id;
-        +String label;
-        +Blob data;
-        +int type;
-    }
     class User{
         +int id;
         +String email;
@@ -81,6 +75,7 @@ classDiagram
         +int size;
         +string mimeType;
         +User uploader;
+        +string getURL();
     }
 
     Tool --> FileUpload
@@ -93,7 +88,6 @@ classDiagram
     Listing --> Tool
     Tool --> User
     User --> Address
-    User --> PaymentMethod
 ```
 
 ## Components & Interfaces

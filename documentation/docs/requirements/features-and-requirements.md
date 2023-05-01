@@ -58,11 +58,15 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
       - Delete Account 
 
-- The system shall contain a bar at the top with the following menus 
+- The system shall contain a navigation bar at the top with the following menus/sub-menus
 
     - Home 
 
-    - Profile
+    - General
+
+    - Login / Sign Up
+
+    - Add Tools
 
     - Your Tools
 
@@ -72,13 +76,17 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
     - Messages
 
+    - About
+
  
 
-- The system shall show no listings if none are found that meet the filter criteria, the home page of the Tool Shed contains suggestions of other tools nearby 
+- The system shall show no listings if none are found that meet the filter criteria, the listing details page of a selected tool contains suggestions of other tools with similar criteria
 
-    - The user will only receive tool recommendations if there is no tool that fits the filters for a particular search 
+    - The user will only receive tool recommendations if there are tools that match the Category/Maker/Distance of the tool selected by viewing the listing details page 
 
-    - The user will receive recommended tools that are similar to the filter criteria but may not 100% match being based on location and previous searches
+    - The user will receive recommended tools that are similar to the filter criteria but may not 100% match
+
+    - The user will have reccomendations displayed under another tool's listing detail information
 
 
 
@@ -92,9 +100,9 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
     - Your Listings Active will have details regarding your tools available for rent/purchase. Details will include (Tool Name, Type, Description, Cost, Availability, Owner) 
 
-      - Listing details will show either available, or the location of the tool if the tool is currently in use by another registered user 
+      - Listing details will show either available, or the location of the tool if the tool is currently in use by another registered user (not available)
 
-    - Your Listings Inactive will have similar details regarding your tools, but will be highlighted with a red background. Details will include (Tool Name, Type, Description, Cost, Availability, Owner) 
+    - Your Listings (Inactive) will have similar details regarding your tools, but will be highlighted with a red background. Details will include (Tool Name, Type, Description, Cost, Availability, Owner) 
 
  
 
@@ -106,26 +114,28 @@ For users seeking to sell or lend their tools to others, the listing process inv
 
  - The system shall allow users will have access to contact information of other users
 
-    - A notification will consist of the meeting address and the instructions from the seller/renter (TO BE EDITED)
- 
+    - Users will be able to contact owners directly from a listing details page
+
+    - Users can use the built-in messaging system to contact the owner of the tool and set up a date, time, and transaction information in order to recieve their requested tool
+
 
  
 
 ## Nonfunctional Requirements 
 
-- Tool-Shed will have a simple, easy to understand user-interface throughout. 
+- Tool-Shed will have a simple, easy to understand user-interface throughout 
 
-    - Multiple listings will be contained per row/column that are interactive. 
+    - Multiple listings will be contained in the map portion of the main page, each listing is interactive 
 
-      - Clicking on each listing from this initial page will take you to a more detailed view of the specific listing. 
+      - Clicking on each listing from this map will take you to a more detailed view of the specific listing, refered to as the listing details page
 
-      - From this more detailed listing, users will be shown a pin on a map letting them know the general vicinity of the tool.  
+      - From this listing details page, users will be shown a breakdown of all of the information associated with the tool and listing (photo, YouTube video, description, maker, etc.)  
 
-    - The listings on the initial search menu will provide only necessary information to determine if it may be a good candidate for purchase/rent. 
+    - The listings shown on the initial search map will provide only necessary information to determine if it may be a good candidate for purchase/rent 
 
-      - In the case of multiple images, a carousel feature will cycle through them. 
+      - Information shown includes the name and description of the tool which is associated to the listing 
 
-- Rendering at max 10 listings, the Tool Shed web app should load listings in under one minute
+- The Tool Shed web app should load listings in under 20 seconds
 
 - Users must have verifiable identification
 
@@ -140,3 +150,7 @@ For users seeking to sell or lend their tools to others, the listing process inv
 - The mapping/search navigation system will only show relevant United States information
 
 - Meeting locations must be in a map-friendly format (Street, Zip, State) format
+
+- Videos added to a tool must be from YouTube
+
+- Descriptions can be no longer than 250 characters

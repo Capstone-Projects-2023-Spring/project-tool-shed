@@ -13,6 +13,9 @@ classDiagram
         +String city;
         +String state;
         +String zip_code;
+        +bool geocoded;
+        +double geocoded_lat;
+        +double geocoded_lon;
     }
     class PaymentMethod {
         +int id;
@@ -22,10 +25,11 @@ classDiagram
     }
     class User{
         +int id;
-        +String email_address;
-        +Blob password_digest;
+        +String email;
+        +Blob password_hash;
         +String first_name;
         +String last_name;
+        +bool active;
         +Address address;
         +setPassword(String password);
         +passwordMatches(String aPassword) bool;
@@ -36,9 +40,14 @@ classDiagram
     }
     class Tool {
         +int id;
+        +String name;
         +String description;
+        +String video;
         +ToolCategory category;
         +ToolMaker maker;
+        +User owner;
+        +FileUpload manual;
+        +FileUpload photo;
     }
     class ToolMaker {
         +int id;
@@ -47,11 +56,42 @@ classDiagram
     class Listing {
         +Tool tool;
         +double price;
+        +BillingInterval billingInterval;
+        +int maxBillingIntervals;
+        +bool active;
     }
+
+    class UserMessage {
+        +String content;
+        +User sender;
+        +User recipient;
+        +Listing listing;
+    }
+
+    class UserReview {
+        +String content;
+        +int ratings;
+        +User reviewer;
+        +User reviewee;
+    }
+
+    class FileUpload {
+        +string path;
+        +string originalName;
+        +int size;
+        +string mimeType;
+        +User uploader;
+    }
+
+    Tool --> FileUpload
+    FileUpload --> User
+    UserReview --> User
+    UserMessage --> User
+    UserMessage --> Listing
     Tool --> ToolCategory
     Tool --> ToolMaker
     Listing --> Tool
-    Listing --> User
+    Tool --> User
     User --> Address
     User --> PaymentMethod
 ```

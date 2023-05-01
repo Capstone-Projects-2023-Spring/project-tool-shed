@@ -1,6 +1,6 @@
 {
   "label": "Jest Results",
-  "position": 8,
+  "position": 4,
   "link": {
     "type": "generated-index",
     "description": "The results from running tests."
